@@ -1,0 +1,18 @@
+.address {
+  font-size: x-small;
+  font-weight: bold;
+}
+
+.dice-display{
+    height: 5rem;
+    aspect-ratio: 1;
+    display: block;
+}
+
+.ml-150{
+  margin-left: 150px;
+}
+
+.mr-20{
+  margin-right: 20px;
+}
