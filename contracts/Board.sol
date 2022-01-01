@@ -100,19 +100,15 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		b.buildType = 1;
 	}
 
-	/// @dev pseudo-random function
+	/// @dev pseudo-random function.
 	/// @return a random value in between [0, type(uint16).max]
-	//function getRandomKeccak256(address user) public view returns (uint16) {
-	function getKeccak256RandomNumber() public view returns (uint16) {
-		/*return
-			uint16(((uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, user))) %
-			type(uint16).max) % 6) + 1);
-		*/
+
+	function getRandomKeccak256() public view returns (uint16) {
 
 		return
-			uint16(
-				((uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % type(uint16).max) % 6) + 1
-			);
+			uint16(((uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, msg.sender))) %
+			type(uint16).max) % 6) + 1);
+
 	}
 
 	/**
