@@ -68,4 +68,5 @@ contract("BoardContract", async (accounts) => {
       ).to.equal(true);
     }
   });
+
 });
