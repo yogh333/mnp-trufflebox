@@ -1,6 +1,7 @@
 const Board = artifacts.require("BoardContract");
 const utils = require("./utils.js");
 
+
 contract("BoardContract", async (accounts) => {
   beforeEach(async function () {
     BoardInstance = await Board.new();
@@ -48,8 +49,6 @@ contract("BoardContract", async (accounts) => {
       b.build_lvl,
       b.max_pawns
     );
-
-    // console.log(result.logs[0].args);
 
     let edition_nb = result.logs[0].args["new_edition_nb"].toNumber();
     expect((await BoardInstance.getMaxEdition()).toNumber()).to.equal(1);

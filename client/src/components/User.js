@@ -11,6 +11,8 @@ import BuildJson from "../contracts/BuildContract.json";
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
 
+const CELLS_ON_BOARD = 40;
+
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
@@ -94,10 +96,10 @@ export default function User(props) {
    * @param total
    */
   function handleNewPosition(previousPosition, total) {
-    const newCell = previousPosition + total;
+    const newCell = (previousPosition + total) % CELLS_ON_BOARD;
 
     //TODO: to define more accurately
-    if (newCell >= 40) return;
+    //if (newCell >= 40) return;
     highlightCurrentCell(newCell);
     setCurrentPosition(newCell);
     forgetPreviousPosition(previousPosition);
