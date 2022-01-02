@@ -2,6 +2,7 @@
 
 const Board = artifacts.require("BoardContract");
 
+
 const utils = require("./utils.js");
 
 contract("BoardContract", async (accounts) => {
@@ -45,6 +46,7 @@ contract("BoardContract", async (accounts) => {
       max_pawns: 100,
 
     };
+
 
     let result = await BoardInstance.newBoard(
       b.lands,
