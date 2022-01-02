@@ -1,8 +1,8 @@
 // Board.test.js
 
 const Board = artifacts.require("BoardContract");
-const utils = require("./utils.js");
 
+const utils = require("./utils.js");
 
 contract("BoardContract", async (accounts) => {
   beforeEach(async function () {
@@ -10,6 +10,7 @@ contract("BoardContract", async (accounts) => {
 
     deployer = accounts[0];
   });
+
 
   it("should return proper number of lands ", async function () {
     expect((await BoardInstance.getNbLands(0)).toNumber()).to.equal(40);
@@ -42,6 +43,7 @@ contract("BoardContract", async (accounts) => {
       build_lvl: 4,
       buildings: [1, 2, 3, 6, 8],
       max_pawns: 100,
+
     };
 
     let result = await BoardInstance.newBoard(

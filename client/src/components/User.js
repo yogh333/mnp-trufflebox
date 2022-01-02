@@ -6,7 +6,6 @@ import MonoJson from "../contracts/MonoContract.json";
 import BankJson from "../contracts/BankContract.json";
 import PropJson from "../contracts/PropContract.json";
 import BoardJson from "../contracts/BoardContract.json";
-import BuildJson from "../contracts/BuildContract.json";
 
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
@@ -97,9 +96,7 @@ export default function User(props) {
    */
   function handleNewPosition(previousPosition, total) {
     const newCell = (previousPosition + total) % CELLS_ON_BOARD;
-
-    //TODO: to define more accurately
-    //if (newCell >= 40) return;
+    
     highlightCurrentCell(newCell);
     setCurrentPosition(newCell);
     forgetPreviousPosition(previousPosition);

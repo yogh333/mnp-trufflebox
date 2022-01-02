@@ -21,8 +21,6 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	/// @param _pawnID pawn's ID
 	event ePawn(uint16 indexed _edition, uint256 indexed _pawnID);
 
-	event GenerateRandomResult(uint256 randomResult);
-
 	/// @dev structure used to store pawn's attribute
 	struct PawnStruct {
 		bool isOnBoard;
@@ -100,8 +98,11 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		b.buildType = 1;
 	}
 
-	/// @dev pseudo-random function.
-	/// @return a random value in between [0, type(uint16).max]
+
+	/**
+	 * @dev pseudo-random function to simulate the roll of dice in the game
+	 * @return a random value in between [0, type(uint16).max]
+	 */
 
 	function getRandomKeccak256() public view returns (uint16) {
 
@@ -128,7 +129,6 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
 		randomResult = (randomness % 6) + 1;
 
-		emit GenerateRandomResult(randomResult);
 	}
 
 	/**
