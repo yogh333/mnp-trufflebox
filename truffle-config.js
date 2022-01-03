@@ -46,6 +46,14 @@ module.exports = {
       network_id: "*", // Any network (default: none)
     },
 
+    kovan: {
+      provider: () =>
+        new HDWalletProvider('solar such lumber firm inhale combine old hint neutral obscure fiber dumb', 'https://kovan.infura.io/v3/0cf118ade5ad413a8bd22c155b396750'),
+      network_id: 42
+    },
+
+
+
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port

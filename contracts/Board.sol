@@ -25,6 +25,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	struct PawnStruct {
 		bool isOnBoard;
 		uint8 position;
+		bool rollingState;
 	}
 
 	/// @dev structure used to store pawn's attribute
@@ -116,19 +117,35 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @notice Requests randomness
 	 * @return requestId the id of the request for the oracle
 	 */
-	function getRandomNumber() public returns (bytes32 requestId) {
+	function requestRandomNumber(uint16 _edition, uint256 _pawnID) public returns (bytes32 requestId) {
+		require(isRegistered(_edition, _pawnID), "pawn has not been registered");
 		require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
+		boards[_edition].pawns[_pawnID].rollingState = true;
 		return requestRandomness(keyHash, fee);
 	}
 
+	function getRollingState(uint16 _edition, uint256 _pawnID) public view returns (bool){
+		return boards[_edition].pawns[_pawnID].rollingState;
+	}
+
+	/**
+	 * @notice Requests randomness
+	 * @return requestId the id of the request for the oracle
+	 */
+	function getRandomNumber(uint16 _edition, uint256 _pawnID) internal returns (uint){
+		require(isRegistered(_edition, _pawnID),'pawn has not been registered');
+		require(randomResult() != 0,'randomness is not prepared');
+		boards[_edition].pawns[_pawnID].rollingState = false;
+
+		return randomResult();
+	}
 	/**
 	 * @notice Callback function used by VRF Coordinator
 	 * @param requestId the id of the request for the oracle
 	 * @param randomness randomness must be requested from an oracle, which generates a number and a cryptographic proof
 	 */
 	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
-		randomResult = (randomness % 6) + 1;
-
+		randomResult = (randomness % 11) + 2;
 	}
 
 	/**
@@ -244,10 +261,13 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		require(boards[_edition].pawns[_pawnID].isOnBoard == true, "Unregistered pawn");
 
 		// roll dices (randomly)
-		dices_score_ = 4;
+		//dices_score_ = 4;
+		dices_score_ = getRandomNumber();
 
 		// update player's position (modulo boards[edition].nbOfLands)
 		boards[_edition].pawns[_pawnID].position += dices_score_ % boards[_edition].nbOfLands;
+
+		//event new Position of pawn
 	}
 
 	/**
