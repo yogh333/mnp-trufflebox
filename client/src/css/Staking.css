@@ -1,0 +1,23 @@
+.symbol{
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+
+img.token {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0.3rem;
+}
+
+.right {
+    text-align: right;
+}
+
+.title {
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1.5;
+    text-transform: uppercase;
+    padding: 1em;
+}
