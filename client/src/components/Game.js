@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ethers } from "ethers";
 
@@ -11,6 +11,7 @@ import Land from "./Land";
 
 import BankJson from "../contracts/BankContract.json";
 import Spinner from "react-bootstrap/Spinner";
+import { Button, Card, Col, Container, Row } from "react-bootstrap";
 
 function Game(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -32,14 +33,16 @@ function Game(props) {
   });
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [isRetrievingInfo, setIsRetrievingInfo] = useState(false);
+  const [canPlay, setCanPlay] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
 
   useEffect(() => {
     /*if (window.ethereum && !window.ethereum.selectedAddress) { // Redirect to Home if disconnected
       window.location.href = "/"
 
       return
-    }
-*/
+    }*/
+
     if (!(provider && address && networkId)) {
       return;
     }
@@ -116,8 +119,93 @@ function Game(props) {
     }
   }
 
+  const buyMonoAndApproveSpent = async () => {
+    if (false) {
+      return;
+    }
+
+    const amountToBuy = ethers.utils.parseEther("50"); // must be as param in contract
+
+    setIsBuying(true);
+
+    let result;
+
+    // calcul nombre de link à acheter link
+    // fees
+    // mumbai 0.0001 LINK
+    // Kovan 0.1 LINK
+
+    /*try {
+      result = await Bank.initPlayer();
+      if (!result.hash) {
+        setIsBuying(false);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setIsBuying(false);
+      return;
+    }
+
+    try {
+      result = await Mono.approve(Bank.address, amountToBuy);
+      if (!result.hash) {
+        setIsBuying(false);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setIsBuying(false);
+      return;
+    }*/
+  };
+
   if (!isReadyToRender) {
     return <>{spinner}</>;
+  }
+
+  if (!canPlay) {
+    return (
+      <Container>
+        <Card
+          className="m-1 d-inline-flex"
+          style={{ width: "calc((100% - 2rem)/3)" }}
+        >
+          <Card.Header className="text-center">First</Card.Header>
+          <Card.Body>
+            Before playing, you must buy 50 MONO and give us approval to spent
+            this amount.
+          </Card.Body>
+          <Card.Footer>
+            <Button variant="primary" onClick={buyMonoAndApproveSpent}>
+              {isBuying ? (
+                <Spinner as="span" animation="border" size="sm" />
+              ) : (
+                "Buy and approve"
+              )}
+            </Button>
+          </Card.Footer>
+        </Card>
+        <Card
+          className="m-1 d-inline-flex"
+          style={{ width: "calc((100% - 2rem)/3)" }}
+        >
+          <Card.Header className="text-center">Second</Card.Header>
+          <Card.Body>
+            Each roll have fee. You must prepaid 50 rolls to play.
+          </Card.Body>
+          <Card.Footer>
+            <Button variant="primary" onClick={buyMonoAndApproveSpent}>
+              {isBuying ? (
+                <Spinner as="span" animation="border" size="sm" />
+              ) : (
+                "Prepaid 50 rolls"
+              )}
+            </Button>
+          </Card.Footer>
+        </Card>
+      </Container>
+    );
   }
 
   return (

@@ -50,7 +50,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	uint256 public randomResult;
 
 	/// @notice constructor
-	constructor()
+	constructor() //todo pass VRFConsumerBase keys, keyHash and fee as param.
 		VRFConsumerBase(
 			0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9, // VRF Coordinator
 			0xa36085F69e2889c224210F603D836748e7dC0088 // LINK Token

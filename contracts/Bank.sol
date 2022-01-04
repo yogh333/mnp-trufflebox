@@ -4,6 +4,7 @@ pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./Pawn.sol";
 import "./Board.sol";
@@ -12,6 +13,11 @@ import "./Prop.sol";
 import "./Build.sol";
 
 contract BankContract is AccessControl, IERC721Receiver {
+	struct PlayerInfo {
+		bool isEnrolled;
+		uint8 prepaidRolls;
+	}
+
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 	bytes32 public constant BANKER_ROLE = keccak256("BANKER_ROLE");
 
@@ -20,18 +26,19 @@ contract BankContract is AccessControl, IERC721Receiver {
 	PropContract private immutable Prop;
 	BuildContract private immutable Build;
 	MonoContract private immutable Mono;
+	IERC20 private immutable Link;
 
 	/// @dev fee to be paid when player enrolls (in $MONO)
 	uint256 public enroll_fee = 50 * 1 ether;
-
-	/// @dev fee to be paid for each roll of dices (in $MONO)
-	uint256 public dices_fee = 1 ether;
 
 	/// @dev price of PROP by rarity by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private propPrices;
 
 	/// @dev price of BUILD by type by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private buildPrices;
+
+	/// @dev player information by edition by player address
+	mapping(uint256 => mapping(uint16 => PlayerInfo)) private playerInfos;
 
 	event eBuyProp(address indexed to, uint256 indexed prop_id);
 	event eBuyBuild(address indexed to, uint256 indexed build_id, uint32 nb);
@@ -48,19 +55,22 @@ contract BankContract is AccessControl, IERC721Receiver {
 		address BoardAddress,
 		address PropAddress,
 		address BuildAddress,
-		address MonoAddress
+		address MonoAddress,
+		address LinkAddress
 	) {
 		require(PawnAddress != address(0), "PAWN token smart contract address must be provided");
 		require(BoardAddress != address(0), "BOARD smart contract address must be provided");
 		require(PropAddress != address(0), "PROP token smart contract address must be provided");
 		require(BuildAddress != address(0), "BUILD token smart contract address must be provided");
 		require(MonoAddress != address(0), "MONO token smart contract address must be provided");
+		require(LinkAddress != address(0), "LINK token smart contract address must be provided");
 
 		Pawn = PawnContract(PawnAddress);
 		Board = BoardContract(BoardAddress);
 		Prop = PropContract(PropAddress);
 		Build = BuildContract(BuildAddress);
 		Mono = MonoContract(MonoAddress);
+		Link = IERC20(LinkAddress);
 
 		// Set roles
 		_setupRole(ADMIN_ROLE, msg.sender);
@@ -103,7 +113,19 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 		require(Board.register(_edition, pawnID), "error when enrolling");
 
+		playerInfos[msg.sender][_edition].isEnrolled = true;
+
 		emit eEnrollPlayer(_edition, msg.sender);
+	}
+
+	function prepaidDicesRolls(uint8 _quantity) external {
+		chainLinkFee = Board.fee();
+
+		require(Link.transfer(address(this), _quantity * chainLinkFee * 10**18), "$LINK transfer failed");
+
+		playerInfos[msg.sender][_edition].prepaidRolls = _quantity;
+
+		emit PrepaidDicesRolls(msg.sender, _quantity);
 	}
 
 	function rollDices(uint16 _edition) external {
@@ -287,7 +309,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		uint256 royaltyAmount;
 		(receiver, royaltyAmount) = Prop.royaltyInfo(_tokenId, _salePrice);
 
-		// Ajout du prix de la transaction en gas => oracle ? ou estimation large ?
+		// todo Ajout du prix de la transaction en gas => oracle ? ou estimation large ?
 		require(Mono.balanceOf(_to) > _salePrice, "Not sufficient token balance");
 
 		require(Mono.transferFrom(_to, _from, _salePrice));
