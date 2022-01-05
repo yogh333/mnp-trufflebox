@@ -52,11 +52,11 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	/// @notice constructor
 	constructor()
 		VRFConsumerBase(
-			0x8C7382F9D8f56b33781fE506E897a4F1e2d17255, // VRF Coordinator
-			0x326C977E6efc84E512bB9C30f76E30c160eD06FB // LINK Token
+			0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9, // VRF Coordinator
+			0xa36085F69e2889c224210F603D836748e7dC0088 // LINK Token
 		)
 	{
-		keyHash = 0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4;
+		keyHash = 0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4;
 		fee = 0.0001 * 10**18; // 0.1 LINK (Varies by network)
 
 		_setupRole(ADMIN_ROLE, msg.sender);
@@ -106,10 +106,12 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 */
 
 	function getRandomKeccak256() public view returns (uint16) {
-
 		return
-			uint16(((uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, msg.sender))) %
-			type(uint16).max) % 6) + 1);
+
+			uint16(
+				((uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, msg.sender))) %
+					type(uint16).max) % 6) + 1
+			);
 
 	}
 
@@ -145,7 +147,9 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @param randomness randomness must be requested from an oracle, which generates a number and a cryptographic proof
 	 */
 	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
-		randomResult = (randomness % 11) + 2;
+
+		randomResult = (randomness % 6) + 1;
+
 	}
 
 	/**
