@@ -1,4 +1,5 @@
 const Mono = artifacts.require("MonoContract");
+const truffleAssert = require("truffle-assertions");
 
 const utils = require("./utils.js");
 
@@ -36,13 +37,17 @@ contract("MonoContract", async (accounts) => {
   it("should revert when minting exceeds token max supply", async function () {
     await mint(accounts);
 
-    try {
+    await truffleAssert.reverts(
+      MonoInstance.mint(user1, web3.utils.toWei("1000", "ether"))
+    );
+
+    /*try {
       await MonoInstance.mint(user1, web3.utils.toWei("1000", "ether"));
     } catch (err) {
       assert(utils.isEVMException(err), err.toString());
       return;
     }
-    assert(false, "test did not revert");
+    assert(false, "test did not revert");*/
   });
 
   it("should let user1 to burn 500 $MONO", async function () {
@@ -89,13 +94,18 @@ contract("MonoContract", async (accounts) => {
 
   it("minting token should not be possible after pausing", async function () {
     await MonoInstance.pause();
-    try {
+
+    await truffleAssert.reverts(
+      MonoInstance.mint(user1, web3.utils.toWei("1000", "ether"))
+    );
+
+    /*try {
       await MonoInstance.mint(user1, web3.utils.toWei("1000", "ether"));
     } catch (err) {
       assert(utils.isEVMException(err), err.toString());
       return;
     }
-    assert(false, "test did not revert");
+    assert(false, "test did not revert");*/
   });
 
   it("minting token should be possible after unpausing", async function () {
