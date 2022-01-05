@@ -52,12 +52,12 @@ contract PawnContract is ERC721Enumerable, AccessControl {
 		require(balanceOf(_to) == 0, "player already owns a pawn");
 
 		PawnStruct memory p;
-		uint8 r = random(msg.sender);
-		p.subject = r % 8;
-		p.background = r % 10;
-		p.material = r % 10;
-		p.halo = r % 7;
-		p.power = r % 11;
+		uint8 r = random(_to);
+		p.subject = 1 + (r % 8);
+		p.background = 1 + (r % 10);
+		p.material = 1 + (r % 10);
+		p.halo = 1 + (r % 7);
+		p.power = 1 + (r % 11);
 		p.level = 0;
 		p.xp = 0;
 
