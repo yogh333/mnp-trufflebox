@@ -14,7 +14,7 @@ module.exports = async function (deployer, network, accounts) {
   await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
   const PawnInstance = await Pawn.deployed();
 
-  await deployer.deploy(Board, PawnInstance.address);
+  await deployer.deploy(Board);
   const BoardInstance = await Board.deployed();
 
   await deployer.deploy(

@@ -1,12 +1,10 @@
 const Board = artifacts.require("BoardContract");
-const Pawn = artifacts.require("PawnContract");
 const Build = artifacts.require("BuildContract");
 const utils = require("./utils.js");
 
 contract("BuildContract", async (accounts) => {
   beforeEach(async function () {
-    PawnInstance = await Pawn.new("NAME", "SYMBOL", "URI");
-    BoardInstance = await Board.new(PawnInstance.address);
+    BoardInstance = await Board.new();
     BuildInstance = await Build.new(
       BoardInstance.address,
       "https://token-cdn/"

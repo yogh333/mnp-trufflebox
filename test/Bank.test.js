@@ -8,18 +8,6 @@ const Mono = artifacts.require("MonoContract");
 const utils = require("./utils.js");
 
 contract("BankContract", async (accounts) => {
-  /*type Prop = {
-    edition: number,
-    land: number,
-    rarity: number,
-  };
-
-  type Build = {
-    edition: number,
-    land: number,
-    type: number,
-  };*/
-
   beforeEach(async function () {
     let max_supply = web3.utils.toBN(accounts.length * 5000);
     MonoInstance = await Mono.new(web3.utils.toWei(max_supply, "ether"));
@@ -29,9 +17,11 @@ contract("BankContract", async (accounts) => {
       await MonoInstance.mint(accounts[i], web3.utils.toWei("5000", "ether"));
     }
 
-    /* Deploy Board */
+    /* Deploy Pawn */
     PawnInstance = await Pawn.new("NAME", "SYMBOL", "URI");
-    BoardInstance = await Board.new(PawnInstance.address);
+
+    /* Deploy Board */
+    BoardInstance = await Board.new();
 
     /* Deploy Prop */
     PropInstance = await Prop.new(

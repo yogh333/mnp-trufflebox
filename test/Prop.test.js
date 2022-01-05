@@ -1,12 +1,10 @@
 const Board = artifacts.require("BoardContract");
-const Pawn = artifacts.require("PawnContract");
 const Prop = artifacts.require("PropContract");
 const utils = require("./utils.js");
 
 contract("PropContract", async (accounts) => {
   beforeEach(async function () {
-    PawnInstance = await Pawn.new("NAME", "SYMBOL", "URI");
-    BoardInstance = await Board.new(PawnInstance.address);
+    BoardInstance = await Board.new();
     PropInstance = await Prop.new(
       BoardInstance.address,
       "TMWPROP",

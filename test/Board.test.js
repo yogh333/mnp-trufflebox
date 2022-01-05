@@ -1,11 +1,9 @@
 const Board = artifacts.require("BoardContract");
-const Pawn = artifacts.require("PawnContract");
 const utils = require("./utils.js");
 
 contract("BoardContract", async (accounts) => {
   beforeEach(async function () {
-    PawnInstance = await Pawn.new("NAME", "SYMBOL", "URI");
-    BoardInstance = await Board.new(PawnInstance.address);
+    BoardInstance = await Board.new();
 
     deployer = accounts[0];
   });

@@ -4,7 +4,6 @@ pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
-import "./Pawn.sol";
 
 contract BoardContract is AccessControl, VRFConsumerBase {
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
@@ -33,14 +32,12 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 
 	mapping(uint16 => BoardStruct) private boards;
 
-	PawnContract immutable Pawn;
-
 	bytes32 internal keyHash;
 	uint256 internal fee;
 
 	uint256 public randomResult;
 
-	constructor(address PawnAddress)
+	constructor()
 		VRFConsumerBase(
 			0x8C7382F9D8f56b33781fE506E897a4F1e2d17255, // VRF Coordinator
 			0x326C977E6efc84E512bB9C30f76E30c160eD06FB // LINK Token
@@ -49,16 +46,12 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		keyHash = 0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4;
 		fee = 0.0001 * 10**18; // 0.1 LINK (Varies by network)
 
-		require(PawnAddress != address(0));
-
 		_setupRole(ADMIN_ROLE, msg.sender);
 		_setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
 		_setupRole(MANAGER_ROLE, msg.sender);
 		_setRoleAdmin(MANAGER_ROLE, ADMIN_ROLE);
 
 		editionMax = 0;
-
-		Pawn = PawnContract(PawnAddress);
 
 		BoardStruct storage b = boards[0];
 		b.nbOfLands = 40;
@@ -102,9 +95,10 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 			type(uint16).max) % 6) + 1);
 		*/
 
-		return uint16(((uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) %
-	type(uint16).max) % 6) + 1);
-
+		return
+			uint16(
+				((uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp))) % type(uint16).max) % 6) + 1
+			);
 	}
 
 	/**
