@@ -68,8 +68,8 @@ module.exports = {
     kovan: {
       provider: () =>
         new HDWalletProvider(
-          "extra session page mixture immune roast average burst universe liquid hood pistol",
-          `https://kovan.infura.io/v3/1f9d14ce270340acbedafaa696071aab`
+          "seed phrase",
+          `https://kovan.infura.io/v3/YOUR_INFURA_ID`
         ),
       network_id: 42,
       gas: 8500000,
