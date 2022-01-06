@@ -1,14 +1,19 @@
 # Avoiding Common Attacks
 
-## Random Numbers Generation (dices roll)
+## Génération de nombres aléatoires (dices roll)
 
-Generating random numbers in blockchain is an well known issue. To get further details please refer to:
+La génération de nombres aléatoires dans la blockchain est un problème bien connu. Pour obtenir plus de détails, veuillez-vous référer à :
 
 1. [Solidity Pitfalls](https://betterprogramming.pub/how-to-generate-truly-random-numbers-in-solidity-and-blockchain-9ced6472dbdf)
 2. [How to Generate Truly Random Numbers in Solidity and Blockchain](https://betterprogramming.pub/how-to-generate-truly-random-numbers-in-solidity-and-blockchain-9ced6472dbdf)
 3. [Generating Randomness In Blockchain: Verifiable Random Function](https://hackernoon.com/generating-randomness-in-blockchain-verifiable-random-function-ft1534ud)
 
 [Chainlink VRF](https://docs.chain.link/docs/chainlink-vrf/) Verifiable Random Function is a provably-fair and veriafiable source of randomness.
+
+Dans un premier temps, nous avons pris le parti de générer le jet de dés par une fonction ```getRandomKeccak256()```, afin de progresser par étapes dans la complexité, qui va utiliser les différents arguments suivants : ```block.difficulty```, ```block.timestamp``` dont la valeur est recalculée à chaque changement bloc et l'adresse de l'utilisateur courant ```msg.sender```.
+
+Dans un deuxième temps, nous prévoyons d'utiliser la fonctionnalité VRF de l'oracle Chainlink pour fiabiliser le lancer de dé.
+
 
 ## Bugs logiques
 
