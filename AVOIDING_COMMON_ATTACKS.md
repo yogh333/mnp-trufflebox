@@ -20,7 +20,7 @@ Des tests unitaires ont été créés pour vérifier que le comportement du cont
 
 ## Default Visibilities
 
-Nous avons spécifié la visibilité de toutes les fonctions dans les contracts pour ce protéger contre la vulnérabilité `Default Visibilities`
+Nous avons spécifié la visibilité de toutes les fonctions dans les contracts pour se protéger contre la vulnérabilité `Default Visibilities`
 
 ## Restrictions d'accès
 
