@@ -72,7 +72,7 @@ module.exports = {
           `https://kovan.infura.io/v3/1f9d14ce270340acbedafaa696071aab`
         ),
       network_id: 42,
-      gas: 5000000,
+      gas: 8500000,
       gasprice: 25000000000,
     },
     // Useful for private networks
