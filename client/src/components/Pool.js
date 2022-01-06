@@ -20,6 +20,7 @@ function Pool(props) {
       decimals: null,
       icon: null,
     },
+    isTokenNetworkPool: null,
     yield: 0,
   });
   const [rewardToken, setRewardToken] = useState({
@@ -39,6 +40,8 @@ function Pool(props) {
   const [poolTokenPrice, setPoolTokenPrice] = useState(props.rewardTokenPrice);
   const [PoolTokenInstance, setPoolTokenInstance] = useState(null);
   const [PoolTokenPriceFeedInstance, setPoolTokenPriceFeedInstance] =
+    useState(null);
+  const [networkTokenVirtualAddress, setNetworkTokenVirtualAddress] =
     useState(null);
 
   const [isStakeModalShown, setIsStakeModalShown] = useState(false);
@@ -78,17 +81,32 @@ function Pool(props) {
     const _pool = await Staking.pools(pool.token.address);
     pool.yield = parseInt(_pool.yield);
 
+    pool.isTokenNetworkPool = _pool.isTokenNetwork;
+
+    let _networkTokenVirtualAddress = networkTokenVirtualAddress;
+    if (!_networkTokenVirtualAddress) {
+      _networkTokenVirtualAddress =
+        await Staking.NETWORK_TOKEN_VIRTUAL_ADDRESS();
+    }
+
     const _PoolTokenInstance = new ethers.Contract(
       pool.token.address,
       ERC20Json.abi,
       provider.getSigner(address)
     );
 
-    pool.token.symbol = await _PoolTokenInstance.symbol();
+    if (pool.isTokenNetworkPool) {
+      pool.token.symbol = await Staking.networkTokenSymbol();
+      pool.token.name = "Network Token";
+      pool.token.decimals = 18;
+    } else {
+      pool.token.symbol = await _PoolTokenInstance.symbol();
+      pool.token.name = await _PoolTokenInstance.name();
+      pool.token.decimals = await _PoolTokenInstance.decimals();
+    }
+
     pool.token.icon =
       "./images/tokens/" + pool.token.symbol.toLowerCase() + ".svg";
-    pool.token.name = await _PoolTokenInstance.name();
-    pool.token.decimals = await _PoolTokenInstance.decimals();
 
     const aggregatorV3InterfaceABI = [
       {
@@ -140,7 +158,9 @@ function Pool(props) {
       },
     ];
 
-    const poolTokenPriceFeed = await retrievePoolPriceFeed(pool.token.address);
+    const poolTokenPriceFeed = await retrievePoolPriceFeed(
+      pool.isTokenNetworkPool ? _networkTokenVirtualAddress : pool.token.address
+    );
 
     const _PoolTokenPriceFeedInstance = new ethers.Contract(
       poolTokenPriceFeed,
@@ -148,6 +168,7 @@ function Pool(props) {
       provider
     );
 
+    setNetworkTokenVirtualAddress(_networkTokenVirtualAddress);
     setPool(pool);
     setPoolTokenInstance(_PoolTokenInstance);
     setPoolTokenPriceFeedInstance(_PoolTokenPriceFeedInstance);
@@ -194,9 +215,11 @@ function Pool(props) {
   };
 
   const updatePoolBalance = () => {
-    Staking.getPoolBalance(pool.token.address).then((balance) =>
-      setPoolBalance(Number(ethers.utils.formatEther(balance)).toFixed(2))
-    );
+    Staking.getPoolBalance(
+      pool.isTokenNetworkPool ? networkTokenVirtualAddress : pool.token.address
+    ).then((balance) => {
+      setPoolBalance(Number(ethers.utils.formatEther(balance)).toFixed(2));
+    });
   };
 
   const updateUserBalanceInPool = () => {
@@ -214,6 +237,14 @@ function Pool(props) {
   };
 
   const updatePoolTokenUserBalance = () => {
+    if (pool.isTokenNetworkPool) {
+      provider.getBalance(user.account).then((balance) => {
+        setUserBalance(Number(ethers.utils.formatEther(balance)));
+      });
+
+      return;
+    }
+
     PoolTokenInstance.balanceOf(user.account).then((balance) => {
       setUserBalance(Number(ethers.utils.formatEther(balance)));
     });
@@ -229,6 +260,20 @@ function Pool(props) {
     setIsPerforming(true);
 
     let result;
+
+    if (pool.isTokenNetworkPool) {
+      Staking.stake(
+        pool.token.address,
+        ethers.utils.parseEther(amountToStake.toString()),
+        { value: ethers.utils.parseEther(amountToStake.toString()) }
+      ).then((result) => {
+        setIsPerforming(false);
+        setIsStakeModalShown(false);
+      });
+
+      return;
+    }
+
     try {
       result = await PoolTokenInstance.allowance(user.account, Staking.address);
     } catch (error) {

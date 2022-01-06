@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import StakingJson from "../contracts/Staking.json";
+import StakingJson from "../contracts/StakingContract.json";
 import ERC20Json from "../contracts/ERC20.json";
 
 import "bootstrap/dist/css/bootstrap.min.css";

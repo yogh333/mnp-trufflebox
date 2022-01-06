@@ -1,4 +1,4 @@
-// DeFiStaking.sol
+// StakingContract.sol
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.10;
@@ -10,7 +10,7 @@ import '@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol';
 /**
  * @notice This contract is made for staking ERC20 tokens to earn an ERC20 token.
  */
-contract Staking is Ownable {
+contract StakingContract is Ownable {
 
     // User informations for each pool.
     struct UserInfo {
@@ -20,7 +20,8 @@ contract Staking is Ownable {
 
     // Pool informations.
     struct PoolInfo {
-        ERC20 token;            // Address of the staked token
+        ERC20 token; // Address of the staked token
+        bool isTokenNetwork; // ex. MATIC for Polygon networks
         uint256 yield;          // Percentage yield for the pool.
         AggregatorV3Interface priceFeed;    // ChainLink oracle feed for this token
     }
@@ -30,11 +31,16 @@ contract Staking is Ownable {
         mapping(address => UserInfo) users;
     }
 
+    address constant public NETWORK_TOKEN_VIRTUAL_ADDRESS = address(0x1);
+    string public networkTokenSymbol;
+
     // reward token
     IERC20 public rewardToken;
 
     mapping(address => Pool) public pools;
     address[] private registeredPools;
+    mapping(string => address) public poolAddressBySymbol;
+    uint256 public networkTokenPoolBalance;
 
     event PoolAdded(address tokenPoolAddress, address priceFeed);
     event Staked(address user, address tokenPoolAddress, uint256 amount);
@@ -42,11 +48,13 @@ contract Staking is Ownable {
 
     /**
      * @dev initiate reward token and build the first pool with it.
-     * @param _rewardToken : reward token address
-     * @param _rewardTokenFeed : reward token feed
-     * @param _yield : Percentage reward token yield. This token can be stake too.
+     * @param _rewardToken reward token address
+     * @param _rewardTokenFeed reward token feed
+     * @param _yield Percentage reward token yield. This token can be stake too.
+     * @param _networkTokenSymbol Network token symbol
      */
-    constructor(address _rewardToken, address _rewardTokenFeed, uint256 _yield) {
+    constructor(address _rewardToken, address _rewardTokenFeed, uint256 _yield, string memory _networkTokenSymbol) {
+        networkTokenSymbol = _networkTokenSymbol;
         rewardToken = IERC20(_rewardToken);
         _addPool(_rewardToken, _rewardTokenFeed, _yield);
     }
@@ -76,6 +84,10 @@ contract Staking is Ownable {
      * @return balance
      */
     function getPoolBalance(address _token) external view returns (uint256) {
+        if (_token == NETWORK_TOKEN_VIRTUAL_ADDRESS) {
+            return networkTokenPoolBalance;
+        }
+
         return pools[_token].info.token.balanceOf(address(this));
     }
 
@@ -91,6 +103,16 @@ contract Staking is Ownable {
         pools[_token].info.priceFeed = AggregatorV3Interface(_priceFeed);
 
         registeredPools.push(_token);
+
+        if (_token == NETWORK_TOKEN_VIRTUAL_ADDRESS) {
+            pools[_token].info.isTokenNetwork = true;
+            poolAddressBySymbol[networkTokenSymbol] = _token;
+
+            return;
+        }
+
+        string memory symbol = pools[_token].info.token.symbol();
+        poolAddressBySymbol[symbol] = _token;
     }
 
     /**
@@ -113,17 +135,26 @@ contract Staking is Ownable {
      * @param _amount: staked amount
      * @dev Approval is needed before calling this method.
      */
-    function stake(address _token, uint256 _amount) external {
+    function stake(address _token, uint256 _amount) public payable {
         require(_amount > 0, "Non valid amount");
         Pool storage pool = pools[_token];
         UserInfo storage user = pool.users[msg.sender];
         require(user.amount == 0, "Unstack first");
-        require(pool.info.token.balanceOf(msg.sender) >= _amount, "Insufficient balance");
+
+        if (_token == NETWORK_TOKEN_VIRTUAL_ADDRESS) {
+            require(msg.sender.balance >= _amount, "Insufficient balance");
+        } else {
+            require(pool.info.token.balanceOf(msg.sender) >= _amount, "Insufficient balance");
+        }
 
         user.amount = _amount;
         user.depositDate = block.timestamp;
 
-        pool.info.token.transferFrom(msg.sender, address(this), _amount);
+        if (_token == NETWORK_TOKEN_VIRTUAL_ADDRESS) {
+            networkTokenPoolBalance += _amount;
+        } else {
+            pool.info.token.transferFrom(msg.sender, address(this), _amount);
+        }
 
         emit Staked(msg.sender, _token, _amount);
     }
@@ -163,12 +194,20 @@ contract Staking is Ownable {
             user
         );
 
-        uint256 amount = user.amount + rewards;
+        uint256 stakedAmount = user.amount;
         user.amount = 0;
 
-        rewardToken.transfer(msg.sender, amount);
+        if (_token == NETWORK_TOKEN_VIRTUAL_ADDRESS) {
+            networkTokenPoolBalance -= user.amount;
+            (bool sent,) = payable(msg.sender).call{value: stakedAmount}("");
+            require(sent, "Failed to send Ether");
+        } else {
+            pool.info.token.transfer(msg.sender, stakedAmount);
+        }
 
-        emit Unstaked(msg.sender, _token, amount);
+        rewardToken.transfer(msg.sender, rewards);
+
+        emit Unstaked(msg.sender, _token, stakedAmount);
     }
 
     /**
