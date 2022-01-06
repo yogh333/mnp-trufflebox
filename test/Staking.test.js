@@ -1,6 +1,6 @@
 // Staking.test.js
 
-const Staking = artifacts.require("./Staking.sol");
+const Staking = artifacts.require("./StakingContract.sol");
 const ChainLinkPriceFeed = artifacts.require("./ChainLinkPriceFeedStub.sol");
 const ERC20Token = artifacts.require("./ERC20TokenStub.sol");
 const truffleAssert = require("truffle-assertions");
