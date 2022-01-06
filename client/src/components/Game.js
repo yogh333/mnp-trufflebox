@@ -10,6 +10,10 @@ import User from "./User";
 import Land from "./Land";
 
 import BankJson from "../contracts/BankContract.json";
+import BoardJson from "../contracts/BoardContract.json";
+import MonoJson from "../contracts/MonoContract.json";
+import LinkJson from "../contracts/Link.json";
+import PawnJson from "../contracts/PawnContract.json";
 import Spinner from "react-bootstrap/Spinner";
 import { Button, Card, Col, Container, Row } from "react-bootstrap";
 
@@ -23,6 +27,10 @@ function Game(props) {
   const address = props.address;
 
   const [Bank, setBank] = useState(null);
+  const [Mono, setMono] = useState(null);
+  const [Link, setLink] = useState(null);
+  const [Board, setBoard] = useState(null);
+  const [Pawn, setPawn] = useState(null);
   const [visual, setVisual] = useState(<div>Property visual</div>);
   //const [currentLandId, setCurrentLandId] = useState(0);
   const [landInfo, setLandInfo] = useState({
@@ -34,15 +42,11 @@ function Game(props) {
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [isRetrievingInfo, setIsRetrievingInfo] = useState(false);
   const [canPlay, setCanPlay] = useState(false);
-  const [isBuying, setIsBuying] = useState(false);
+  const [isPerforming, setIsPerforming] = useState(false);
+  const [inGameStep, setInGameStep] = useState(1);
+  const [startBlockNumber, setStartBlockNumber] = useState(null);
 
-  useEffect(() => {
-    /*if (window.ethereum && !window.ethereum.selectedAddress) { // Redirect to Home if disconnected
-      window.location.href = "/"
-
-      return
-    }*/
-
+  useEffect(async () => {
     if (!(provider && address && networkId)) {
       return;
     }
@@ -54,6 +58,41 @@ function Game(props) {
         provider.getSigner(address)
       )
     );
+
+    setMono(
+      new ethers.Contract(
+        MonoJson.networks[networkId].address,
+        MonoJson.abi,
+        provider.getSigner(address)
+      )
+    );
+
+    setLink(
+      new ethers.Contract(
+        LinkJson.networks[networkId].address,
+        LinkJson.abi,
+        provider.getSigner(address)
+      )
+    );
+
+    setBoard(
+      new ethers.Contract(
+        BoardJson.networks[networkId].address,
+        BoardJson.abi,
+        provider.getSigner(address)
+      )
+    );
+
+    setPawn(
+      new ethers.Contract(
+        PawnJson.networks[networkId].address,
+        PawnJson.abi,
+        provider.getSigner(address)
+      )
+    );
+
+    const _startBlockNumber = await provider.getBlockNumber();
+    setStartBlockNumber(_startBlockNumber);
   }, [provider, address, networkId]);
 
   useEffect(() => {
@@ -61,8 +100,80 @@ function Game(props) {
       return;
     }
 
+    updateValues();
     setIsReadyToRender(true);
   }, [Bank]);
+
+  useEffect(async () => {
+    if (!startBlockNumber || !Bank) {
+      return;
+    }
+
+    subscribeContractsEvents();
+  }, [startBlockNumber, Bank]);
+
+  const subscribeContractsEvents = () => {
+    Bank.on("PlayerEnrolled", (edition, player, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+
+      updateValues();
+    });
+    Bank.on("DicesRollsPrepaid", (player, quantity, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+
+      updateValues();
+    });
+    Bank.on("MonoBought", (player, amount, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+
+      updateValues();
+    });
+  };
+
+  const updateValues = () => {
+    updatePlayerInfos();
+  };
+
+  const updatePlayerInfos = async () => {
+    const monoBalance = await Mono.balanceOf(address);
+    const pawnBalance = await Pawn.balanceOf(address);
+
+    Bank.getPlayerInfo(address, props.edition_id).then((playerInfo) => {
+      if (playerInfo.isEnrolled === true && playerInfo.prepaidRolls > 0) {
+        setIsPerforming(false);
+        setCanPlay(true);
+
+        return;
+      }
+
+      if (playerInfo.isEnrolled === true) {
+        setInGameStep(4);
+        setIsPerforming(false);
+
+        return;
+      }
+
+      if (
+        ethers.BigNumber.from(monoBalance).sub(ethers.utils.parseEther("50")) >=
+          ethers.utils.parseEther("0") &&
+        pawnBalance.toNumber() > 0
+      ) {
+        setInGameStep(3);
+        setIsPerforming(false);
+
+        return;
+      }
+
+      if (
+        ethers.BigNumber.from(monoBalance).sub(ethers.utils.parseEther("50")) >=
+        ethers.utils.parseEther("0")
+      ) {
+        setInGameStep(2);
+      }
+
+      setIsPerforming(false);
+    });
+  };
 
   const retrieveCellPrices = async (editionId, cellID) => {
     console.log("get prices !");
@@ -119,45 +230,135 @@ function Game(props) {
     }
   }
 
-  const buyMonoAndApproveSpent = async () => {
-    if (false) {
-      return;
-    }
-
-    const amountToBuy = ethers.utils.parseEther("50"); // must be as param in contract
-
-    setIsBuying(true);
+  const buyMono = async () => {
+    setIsPerforming(true);
 
     let result;
 
-    // calcul nombre de link à acheter link
-    // fees
-    // mumbai 0.0001 LINK
-    // Kovan 0.1 LINK
+    result = await Mono.balanceOf(Bank.address);
 
-    /*try {
-      result = await Bank.initPlayer();
+    try {
+      result = await Bank.buyMono({ value: ethers.utils.parseEther("0.5") });
       if (!result.hash) {
-        setIsBuying(false);
+        setIsPerforming(false);
         return;
       }
     } catch (error) {
       console.error(error);
-      setIsBuying(false);
+      setIsPerforming(false);
+      return;
+    }
+  };
+
+  const buyOnePawn = async () => {
+    setIsPerforming(true);
+
+    let result;
+
+    result = await Mono.balanceOf(Bank.address);
+
+    console.log(result.toString());
+
+    try {
+      result = await Bank.buyPawn();
+      if (!result.hash) {
+        setIsPerforming(false);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setIsPerforming(false);
+      return;
+    }
+  };
+
+  const approveSpentAndEnrollPlayer = async () => {
+    if (!props.edition_id) {
       return;
     }
 
+    setIsPerforming(true);
+
+    let result;
+
     try {
-      result = await Mono.approve(Bank.address, amountToBuy);
+      result = await Mono.allowance(address, Bank.address);
+    } catch (error) {
+      console.error(error);
+      setIsPerforming(false);
+      return;
+    }
+
+    if (ethers.BigNumber.from(result) < ethers.utils.parseEther("50")) {
+      try {
+        result = await Mono.approve(
+          Bank.address,
+          ethers.utils.parseEther("50")
+        );
+        if (!result.hash) {
+          setIsPerforming(false);
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+        setIsPerforming(false);
+        return;
+      }
+    }
+
+    try {
+      result = await Bank.enrollPlayer(props.edition_id);
       if (!result.hash) {
-        setIsBuying(false);
+        setIsPerforming(false);
         return;
       }
     } catch (error) {
       console.error(error);
-      setIsBuying(false);
+      setIsPerforming(false);
       return;
-    }*/
+    }
+  };
+
+  const prepaidDicesRolls = async () => {
+    setIsPerforming(true);
+
+    let result = await Board.fee();
+
+    const amountToPrepaid = 50 * ethers.BigNumber.from(result);
+
+    try {
+      result = await Link.allowance(address, Bank.address);
+    } catch (error) {
+      console.error(error);
+      setIsPerforming(false);
+      return;
+    }
+
+    if (ethers.BigNumber.from(result) < amountToPrepaid) {
+      try {
+        result = await Link.approve(Bank.address, amountToPrepaid);
+        if (!result.hash) {
+          setIsPerforming(false);
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+        setIsPerforming(false);
+        return;
+      }
+    }
+
+    try {
+      result = await Bank.prepaidDicesRolls(50, props.edition_id);
+      if (!result.hash) {
+        setIsPerforming(false);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setIsPerforming(false);
+      return;
+    }
   };
 
   if (!isReadyToRender) {
@@ -167,43 +368,80 @@ function Game(props) {
   if (!canPlay) {
     return (
       <Container>
-        <Card
-          className="m-1 d-inline-flex"
-          style={{ width: "calc((100% - 2rem)/3)" }}
-        >
-          <Card.Header className="text-center">First</Card.Header>
-          <Card.Body>
-            Before playing, you must buy 50 MONO and give us approval to spent
-            this amount.
-          </Card.Body>
-          <Card.Footer>
-            <Button variant="primary" onClick={buyMonoAndApproveSpent}>
-              {isBuying ? (
-                <Spinner as="span" animation="border" size="sm" />
-              ) : (
-                "Buy and approve"
-              )}
-            </Button>
-          </Card.Footer>
-        </Card>
-        <Card
-          className="m-1 d-inline-flex"
-          style={{ width: "calc((100% - 2rem)/3)" }}
-        >
-          <Card.Header className="text-center">Second</Card.Header>
-          <Card.Body>
-            Each roll have fee. You must prepaid 50 rolls to play.
-          </Card.Body>
-          <Card.Footer>
-            <Button variant="primary" onClick={buyMonoAndApproveSpent}>
-              {isBuying ? (
-                <Spinner as="span" animation="border" size="sm" />
-              ) : (
-                "Prepaid 50 rolls"
-              )}
-            </Button>
-          </Card.Footer>
-        </Card>
+        <div className={"d-flex justify-content-center"}>
+          <Card
+            className={inGameStep === 1 ? "m-1" : "d-none"}
+            style={{ width: "calc((100% - 2rem)/3)" }}
+          >
+            <Card.Header className="text-center">Buy $MONO</Card.Header>
+            <Card.Body>You don't have enough $MONO. Buy Some.</Card.Body>
+            <Card.Footer>
+              <Button variant="primary" onClick={buyMono}>
+                {isPerforming ? (
+                  <Spinner as="span" animation="border" size="sm" />
+                ) : (
+                  "Buy"
+                )}
+              </Button>
+            </Card.Footer>
+          </Card>
+
+          <Card
+            className={inGameStep === 2 ? "m-1" : "d-none"}
+            style={{ width: "calc((100% - 2rem)/3)" }}
+          >
+            <Card.Header className="text-center">Buy a pawn</Card.Header>
+            <Card.Body>You don't have a pawn. Buy one.</Card.Body>
+            <Card.Footer>
+              <Button variant="primary" onClick={buyOnePawn}>
+                {isPerforming ? (
+                  <Spinner as="span" animation="border" size="sm" />
+                ) : (
+                  "Buy"
+                )}
+              </Button>
+            </Card.Footer>
+          </Card>
+
+          <Card
+            className={inGameStep === 3 ? "m-1" : "d-none"}
+            style={{ width: "calc((100% - 2rem)/3)" }}
+          >
+            <Card.Header className="text-center">Second step</Card.Header>
+            <Card.Body>
+              Before playing, you must have pawn and give us approval to spent
+              50 $MONO.
+            </Card.Body>
+            <Card.Footer>
+              <Button variant="primary" onClick={approveSpentAndEnrollPlayer}>
+                {isPerforming ? (
+                  <Spinner as="span" animation="border" size="sm" />
+                ) : (
+                  "Approve"
+                )}
+              </Button>
+            </Card.Footer>
+          </Card>
+
+          <Card
+            className={inGameStep === 4 ? "m-1" : "d-none"}
+            style={{ width: "calc((100% - 2rem)/3)" }}
+          >
+            <Card.Header className="text-center">Third step</Card.Header>
+            <Card.Body>
+              Each roll have fee. You must prepaid 50 rolls to play.
+            </Card.Body>
+            <Card.Footer>
+              <Button variant="primary" onClick={prepaidDicesRolls}>
+                {isPerforming ? (
+                  <Spinner as="span" animation="border" size="sm" />
+                ) : (
+                  "Prepaid 50 rolls"
+                )}
+              </Button>
+            </Card.Footer>
+          </Card>
+        </div>
       </Container>
     );
   }

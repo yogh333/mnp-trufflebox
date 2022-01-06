@@ -10,7 +10,7 @@ import BankJson from "../contracts/BankContract.json";
 import MonoJson from "../contracts/MonoContract.json";
 import PropJson from "../contracts/PropContract.json";
 import BuildJson from "../contracts/BuildContract.json";
-import StakingJson from "../contracts/Staking.json";
+import StakingJson from "../contracts/StakingContract.json";
 
 import {
   Button,
@@ -152,7 +152,7 @@ function Admin(props) {
         newPool.token.value,
         newPool.prideFeed.value,
         newPool.yield.value
-      ).send({ from: address });
+      );
     } catch (error) {
       console.error(error);
     }

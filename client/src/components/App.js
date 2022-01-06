@@ -13,7 +13,7 @@ import Staking from "./Staking";
 
 import "../css/App.css";
 import { ethers } from "ethers";
-import StakingJson from "../contracts/Staking.json";
+import StakingJson from "../contracts/StakingContract.json";
 import ERC20Json from "../contracts/ERC20.json";
 
 function App() {

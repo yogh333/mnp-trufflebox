@@ -29,7 +29,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	}
 
 	/// @dev structure used to store pawn's attribute
-	struct BoardStruct {
+	struct BoardInfo {
 		uint8 nbOfLands;
 		uint8 rarityLevel;
 		mapping(uint8 => bool) isBuildingLand;
@@ -43,7 +43,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	uint16 private editionMax;
 
 	/// @dev store all boards by edition number
-	mapping(uint16 => BoardStruct) private boards;
+	mapping(uint16 => BoardInfo) private boards;
 
 	bytes32 internal keyHash;
 	uint256 internal fee;
@@ -66,8 +66,12 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 
 		editionMax = 0;
 
-		BoardStruct storage b = boards[0];
+		Pawn = PawnContract(PawnAddress);
+
+		BoardInfo storage b = boards[0];
+
 		b.nbOfLands = 40;
+		b.nb_pawns_max = 1000;
 		b.rarityLevel = 2;
 		b.isBuildingLand[1] = true;
 		b.isBuildingLand[3] = true;
@@ -212,7 +216,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		uint16 _maxPawns
 	) public onlyRole(MANAGER_ROLE) {
 		editionMax += 1;
-		BoardStruct storage b = boards[editionMax];
+		BoardInfo storage b = boards[editionMax];
 		b.nbOfLands = _nbOfLands;
 		b.rarityLevel = _rarityLevel;
 		for (uint8 i = 0; i < _buildingLands.length; i++) {
@@ -234,7 +238,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	function register(uint16 _edition, uint256 _pawnID) external onlyRole(MANAGER_ROLE) returns (bool isOnBoarded) {
 		require(_edition <= editionMax, "Unknown edition");
 		require(boards[_edition].pawns[_pawnID].isOnBoard == false, "pawn already registered");
-		require(boards[_edition].nb_pawns + 1 < boards[_edition].nb_pawns_max, "game is full");
+		require(boards[_edition].nb_pawns < boards[_edition].nb_pawns_max, "game is full");
 
 		boards[_edition].pawns[_pawnID].isOnBoard = true;
 		boards[_edition].nb_pawns += 1;
