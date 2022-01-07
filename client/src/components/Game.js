@@ -14,10 +14,13 @@ import BoardJson from "../contracts/BoardContract.json";
 import MonoJson from "../contracts/MonoContract.json";
 import LinkJson from "../contracts/Link.json";
 import PawnJson from "../contracts/PawnContract.json";
+import StakingJson from "../contracts/StakingContract.json";
 import Spinner from "react-bootstrap/Spinner";
-import { Button, Card, Col, Container, Row } from "react-bootstrap";
+import { Button, Card, Container } from "react-bootstrap";
 
 function Game(props) {
+  const IN_GAME_MONO_AMOUNT = 50;
+
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
   const board = require(`../data/${boards[parseInt(props.edition_id)]}.json`);
@@ -31,6 +34,7 @@ function Game(props) {
   const [Link, setLink] = useState(null);
   const [Board, setBoard] = useState(null);
   const [Pawn, setPawn] = useState(null);
+  const [Staking, setStaking] = useState(null);
   const [visual, setVisual] = useState(<div>Property visual</div>);
   //const [currentLandId, setCurrentLandId] = useState(0);
   const [landInfo, setLandInfo] = useState({
@@ -44,9 +48,15 @@ function Game(props) {
   const [canPlay, setCanPlay] = useState(false);
   const [isPerforming, setIsPerforming] = useState(false);
   const [inGameStep, setInGameStep] = useState(1);
-  const [startBlockNumber, setStartBlockNumber] = useState(null);
+  const [isRegistered, setIsRegistered] = useState(false);
 
-  useEffect(async () => {
+  const [startBlockNumber, setStartBlockNumber] = useState(null);
+  const [monoBalance, setMonoBalance] = useState(null);
+  const [pawnBalance, setPawnBalance] = useState(null);
+  const [monoToBuy, setMonoToBuy] = useState(0);
+  const [networkTokensToBuy, setNetworkTokensToBuy] = useState(null);
+
+  useEffect(() => {
     if (!(provider && address && networkId)) {
       return;
     }
@@ -91,7 +101,21 @@ function Game(props) {
       )
     );
 
-    const _startBlockNumber = await provider.getBlockNumber();
+    setStaking(
+      new ethers.Contract(
+        StakingJson.networks[networkId].address,
+        StakingJson.abi,
+        provider.getSigner(address)
+      )
+    );
+
+    let _startBlockNumber;
+    const fetchStartBlockNumber = async () => {
+      _startBlockNumber = await provider.getBlockNumber();
+    };
+
+    fetchStartBlockNumber();
+
     setStartBlockNumber(_startBlockNumber);
   }, [provider, address, networkId]);
 
@@ -104,7 +128,7 @@ function Game(props) {
     setIsReadyToRender(true);
   }, [Bank]);
 
-  useEffect(async () => {
+  useEffect(() => {
     if (!startBlockNumber || !Bank) {
       return;
     }
@@ -131,48 +155,158 @@ function Game(props) {
   };
 
   const updateValues = () => {
+    setIsPerforming(false);
+
     updatePlayerInfos();
   };
 
   const updatePlayerInfos = async () => {
-    const monoBalance = await Mono.balanceOf(address);
-    const pawnBalance = await Pawn.balanceOf(address);
+    const _monoBalance = await Mono.balanceOf(address);
+    const _pawnBalance = await Pawn.balanceOf(address);
 
-    Bank.getPlayerInfo(address, props.edition_id).then((playerInfo) => {
-      if (playerInfo.isEnrolled === true && playerInfo.prepaidRolls > 0) {
-        setIsPerforming(false);
-        setCanPlay(true);
+    setMonoBalance(_monoBalance);
+    setPawnBalance(_pawnBalance);
 
-        return;
-      }
+    let _isRegistered;
 
-      if (playerInfo.isEnrolled === true) {
-        setInGameStep(4);
-        setIsPerforming(false);
+    if (_pawnBalance.toNumber() > 0) {
+      const _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
+      _isRegistered = await Board.isRegistered(props.edition_id, _pawnID);
+    }
 
-        return;
-      }
+    //setIsRegistered(_isRegistered);
 
-      if (
-        ethers.BigNumber.from(monoBalance).sub(ethers.utils.parseEther("50")) >=
-          ethers.utils.parseEther("0") &&
-        pawnBalance.toNumber() > 0
-      ) {
-        setInGameStep(3);
-        setIsPerforming(false);
-
-        return;
-      }
-
-      if (
-        ethers.BigNumber.from(monoBalance).sub(ethers.utils.parseEther("50")) >=
-        ethers.utils.parseEther("0")
-      ) {
-        setInGameStep(2);
-      }
-
+    if (
+      _isRegistered &&
+      ethers.BigNumber.from(_monoBalance).gte(
+        ethers.utils.parseEther("1") //todo qui paye le gas qd le contr ct tranfertFrom MONO ?
+      )
+    ) {
       setIsPerforming(false);
-    });
+      setInGameStep(5);
+      setCanPlay(true);
+      setIsRegistered(_isRegistered);
+
+      return;
+    }
+
+    const _monoToBuy = Math.ceil(
+      IN_GAME_MONO_AMOUNT -
+        Number(ethers.utils.formatEther(_monoBalance)).toFixed(2) +
+        (_pawnBalance.toNumber() > 0 ? 0 : 1)
+    );
+
+    const allowance = await Mono.allowance(address, Bank.address);
+
+    if (
+      _isRegistered &&
+      ethers.BigNumber.from(_monoBalance).gte(
+        ethers.utils.parseEther("1") //todo qui paye le gas qd le contr ct tranfertFrom MONO ?
+      ) &&
+      ethers.BigNumber.from(allowance).gte(ethers.utils.parseEther("1")) &&
+      _pawnBalance.toNumber() > 0
+    ) {
+      setIsPerforming(false);
+      setInGameStep(4);
+      setCanPlay(false);
+      setIsRegistered(_isRegistered);
+
+      return;
+    }
+
+    if (
+      !_isRegistered &&
+      ethers.BigNumber.from(allowance).gte(
+        ethers.utils.parseEther(
+          (
+            IN_GAME_MONO_AMOUNT + (_pawnBalance.toNumber() > 0 ? 0 : 1)
+          ).toString()
+        )
+      ) &&
+      _pawnBalance.toNumber() > 0
+    ) {
+      setInGameStep(4);
+      setIsPerforming(false);
+      setMonoToBuy(_monoToBuy);
+      setIsRegistered(_isRegistered);
+
+      return;
+    }
+
+    if (
+      _isRegistered &&
+      ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1")) &&
+      ethers.BigNumber.from(allowance).gte(ethers.utils.parseEther("1"))
+    ) {
+      setInGameStep(3);
+      setIsPerforming(false);
+      setMonoToBuy(_monoToBuy);
+      setIsRegistered(_isRegistered);
+
+      return;
+    }
+
+    if (
+      !_isRegistered &&
+      ethers.BigNumber.from(allowance).gte(
+        ethers.utils.parseEther(
+          (
+            IN_GAME_MONO_AMOUNT + (_pawnBalance.toNumber() > 0 ? 0 : 1)
+          ).toString()
+        )
+      )
+    ) {
+      setInGameStep(3);
+      setIsPerforming(false);
+      setMonoToBuy(_monoToBuy);
+      setIsRegistered(_isRegistered);
+
+      return;
+    }
+
+    if (
+      _isRegistered &&
+      ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1"))
+    ) {
+      setInGameStep(2);
+      setIsPerforming(false);
+      setMonoToBuy(_monoToBuy);
+      setIsRegistered(_isRegistered);
+
+      return;
+    }
+
+    if (
+      !_isRegistered &&
+      ethers.BigNumber.from(_monoBalance).gte(
+        ethers.utils.parseEther(_monoToBuy.toString())
+      )
+    ) {
+      setInGameStep(2);
+      setIsPerforming(false);
+      setMonoToBuy(_monoToBuy);
+      setIsRegistered(_isRegistered);
+
+      return;
+    }
+
+    // Tester si enrolled
+    // Step 1
+    const monoLastPrice = await Staking.getLastPrice(Mono.address);
+    const networkTokenVirtualAddress =
+      await Staking.NETWORK_TOKEN_VIRTUAL_ADDRESS();
+    const networkTokenLastPrice = await Staking.getLastPrice(
+      networkTokenVirtualAddress
+    );
+
+    setIsRegistered(_isRegistered);
+    setMonoToBuy(_monoToBuy);
+    setNetworkTokensToBuy(
+      Math.ceil(
+        ((_monoToBuy * monoLastPrice) / networkTokenLastPrice) * 10 ** 18
+      )
+    );
+    setIsPerforming(false);
   };
 
   const retrieveCellPrices = async (editionId, cellID) => {
@@ -231,14 +365,14 @@ function Game(props) {
   }
 
   const buyMono = async () => {
+    if (networkTokensToBuy === 0) {
+      return;
+    }
+
     setIsPerforming(true);
 
-    let result;
-
-    result = await Mono.balanceOf(Bank.address);
-
     try {
-      result = await Bank.buyMono({ value: ethers.utils.parseEther("0.5") });
+      const result = await Bank.buyMono({ value: networkTokensToBuy });
       if (!result.hash) {
         setIsPerforming(false);
         return;
@@ -250,29 +384,7 @@ function Game(props) {
     }
   };
 
-  const buyOnePawn = async () => {
-    setIsPerforming(true);
-
-    let result;
-
-    result = await Mono.balanceOf(Bank.address);
-
-    console.log(result.toString());
-
-    try {
-      result = await Bank.buyPawn();
-      if (!result.hash) {
-        setIsPerforming(false);
-        return;
-      }
-    } catch (error) {
-      console.error(error);
-      setIsPerforming(false);
-      return;
-    }
-  };
-
-  const approveSpentAndEnrollPlayer = async () => {
+  const approveSpent = async () => {
     if (!props.edition_id) {
       return;
     }
@@ -289,25 +401,43 @@ function Game(props) {
       return;
     }
 
-    if (ethers.BigNumber.from(result) < ethers.utils.parseEther("50")) {
-      try {
-        result = await Mono.approve(
-          Bank.address,
-          ethers.utils.parseEther("50")
-        );
-        if (!result.hash) {
-          setIsPerforming(false);
-          return;
-        }
-      } catch (error) {
-        console.error(error);
-        setIsPerforming(false);
-        return;
-      }
+    if (
+      ethers.BigNumber.from(result).gte(
+        ethers.utils.parseEther(IN_GAME_MONO_AMOUNT.toString())
+      )
+    ) {
+      console.log("updateValues()");
+      updateValues();
+      return;
     }
 
     try {
-      result = await Bank.enrollPlayer(props.edition_id);
+      result = await Mono.approve(
+        Bank.address,
+        ethers.utils.parseEther(IN_GAME_MONO_AMOUNT.toString())
+      );
+
+      setIsPerforming(false);
+      if (!result) {
+        return;
+      }
+
+      // Not waiting for Approve event
+      console.log("updateValues()");
+      updateValues();
+    } catch (error) {
+      console.error(error);
+      return;
+    }
+  };
+
+  const buyOnePawn = async () => {
+    setIsPerforming(true);
+
+    let result;
+
+    try {
+      result = await Bank.buyPawn();
       if (!result.hash) {
         setIsPerforming(false);
         return;
@@ -319,37 +449,17 @@ function Game(props) {
     }
   };
 
-  const prepaidDicesRolls = async () => {
-    setIsPerforming(true);
-
-    let result = await Board.fee();
-
-    const amountToPrepaid = 50 * ethers.BigNumber.from(result);
-
-    try {
-      result = await Link.allowance(address, Bank.address);
-    } catch (error) {
-      console.error(error);
-      setIsPerforming(false);
+  const enrollPlayer = async () => {
+    if (!props.edition_id) {
       return;
     }
 
-    if (ethers.BigNumber.from(result) < amountToPrepaid) {
-      try {
-        result = await Link.approve(Bank.address, amountToPrepaid);
-        if (!result.hash) {
-          setIsPerforming(false);
-          return;
-        }
-      } catch (error) {
-        console.error(error);
-        setIsPerforming(false);
-        return;
-      }
-    }
+    setIsPerforming(true);
+
+    let result;
 
     try {
-      result = await Bank.prepaidDicesRolls(50, props.edition_id);
+      result = await Bank.enrollPlayer(props.edition_id);
       if (!result.hash) {
         setIsPerforming(false);
         return;
@@ -373,8 +483,12 @@ function Game(props) {
             className={inGameStep === 1 ? "m-1" : "d-none"}
             style={{ width: "calc((100% - 2rem)/3)" }}
           >
-            <Card.Header className="text-center">Buy $MONO</Card.Header>
-            <Card.Body>You don't have enough $MONO. Buy Some.</Card.Body>
+            <Card.Header className="text-center">
+              Buy $MONO{isRegistered ? "" : " (in game step 1/4)"}
+            </Card.Header>
+            <Card.Body>
+              Before playing, you must buy {monoToBuy.toString()} $MONO.
+            </Card.Body>
             <Card.Footer>
               <Button variant="primary" onClick={buyMono}>
                 {isPerforming ? (
@@ -390,7 +504,31 @@ function Game(props) {
             className={inGameStep === 2 ? "m-1" : "d-none"}
             style={{ width: "calc((100% - 2rem)/3)" }}
           >
-            <Card.Header className="text-center">Buy a pawn</Card.Header>
+            <Card.Header className="text-center">
+              Give allowance{!isRegistered ? " (in game step 2/4)" : ""}
+            </Card.Header>
+            <Card.Body>
+              You must give us allowance to spent{" "}
+              {IN_GAME_MONO_AMOUNT.toString()} $MONO
+            </Card.Body>
+            <Card.Footer>
+              <Button variant="primary" onClick={approveSpent}>
+                {isPerforming ? (
+                  <Spinner as="span" animation="border" size="sm" />
+                ) : (
+                  "Approve"
+                )}
+              </Button>
+            </Card.Footer>
+          </Card>
+
+          <Card
+            className={inGameStep === 3 ? "m-1" : "d-none"}
+            style={{ width: "calc((100% - 2rem)/3)" }}
+          >
+            <Card.Header className="text-center">
+              Buy a pawn{!isRegistered ? " (in game step 3/4)" : ""}
+            </Card.Header>
             <Card.Body>You don't have a pawn. Buy one.</Card.Body>
             <Card.Footer>
               <Button variant="primary" onClick={buyOnePawn}>
@@ -404,39 +542,19 @@ function Game(props) {
           </Card>
 
           <Card
-            className={inGameStep === 3 ? "m-1" : "d-none"}
-            style={{ width: "calc((100% - 2rem)/3)" }}
-          >
-            <Card.Header className="text-center">Second step</Card.Header>
-            <Card.Body>
-              Before playing, you must have pawn and give us approval to spent
-              50 $MONO.
-            </Card.Body>
-            <Card.Footer>
-              <Button variant="primary" onClick={approveSpentAndEnrollPlayer}>
-                {isPerforming ? (
-                  <Spinner as="span" animation="border" size="sm" />
-                ) : (
-                  "Approve"
-                )}
-              </Button>
-            </Card.Footer>
-          </Card>
-
-          <Card
             className={inGameStep === 4 ? "m-1" : "d-none"}
             style={{ width: "calc((100% - 2rem)/3)" }}
           >
-            <Card.Header className="text-center">Third step</Card.Header>
-            <Card.Body>
-              Each roll have fee. You must prepaid 50 rolls to play.
-            </Card.Body>
+            <Card.Header className="text-center">
+              Enroll{!isRegistered ? " (in game step 4/4)" : ""}
+            </Card.Header>
+            <Card.Body>Last step, inscription to the board.</Card.Body>
             <Card.Footer>
-              <Button variant="primary" onClick={prepaidDicesRolls}>
+              <Button variant="primary" onClick={enrollPlayer}>
                 {isPerforming ? (
                   <Spinner as="span" animation="border" size="sm" />
                 ) : (
-                  "Prepaid 50 rolls"
+                  "Go"
                 )}
               </Button>
             </Card.Footer>

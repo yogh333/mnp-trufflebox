@@ -38,7 +38,7 @@ export default function Land(props) {
     Prop.balanceOf(address).then((value) => setPropBalance(value.toNumber()));
   }, [address, provider, networkId, landInfo.id, editionId]);
 
-  useEffect(async () => {
+  useEffect(() => {
     if (propBalance === null) {
       return;
     }
@@ -50,21 +50,26 @@ export default function Land(props) {
     );
 
     const nbOfPropsByRarity = [];
-    for (let rarity = 0; rarity < 3; rarity++) {
+    const fetchNbOfPropsByRarity = async (rarity) => {
       nbOfPropsByRarity[rarity] = await Prop.getNbOfProps(
         editionId,
         landInfo.id,
         rarity
       );
+    };
+    for (let rarity = 0; rarity < 3; rarity++) {
+      fetchNbOfPropsByRarity(rarity);
     }
 
     let properties = [];
     let propertiesCountByRarity = [0, 0, 0];
-    for (let index = 0; index < propBalance; index++) {
+    const fetchPropertiesData = async (index) => {
       const idx = await Prop.tokenOfOwnerByIndex(address, index);
-
       properties[index] = await Prop.get(idx); // can be used
       propertiesCountByRarity[properties[index].rarity]++;
+    };
+    for (let index = 0; index < propBalance; index++) {
+      fetchPropertiesData(index);
     }
 
     setPropRare(propertiesCountByRarity[0]);

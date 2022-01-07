@@ -10,8 +10,6 @@ import BoardJson from "../contracts/BoardContract.json";
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
 
-
-
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
@@ -78,9 +76,10 @@ export default function User(props) {
     const generateNewNumber = () => Math.floor(Math.random(result) * 6 + 1);
     const number1 = generateNewNumber();
     const number2 = generateNewNumber();
-    console.log({number1, number2});
+    console.log({ number1, number2 });
 
     console.log({ rollDice });
+
     const total = calculateTotal(number1, number2);
     handleNewPosition(currentPosition, total);
     console.log("total:", { total });
@@ -97,7 +96,7 @@ export default function User(props) {
    */
   function handleNewPosition(previousPosition, total) {
     const newCell = (previousPosition + total) % maxCells;
-    
+
     highlightCurrentCell(newCell);
     setCurrentPosition(newCell);
     forgetPreviousPosition(previousPosition);

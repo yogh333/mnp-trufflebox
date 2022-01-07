@@ -9,11 +9,12 @@ import Navbar from "react-bootstrap/Navbar";
 import Admin from "./Admin";
 import Game from "./Game";
 import Home from "./Home";
-import Staking from "./Staking";
+import Staker from "./Staker";
 
 import "../css/App.css";
 import { ethers } from "ethers";
 import StakingJson from "../contracts/StakingContract.json";
+import AggregatorV3InterfaceJson from "../contracts/AggregatorV3Interface.json";
 import ERC20Json from "../contracts/ERC20.json";
 
 function App() {
@@ -21,15 +22,18 @@ function App() {
   const [networkId, setNetworkId] = useState(null);
   const [address, setAddress] = useState(null);
 
-  const [isRewardTokenDisplay, setIsRewardTokenDisplay] = useState(false);
+  const [Staking, setStaking] = useState(null);
+
+  const [rewardTokenAddress, setRewardTokenAddress] = useState(null);
+  const [rewardTokenName, setRewardTokenName] = useState(null);
+  const [rewardTokenSymbol, setRewardTokenSymbol] = useState(null);
+  const [rewardTokenIcon, setRewardTokenIcon] = useState(null);
+  const [rewardTokenPriceFeed, setRewardTokenPriceFeed] = useState(null);
   const [rewardTokenPrice, setRewardTokenPrice] = useState(null);
-  const [rewardToken, setRewardToken] = useState({
-    address: null,
-    name: null,
-    symbol: null,
-    decimals: null,
-    icon: "",
-  });
+
+  const [isRewardTokenDisplay, setIsRewardTokenDisplay] = useState(false);
+
+  const aggregatorV3InterfaceABI = AggregatorV3InterfaceJson.abi;
 
   function initialize() {
     window.ethereum
@@ -112,88 +116,42 @@ function App() {
     }
   }
 
-  useEffect(async () => {
+  useEffect(() => {
     if (!(provider && address && networkId)) {
       return;
     }
 
-    const Staking = new ethers.Contract(
-      StakingJson.networks[networkId].address,
-      StakingJson.abi,
-      provider.getSigner(address)
+    setStaking(
+      new ethers.Contract(
+        StakingJson.networks[networkId].address,
+        StakingJson.abi,
+        provider.getSigner(address)
+      )
     );
+  }, [provider, address, networkId]);
 
-    const rewardTokenAddress = await Staking.rewardToken();
+  useEffect(() => {
+    if (!Staking) {
+      return;
+    }
 
-    const aggregatorV3InterfaceABI = [
-      {
-        inputs: [],
-        name: "decimals",
-        outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "description",
-        outputs: [{ internalType: "string", name: "", type: "string" }],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [{ internalType: "uint80", name: "_roundId", type: "uint80" }],
-        name: "getRoundData",
-        outputs: [
-          { internalType: "uint80", name: "roundId", type: "uint80" },
-          { internalType: "int256", name: "answer", type: "int256" },
-          { internalType: "uint256", name: "startedAt", type: "uint256" },
-          { internalType: "uint256", name: "updatedAt", type: "uint256" },
-          { internalType: "uint80", name: "answeredInRound", type: "uint80" },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "latestRoundData",
-        outputs: [
-          { internalType: "uint80", name: "roundId", type: "uint80" },
-          { internalType: "int256", name: "answer", type: "int256" },
-          { internalType: "uint256", name: "startedAt", type: "uint256" },
-          { internalType: "uint256", name: "updatedAt", type: "uint256" },
-          { internalType: "uint80", name: "answeredInRound", type: "uint80" },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "version",
-        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-        stateMutability: "view",
-        type: "function",
-      },
-    ];
+    Staking.rewardToken().then((_address) => setRewardTokenAddress(_address));
+  }, [Staking]);
 
-    const retrievePoolPriceFeed = async (poolTokenAddress) => {
-      try {
-        const pool = await Staking.pools(poolTokenAddress);
+  useEffect(() => {
+    if (!Staking || !rewardTokenAddress) {
+      return;
+    }
 
-        return pool.priceFeed;
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const rewardTokenPriceFeed = await retrievePoolPriceFeed(
-      rewardTokenAddress
+    Staking.pools(rewardTokenAddress).then((_pool) =>
+      setRewardTokenPriceFeed(_pool.priceFeed)
     );
+  }, [Staking, rewardTokenAddress]);
 
-    const RewardTokenPriceFeedInstance = new ethers.Contract(
-      rewardTokenPriceFeed,
-      aggregatorV3InterfaceABI,
-      provider.getSigner()
-    );
+  useEffect(() => {
+    if (!Staking || !rewardTokenAddress || !rewardTokenPriceFeed) {
+      return;
+    }
 
     const RewardTokenInstance = new ethers.Contract(
       rewardTokenAddress,
@@ -201,16 +159,33 @@ function App() {
       provider.getSigner()
     );
 
-    const rewardTokenName = await RewardTokenInstance.name();
-    const rewardTokenSymbol = await RewardTokenInstance.symbol();
-    const rewardTokenDecimals = await RewardTokenInstance.decimals();
+    RewardTokenInstance.name().then((_name) => setRewardTokenName(_name));
+    RewardTokenInstance.symbol().then((_symbol) => {
+      setRewardTokenSymbol(_symbol);
+      setRewardTokenIcon("/images/tokens/" + _symbol.toLowerCase() + ".svg");
+    });
+    RewardTokenInstance.decimals().then((_decimals) =>
+      setRewardTokenName(_decimals)
+    );
+  }, [Staking, rewardTokenAddress, rewardTokenPriceFeed]);
 
-    rewardToken.address = rewardTokenAddress;
-    rewardToken.name = rewardTokenName;
-    rewardToken.symbol = rewardTokenSymbol;
-    rewardToken.decimals = rewardTokenDecimals;
-    rewardToken.icon =
-      "/images/tokens/" + rewardTokenSymbol.toLowerCase() + ".svg";
+  useEffect(() => {
+    if (
+      !Staking ||
+      !rewardTokenAddress ||
+      !rewardTokenPriceFeed ||
+      !rewardTokenName ||
+      !rewardTokenSymbol ||
+      !rewardTokenIcon
+    ) {
+      return;
+    }
+
+    const RewardTokenPriceFeedInstance = new ethers.Contract(
+      rewardTokenPriceFeed,
+      aggregatorV3InterfaceABI,
+      provider.getSigner()
+    );
 
     RewardTokenPriceFeedInstance.latestRoundData().then((roundData) => {
       setRewardTokenPrice(
@@ -218,9 +193,15 @@ function App() {
       );
     });
 
-    setRewardToken(rewardToken);
     setIsRewardTokenDisplay(true);
-  }, [provider, address, networkId]);
+  }, [
+    Staking,
+    rewardTokenAddress,
+    rewardTokenPriceFeed,
+    rewardTokenName,
+    rewardTokenSymbol,
+    rewardTokenIcon,
+  ]);
 
   function renderOthersLinks() {
     if (!address) {
@@ -257,11 +238,11 @@ function App() {
                 >
                   <img
                     className="token"
-                    alt={rewardToken.name}
-                    title={rewardToken.name}
-                    src={rewardToken.icon}
+                    alt={rewardTokenName}
+                    title={rewardTokenName}
+                    src={rewardTokenIcon}
                   />{" "}
-                  <span className="symbol">{rewardToken.symbol}</span>{" "}
+                  <span className="symbol">{rewardTokenSymbol}</span>{" "}
                   {rewardTokenPrice} $
                 </div>
                 <Button
@@ -315,10 +296,16 @@ function App() {
             exact
             path="/staking"
             element={
-              <Staking
+              <Staker
                 provider={provider}
                 network_id={networkId}
                 address={address}
+                reward_token_name={rewardTokenName}
+                reward_token_symbol={rewardTokenSymbol}
+                reward_token_icon={rewardTokenIcon}
+                reward_token_address={rewardTokenAddress}
+                reward_token_price={rewardTokenPrice}
+                reward_token_price_feed={rewardTokenPriceFeed}
               />
             }
           />

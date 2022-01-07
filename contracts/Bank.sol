@@ -14,11 +14,6 @@ import "./Build.sol";
 import "./Staking.sol";
 
 contract BankContract is AccessControl, IERC721Receiver {
-	struct PlayerInfo {
-		bool isEnrolled;
-		uint8 prepaidRolls;
-	}
-
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 	bytes32 public constant BANKER_ROLE = keccak256("BANKER_ROLE");
 
@@ -39,9 +34,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/// @dev price of BUILD by type by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private buildPrices;
 
-	/// @dev player information by edition by player address
-	mapping(address => mapping(uint16 => PlayerInfo)) private players;
-
 	event eBuyProp(address indexed to, uint256 indexed prop_id);
 	event eBuyBuild(address indexed to, uint256 indexed build_id, uint32 nb);
 	event PawnBought(address indexed to, uint256 indexed pawn_id);
@@ -50,7 +42,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	event eWithdraw(address indexed to, uint256 value);
 
 	event PlayerEnrolled(uint16 _edition, address indexed player);
-	event eMovePawn(address player, uint8 dices);
+	event PawnMoved(address player, uint8 dices);
 	event DicesRollsPrepaid(address indexed player, uint8 quantity);
 	event MonoBought(address indexed player, uint256 amount);
 
@@ -86,20 +78,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 		_setRoleAdmin(BANKER_ROLE, ADMIN_ROLE);
 	}
 
-	/**
-     * @notice Get player information for an edition
-     * @param _player player address
-     * @param _edition board edition
-     * @dev
-     * @return playerInfo player information {isEnrolled, prepaidRolls}
-     */
-	function getPlayerInfo(
-		address _player,
-		uint16 _edition
-	) external view returns (PlayerInfo memory playerInfo) {
-		return players[_player][_edition];
-	}
-
 	/// @notice buy a pawn (mandatory to play)
 	function buyPawn() external {
 		require(Mono.transferFrom(msg.sender, address(this), 1 ether), "$MONO transfer failed");
@@ -128,7 +106,7 @@ contract BankContract is AccessControl, IERC721Receiver {
      * @param _edition board edition
      */
 	function enrollPlayer(uint16 _edition) public {
-		require(Pawn.balanceOf(msg.sender) == 1, "player does not own a pawn");
+		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 		require(
 			Mono.allowance(msg.sender, address(this)) == enroll_fee,
 			"player has to approve Bank for 50 $MONO"
@@ -138,44 +116,25 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 		require(Board.register(_edition, pawnID), "error when enrolling");
 
-		players[msg.sender][_edition].isEnrolled = true;
-
 		emit PlayerEnrolled(_edition, msg.sender);
 	}
 
-	/**
-     * @notice To prepaid dices rolls
-     * @param _quantity rolls quantity
-     * @param _edition board edition
-     */
-	function prepaidDicesRolls(
-		uint8 _quantity,
-		uint16 _edition
-	) public {
-		uint256 chainLinkFee = Board.fee();
-
-		require(
-			Link.allowance(msg.sender, address(this)) == _quantity * chainLinkFee,
-			"player must approve Bank for spent LINK"
-		);
-
-		require(Link.transferFrom(msg.sender, address(this), _quantity * chainLinkFee), "$LINK transfer failed");
-
-		players[msg.sender][_edition].prepaidRolls = _quantity;
-
-		emit DicesRollsPrepaid(msg.sender, _quantity);
-	}
-
 	function rollDices(uint16 _edition) external {
-		require(Pawn.balanceOf(msg.sender) == 1, "player does not own a pawn");
+		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 		uint256 pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0);
 		require(Board.isRegistered(_edition, pawnID), "player does not enroll");
+		uint256 chainlinkFee = Board.fee();
+		require(Link.balanceOf(address(Board)) > chainlinkFee, "not enough LINK in Board contract");
 
-		require(players[msg.sender][_edition].prepaidRolls != 0, "No prepaid dices rolls");
+		// Bank must be paid here for a roll
+		uint256 monoLastPrice = uint256(Staking.getLastPrice(address(Mono)));
+		uint256 linkLastPrice = uint256(Staking.getLastPrice(address(Link)));
+		Mono.transferFrom(msg.sender, address(this), chainlinkFee * linkLastPrice / monoLastPrice);
 
+		// Bank must provide LINK to Board
 		uint8 dices = Board.play(_edition, pawnID);
 
-		emit eMovePawn(msg.sender, dices);
+		emit PawnMoved(msg.sender, dices);
 	}
 
 	/**

@@ -1,43 +1,41 @@
-import React, { Component, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button, Card, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 
 import { ethers } from "ethers";
 import ERC20Json from "../contracts/ERC20.json";
+import AggregatorV3InterfaceJson from "../contracts/AggregatorV3Interface.json";
 
 function Pool(props) {
-  const spinner = <Spinner as="span" animation="border" size="sm" />;
-
   const provider = props.provider;
   const address = props.address;
   const Staking = props.Staking;
+  const rewardTokenName = props.reward_token_name;
+  const rewardTokenSymbol = props.reward_token_symbol;
+  const rewardTokenIcon = props.reward_token_icon;
+  const rewardTokenAddress = props.reward_token_address;
+  const rewardTokenPriceFeed = props.reward_token_price_feed;
+  const rewardTokenBalance = props.reward_token_balance;
 
-  const [pool, setPool] = useState({
-    token: {
-      address: props.poolToken,
-      name: null,
-      symbol: null,
-      decimals: null,
-      icon: null,
-    },
-    isTokenNetworkPool: null,
-    yield: 0,
-  });
-  const [rewardToken, setRewardToken] = useState({
-    address: props.rewardToken.address,
-    name: props.rewardToken.name,
-    symbol: props.rewardToken.symbol,
-    decimals: props.rewardToken.decimals,
-    icon: "",
-  });
+  const poolTokenAddress = props.pool_token_address;
+
   const [poolBalance, setPoolBalance] = useState(0);
   const [userStakeAmount, setUserStakeAmount] = useState(0);
   const [userPendingRewards, setUserPendingRewards] = useState(0);
   const [userBalance, setUserBalance] = useState(0);
   const [rewardTokenPrice, setRewardTokenPrice] = useState(
-    props.rewardTokenPrice
+    props.reward_token_price
   );
-  const [poolTokenPrice, setPoolTokenPrice] = useState(props.rewardTokenPrice);
+
+  const [poolTokenName, setPoolTokenName] = useState(null);
+  const [poolTokenSymbol, setPoolTokenSymbol] = useState(null);
+  const [poolTokenIcon, setPoolTokenIcon] = useState(null);
+  const [poolTokenDecimals, setPoolTokenDecimals] = useState(null);
+  const [poolTokenYield, setPoolTokenYield] = useState(null);
+  const [poolTokenIsTokenNetworkPool, setPoolTokenIsTokenNetworkPool] =
+    useState(null);
+  const [poolTokenPriceFeed, setPoolTokenPriceFeed] = useState(null);
+  const [poolTokenPrice, setPoolTokenPrice] = useState(null);
   const [PoolTokenInstance, setPoolTokenInstance] = useState(null);
   const [PoolTokenPriceFeedInstance, setPoolTokenPriceFeedInstance] =
     useState(null);
@@ -51,116 +49,86 @@ function Pool(props) {
 
   const user = {
     account: props.address,
-    rewardTokenBalance: props.rewardTokenBalance,
+    rewardTokenBalance: rewardTokenBalance,
   };
+  const aggregatorV3InterfaceABI = AggregatorV3InterfaceJson.abi;
 
   // functions
   const updateRewardTokenBalance = props.updateRewardTokenBalance; // .bind(this) si on a besoin du contexte de Pool
-  const retrievePoolPriceFeed = props.retrievePoolPriceFeed; // Ici on a bien besoin du contexte de App, donc rien
 
-  useEffect(async () => {
-    if (!(props.rewardToken && props.rewardToken.symbol)) {
+  useEffect(() => {
+    if (!Staking || !poolTokenAddress) {
       return;
     }
 
-    rewardToken.address = props.rewardToken.address;
-    rewardToken.name = props.rewardToken.name;
-    rewardToken.symbol = props.rewardToken.symbol;
-    rewardToken.decimals = props.rewardToken.decimals;
-    rewardToken.icon =
-      "./images/tokens/" + props.rewardToken.symbol.toLowerCase() + ".svg";
+    Staking.pools(poolTokenAddress).then((_pool) => {
+      setPoolTokenYield(parseInt(_pool.yield));
+      setPoolTokenIsTokenNetworkPool(_pool.isTokenNetwork);
+    });
 
-    setRewardToken(rewardToken);
-  }, [props.rewardToken.symbol]);
+    setPoolTokenInstance(
+      new ethers.Contract(
+        poolTokenAddress,
+        ERC20Json.abi,
+        provider.getSigner(address)
+      )
+    );
 
-  useEffect(async () => {
-    if (!Staking) {
+    Staking.NETWORK_TOKEN_VIRTUAL_ADDRESS().then((_address) => {
+      setNetworkTokenVirtualAddress(_address);
+    });
+  }, [Staking, poolTokenAddress]);
+
+  useEffect(() => {
+    if (
+      !Staking ||
+      !poolTokenAddress ||
+      !PoolTokenInstance ||
+      !networkTokenVirtualAddress ||
+      poolTokenIsTokenNetworkPool === null
+    ) {
       return;
     }
 
-    const _pool = await Staking.pools(pool.token.address);
-    pool.yield = parseInt(_pool.yield);
+    if (poolTokenIsTokenNetworkPool) {
+      Staking.networkTokenSymbol().then((_symbol) => {
+        setPoolTokenSymbol(_symbol);
+        setPoolTokenName("Network Token");
+        setPoolTokenDecimals(18);
+        setPoolTokenIcon("./images/tokens/" + _symbol.toLowerCase() + ".svg");
+      });
 
-    pool.isTokenNetworkPool = _pool.isTokenNetwork;
+      Staking.pools(networkTokenVirtualAddress).then((_pool) =>
+        setPoolTokenPriceFeed(_pool.priceFeed)
+      );
 
-    let _networkTokenVirtualAddress = networkTokenVirtualAddress;
-    if (!_networkTokenVirtualAddress) {
-      _networkTokenVirtualAddress =
-        await Staking.NETWORK_TOKEN_VIRTUAL_ADDRESS();
+      return;
     }
 
-    const _PoolTokenInstance = new ethers.Contract(
-      pool.token.address,
-      ERC20Json.abi,
-      provider.getSigner(address)
+    PoolTokenInstance.symbol().then((_symbol) => {
+      setPoolTokenSymbol(_symbol);
+      setPoolTokenIcon("./images/tokens/" + _symbol.toLowerCase() + ".svg");
+    });
+    PoolTokenInstance.name().then((_name) => setPoolTokenName(_name));
+    PoolTokenInstance.decimals().then((_decimals) =>
+      setPoolTokenDecimals(_decimals)
     );
 
-    if (pool.isTokenNetworkPool) {
-      pool.token.symbol = await Staking.networkTokenSymbol();
-      pool.token.name = "Network Token";
-      pool.token.decimals = 18;
-    } else {
-      pool.token.symbol = await _PoolTokenInstance.symbol();
-      pool.token.name = await _PoolTokenInstance.name();
-      pool.token.decimals = await _PoolTokenInstance.decimals();
+    Staking.pools(poolTokenAddress).then((_pool) =>
+      setPoolTokenPriceFeed(_pool.priceFeed)
+    );
+  }, [
+    Staking,
+    poolTokenAddress,
+    PoolTokenInstance,
+    networkTokenVirtualAddress,
+    poolTokenIsTokenNetworkPool,
+  ]);
+
+  useEffect(() => {
+    if (!Staking || !poolTokenPriceFeed) {
+      return;
     }
-
-    pool.token.icon =
-      "./images/tokens/" + pool.token.symbol.toLowerCase() + ".svg";
-
-    const aggregatorV3InterfaceABI = [
-      {
-        inputs: [],
-        name: "decimals",
-        outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "description",
-        outputs: [{ internalType: "string", name: "", type: "string" }],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [{ internalType: "uint80", name: "_roundId", type: "uint80" }],
-        name: "getRoundData",
-        outputs: [
-          { internalType: "uint80", name: "roundId", type: "uint80" },
-          { internalType: "int256", name: "answer", type: "int256" },
-          { internalType: "uint256", name: "startedAt", type: "uint256" },
-          { internalType: "uint256", name: "updatedAt", type: "uint256" },
-          { internalType: "uint80", name: "answeredInRound", type: "uint80" },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "latestRoundData",
-        outputs: [
-          { internalType: "uint80", name: "roundId", type: "uint80" },
-          { internalType: "int256", name: "answer", type: "int256" },
-          { internalType: "uint256", name: "startedAt", type: "uint256" },
-          { internalType: "uint256", name: "updatedAt", type: "uint256" },
-          { internalType: "uint80", name: "answeredInRound", type: "uint80" },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-      {
-        inputs: [],
-        name: "version",
-        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-        stateMutability: "view",
-        type: "function",
-      },
-    ];
-
-    const poolTokenPriceFeed = await retrievePoolPriceFeed(
-      pool.isTokenNetworkPool ? _networkTokenVirtualAddress : pool.token.address
-    );
 
     const _PoolTokenPriceFeedInstance = new ethers.Contract(
       poolTokenPriceFeed,
@@ -168,11 +136,8 @@ function Pool(props) {
       provider
     );
 
-    setNetworkTokenVirtualAddress(_networkTokenVirtualAddress);
-    setPool(pool);
-    setPoolTokenInstance(_PoolTokenInstance);
     setPoolTokenPriceFeedInstance(_PoolTokenPriceFeedInstance);
-  }, [Staking]);
+  }, [Staking, poolTokenPriceFeed]);
 
   useEffect(() => {
     if (!PoolTokenInstance || !PoolTokenPriceFeedInstance) {
@@ -191,7 +156,7 @@ function Pool(props) {
       return;
     }
 
-    if (props.poolToUpdateToken !== props.poolToken) {
+    if (props.poolToUpdateToken !== props.pool_token_address) {
       return;
     }
 
@@ -216,14 +181,16 @@ function Pool(props) {
 
   const updatePoolBalance = () => {
     Staking.getPoolBalance(
-      pool.isTokenNetworkPool ? networkTokenVirtualAddress : pool.token.address
+      poolTokenIsTokenNetworkPool
+        ? networkTokenVirtualAddress
+        : poolTokenAddress
     ).then((balance) => {
       setPoolBalance(Number(ethers.utils.formatEther(balance)).toFixed(2));
     });
   };
 
   const updateUserBalanceInPool = () => {
-    Staking.getUserBalanceInPool(pool.token.address, user.account).then(
+    Staking.getUserBalanceInPool(poolTokenAddress, user.account).then(
       (balance) => {
         setUserStakeAmount(Number(ethers.utils.formatEther(balance)));
       }
@@ -231,13 +198,13 @@ function Pool(props) {
   };
 
   const updateUserPendingRewards = () => {
-    Staking.pendingReward(pool.token.address).then((balance) => {
+    Staking.pendingReward(poolTokenAddress).then((balance) => {
       setUserPendingRewards(Number(ethers.utils.formatEther(balance)));
     });
   };
 
   const updatePoolTokenUserBalance = () => {
-    if (pool.isTokenNetworkPool) {
+    if (poolTokenIsTokenNetworkPool) {
       provider.getBalance(user.account).then((balance) => {
         setUserBalance(Number(ethers.utils.formatEther(balance)));
       });
@@ -261,9 +228,9 @@ function Pool(props) {
 
     let result;
 
-    if (pool.isTokenNetworkPool) {
+    if (poolTokenIsTokenNetworkPool) {
       Staking.stake(
-        pool.token.address,
+        poolTokenAddress,
         ethers.utils.parseEther(amountToStake.toString()),
         { value: ethers.utils.parseEther(amountToStake.toString()) }
       ).then((result) => {
@@ -306,7 +273,7 @@ function Pool(props) {
     }
 
     Staking.stake(
-      pool.token.address,
+      poolTokenAddress,
       ethers.utils.parseEther(amountToStake.toString())
     ).then((result) => {
       setIsPerforming(false);
@@ -315,7 +282,7 @@ function Pool(props) {
   };
 
   const doUnstake = async () => {
-    Staking.unstake(pool.token.address).then((result) => {
+    Staking.unstake(poolTokenAddress).then((result) => {
       setIsPerforming(false);
     });
   };
@@ -327,26 +294,26 @@ function Pool(props) {
         style={{ width: "calc((100% - 2rem)/4)" }}
       >
         <Card.Header className="text-center">
-          stake <span className="symbol">{pool.token.symbol}</span>
+          stake <span className="symbol">{poolTokenSymbol}</span>
           <img
             className="token"
-            alt={pool.token.name}
-            title={pool.token.name}
-            src={pool.token.icon}
+            alt={poolTokenName}
+            title={poolTokenName}
+            src={poolTokenIcon}
           />
-          earn <span className="symbol">{rewardToken.symbol}</span>
+          earn <span className="symbol">{rewardTokenSymbol}</span>
           <img
             className="token"
-            alt={rewardToken.name}
-            title={rewardToken.name}
-            src={rewardToken.icon}
+            alt={rewardTokenName}
+            title={rewardTokenName}
+            src={rewardTokenIcon}
           />
           <br />
-          APR: {pool.yield} %
+          APR: {poolTokenYield} %
         </Card.Header>
         <Card.Body>
           <Row>
-            <div className="title">{rewardToken.symbol} earned</div>
+            <div className="title">{rewardTokenSymbol} earned</div>
           </Row>
           <Row>
             <Col>{userPendingRewards.toFixed(6)}</Col>
@@ -355,7 +322,7 @@ function Pool(props) {
             </Col>
           </Row>
           <Row>
-            <div className="title">{pool.token.symbol} stacked</div>
+            <div className="title">{poolTokenSymbol} stacked</div>
           </Row>
           <Row>
             <Col>{userStakeAmount.toFixed(4)}</Col>
@@ -377,9 +344,9 @@ function Pool(props) {
               {isPerforming ? (
                 <Spinner as="span" animation="border" size="sm" />
               ) : userStakeAmount === 0 ? (
-                "Stake " + pool.token.symbol
+                "Stake " + poolTokenSymbol
               ) : (
-                "Unstake " + pool.token.symbol
+                "Unstake " + poolTokenSymbol
               )}
             </Button>
           </Row>
@@ -388,12 +355,12 @@ function Pool(props) {
 
       <Modal show={isStakeModalShown} centered backdrop="static">
         <Modal.Header>
-          <Modal.Title>{pool.token.symbol} staking</Modal.Title>
+          <Modal.Title>{poolTokenSymbol} staking</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group>
-              My {pool.token.symbol} balance: {userBalance}
+              My {poolTokenSymbol} balance: {userBalance}
             </Form.Group>
             <Form.Group>
               <Form.Control
@@ -409,7 +376,7 @@ function Pool(props) {
             {isPerforming ? (
               <Spinner as="span" animation="border" size="sm" />
             ) : (
-              "Stake " + pool.token.symbol
+              "Stake " + poolTokenSymbol
             )}
           </Button>
           <Button

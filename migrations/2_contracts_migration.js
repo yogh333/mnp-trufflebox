@@ -179,6 +179,9 @@ module.exports = async function (deployer, network, accounts) {
   await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
     from: accounts[0],
   });
+  await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
+    from: accounts[0],
+  });
 
   // initialize Paris board prices
   let commonLandPrices = [];
