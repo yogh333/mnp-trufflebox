@@ -10,7 +10,7 @@ import BoardJson from "../contracts/BoardContract.json";
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
 
-const CELLS_ON_BOARD = 40;
+
 
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -18,6 +18,7 @@ export default function User(props) {
   const provider = props.provider;
   const address = props.address;
   const networkId = props.network_id;
+  const maxCells = props.max_lands;
 
   const [Bank, setBank] = useState(null);
   const [Board, setBoard] = useState(null);
@@ -95,7 +96,7 @@ export default function User(props) {
    * @param total
    */
   function handleNewPosition(previousPosition, total) {
-    const newCell = (previousPosition + total) % CELLS_ON_BOARD;
+    const newCell = (previousPosition + total) % maxCells;
     
     highlightCurrentCell(newCell);
     setCurrentPosition(newCell);

@@ -134,13 +134,13 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @notice Requests randomness
 	 * @return requestId the id of the request for the oracle
 	 */
-	function getRandomNumber(uint16 _edition, uint256 _pawnID) internal returns (uint){
+	/*function getRandomNumber(uint16 _edition, uint256 _pawnID) internal returns (uint){
 		require(isRegistered(_edition, _pawnID),'pawn has not been registered');
-		require(randomResult() != 0,'randomness is not prepared');
+		require(randomResult != 0,'randomness is not prepared');
 		boards[_edition].pawns[_pawnID].rollingState = false;
 
-		return randomResult();
-	}
+		return randomResult;
+	}*/
 	/**
 	 * @notice Callback function used by VRF Coordinator
 	 * @param requestId the id of the request for the oracle
@@ -265,8 +265,8 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		require(boards[_edition].pawns[_pawnID].isOnBoard == true, "Unregistered pawn");
 
 		// roll dices (randomly)
-		//dices_score_ = 4;
-		dices_score_ = getRandomNumber();
+		dices_score_ = 4;
+		//dices_score_ = getRandomNumber();
 
 		// update player's position (modulo boards[edition].nbOfLands)
 		boards[_edition].pawns[_pawnID].position += dices_score_ % boards[_edition].nbOfLands;

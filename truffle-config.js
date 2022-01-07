@@ -48,8 +48,10 @@ module.exports = {
 
     kovan: {
       provider: () =>
-        new HDWalletProvider('solar such lumber firm inhale combine old hint neutral obscure fiber dumb', 'https://kovan.infura.io/v3/0cf118ade5ad413a8bd22c155b396750'),
-      network_id: 42
+        new HDWalletProvider('solar such lumber firm inhale combine old hint neutral obscure fiber dumb', 'wss://kovan.infura.io/ws/v3/df38882d8ddf470c8dc5f7eaf2250a46'),
+      network_id: 42,
+      gas: 8500000,
+      gasprice: 25000000000
     },
 
 
