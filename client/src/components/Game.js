@@ -31,12 +31,10 @@ function Game(props) {
 
   const [Bank, setBank] = useState(null);
   const [Mono, setMono] = useState(null);
-  const [Link, setLink] = useState(null);
   const [Board, setBoard] = useState(null);
   const [Pawn, setPawn] = useState(null);
   const [Staking, setStaking] = useState(null);
   const [visual, setVisual] = useState(<div>Property visual</div>);
-  //const [currentLandId, setCurrentLandId] = useState(0);
   const [landInfo, setLandInfo] = useState({
     id: null,
     title: "undefined",
@@ -73,14 +71,6 @@ function Game(props) {
       new ethers.Contract(
         MonoJson.networks[networkId].address,
         MonoJson.abi,
-        provider.getSigner(address)
-      )
-    );
-
-    setLink(
-      new ethers.Contract(
-        LinkJson.networks[networkId].address,
-        LinkJson.abi,
         provider.getSigner(address)
       )
     );
@@ -133,18 +123,12 @@ function Game(props) {
 
   const subscribeContractsEvents = () => {
     Bank.on("PlayerEnrolled", (edition, player, event) => {
-      console.log(event);
       if (event.blockNumber <= startBlockNumber) return;
-      console.log("after");
-      console.log(event);
 
       updateValues();
     });
     Bank.on("DicesRollsPrepaid", (player, quantity, event) => {
-      console.log(event);
       if (event.blockNumber <= startBlockNumber) return;
-      console.log("after");
-      console.log(event);
 
       updateValues();
     });
@@ -197,9 +181,7 @@ function Game(props) {
 
     if (
       _isRegistered &&
-      ethers.BigNumber.from(_monoBalance).gte(
-        ethers.utils.parseEther("1")
-      )
+      ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1"))
     ) {
       setData(5);
       setCanPlay(true);
@@ -283,7 +265,6 @@ function Game(props) {
       return;
     }
 
-    // Tester si enrolled
     // Step 1
     const monoLastPrice = await Staking.getLastPrice(Mono.address);
     const networkTokenVirtualAddress =
