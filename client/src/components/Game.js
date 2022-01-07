@@ -198,7 +198,7 @@ function Game(props) {
     if (
       _isRegistered &&
       ethers.BigNumber.from(_monoBalance).gte(
-        ethers.utils.parseEther("1") //todo qui paye le gas qd le contrat tranfertFrom MONO ?
+        ethers.utils.parseEther("1")
       )
     ) {
       setData(5);
