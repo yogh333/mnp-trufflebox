@@ -42,20 +42,22 @@ export default function User(props) {
       provider
     );
 
-    const Bank = new ethers.Contract(
-      BankJson.networks[networkId].address,
-      BankJson.abi,
-      provider.getSigner()
+    setBank(
+      new ethers.Contract(
+        BankJson.networks[networkId].address,
+        BankJson.abi,
+        provider.getSigner()
+      )
     );
 
-    const Board = new ethers.Contract(
-      BoardJson.networks[networkId].address,
-      BoardJson.abi,
-      provider.getSigner()
+    setBoard(
+      new ethers.Contract(
+        BoardJson.networks[networkId].address,
+        BoardJson.abi,
+        provider.getSigner()
+      )
     );
 
-    setBank(Bank);
-    setBoard(Board);
     Mono.balanceOf(address).then((value) =>
       setBalance(ethers.utils.formatUnits(value))
     );

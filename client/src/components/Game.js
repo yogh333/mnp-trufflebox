@@ -52,7 +52,7 @@ function Game(props) {
 
   const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [monoBalance, setMonoBalance] = useState(null);
-  const [pawnBalance, setPawnBalance] = useState(null);
+  const [pawnBalance, setPawnBalance] = useState(ethers.utils.parseEther("0"));
   const [monoToBuy, setMonoToBuy] = useState(0);
   const [networkTokensToBuy, setNetworkTokensToBuy] = useState(null);
 
@@ -109,14 +109,9 @@ function Game(props) {
       )
     );
 
-    let _startBlockNumber;
-    const fetchStartBlockNumber = async () => {
-      _startBlockNumber = await provider.getBlockNumber();
-    };
-
-    fetchStartBlockNumber();
-
-    setStartBlockNumber(_startBlockNumber);
+    provider
+      .getBlockNumber()
+      .then((_blockNumber) => setStartBlockNumber(_blockNumber));
   }, [provider, address, networkId]);
 
   useEffect(() => {
@@ -138,17 +133,30 @@ function Game(props) {
 
   const subscribeContractsEvents = () => {
     Bank.on("PlayerEnrolled", (edition, player, event) => {
+      console.log(event);
       if (event.blockNumber <= startBlockNumber) return;
+      console.log("after");
+      console.log(event);
 
       updateValues();
     });
     Bank.on("DicesRollsPrepaid", (player, quantity, event) => {
+      console.log(event);
       if (event.blockNumber <= startBlockNumber) return;
+      console.log("after");
+      console.log(event);
 
       updateValues();
     });
     Bank.on("MonoBought", (player, amount, event) => {
       if (event.blockNumber <= startBlockNumber) return;
+      if (player.toLowerCase() !== address) return;
+
+      updateValues();
+    });
+    Mono.on("Approval", (owner, spender, value, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+      if (owner.toLowerCase() !== address) return;
 
       updateValues();
     });
@@ -164,9 +172,6 @@ function Game(props) {
     const _monoBalance = await Mono.balanceOf(address);
     const _pawnBalance = await Pawn.balanceOf(address);
 
-    setMonoBalance(_monoBalance);
-    setPawnBalance(_pawnBalance);
-
     let _isRegistered;
 
     if (_pawnBalance.toNumber() > 0) {
@@ -174,27 +179,33 @@ function Game(props) {
       _isRegistered = await Board.isRegistered(props.edition_id, _pawnID);
     }
 
-    //setIsRegistered(_isRegistered);
-
-    if (
-      _isRegistered &&
-      ethers.BigNumber.from(_monoBalance).gte(
-        ethers.utils.parseEther("1") //todo qui paye le gas qd le contr ct tranfertFrom MONO ?
-      )
-    ) {
-      setIsPerforming(false);
-      setInGameStep(5);
-      setCanPlay(true);
-      setIsRegistered(_isRegistered);
-
-      return;
-    }
-
     const _monoToBuy = Math.ceil(
       IN_GAME_MONO_AMOUNT -
         Number(ethers.utils.formatEther(_monoBalance)).toFixed(2) +
         (_pawnBalance.toNumber() > 0 ? 0 : 1)
     );
+
+    const setData = (_step) => {
+      setInGameStep(_step);
+      setCanPlay(false);
+      setIsPerforming(false);
+      setMonoBalance(_monoBalance);
+      setPawnBalance(_pawnBalance);
+      setIsRegistered(_isRegistered);
+      setMonoToBuy(_monoToBuy);
+    };
+
+    if (
+      _isRegistered &&
+      ethers.BigNumber.from(_monoBalance).gte(
+        ethers.utils.parseEther("1") //todo qui paye le gas qd le contrat tranfertFrom MONO ?
+      )
+    ) {
+      setData(5);
+      setCanPlay(true);
+
+      return;
+    }
 
     const allowance = await Mono.allowance(address, Bank.address);
 
@@ -206,10 +217,7 @@ function Game(props) {
       ethers.BigNumber.from(allowance).gte(ethers.utils.parseEther("1")) &&
       _pawnBalance.toNumber() > 0
     ) {
-      setIsPerforming(false);
-      setInGameStep(4);
-      setCanPlay(false);
-      setIsRegistered(_isRegistered);
+      setData(4);
 
       return;
     }
@@ -225,10 +233,7 @@ function Game(props) {
       ) &&
       _pawnBalance.toNumber() > 0
     ) {
-      setInGameStep(4);
-      setIsPerforming(false);
-      setMonoToBuy(_monoToBuy);
-      setIsRegistered(_isRegistered);
+      setData(4);
 
       return;
     }
@@ -238,10 +243,7 @@ function Game(props) {
       ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1")) &&
       ethers.BigNumber.from(allowance).gte(ethers.utils.parseEther("1"))
     ) {
-      setInGameStep(3);
-      setIsPerforming(false);
-      setMonoToBuy(_monoToBuy);
-      setIsRegistered(_isRegistered);
+      setData(3);
 
       return;
     }
@@ -256,10 +258,7 @@ function Game(props) {
         )
       )
     ) {
-      setInGameStep(3);
-      setIsPerforming(false);
-      setMonoToBuy(_monoToBuy);
-      setIsRegistered(_isRegistered);
+      setData(3);
 
       return;
     }
@@ -268,10 +267,7 @@ function Game(props) {
       _isRegistered &&
       ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1"))
     ) {
-      setInGameStep(2);
-      setIsPerforming(false);
-      setMonoToBuy(_monoToBuy);
-      setIsRegistered(_isRegistered);
+      setData(2);
 
       return;
     }
@@ -282,10 +278,7 @@ function Game(props) {
         ethers.utils.parseEther(_monoToBuy.toString())
       )
     ) {
-      setInGameStep(2);
-      setIsPerforming(false);
-      setMonoToBuy(_monoToBuy);
-      setIsRegistered(_isRegistered);
+      setData(2);
 
       return;
     }
@@ -299,14 +292,12 @@ function Game(props) {
       networkTokenVirtualAddress
     );
 
-    setIsRegistered(_isRegistered);
-    setMonoToBuy(_monoToBuy);
     setNetworkTokensToBuy(
       Math.ceil(
         ((_monoToBuy * monoLastPrice) / networkTokenLastPrice) * 10 ** 18
       )
     );
-    setIsPerforming(false);
+    setData(1);
   };
 
   const retrieveCellPrices = async (editionId, cellID) => {
@@ -389,6 +380,11 @@ function Game(props) {
       return;
     }
 
+    const _pawnBalance = await Pawn.balanceOf(address);
+
+    console.log(_pawnBalance);
+    console.log(pawnBalance);
+
     setIsPerforming(true);
 
     let result;
@@ -403,7 +399,11 @@ function Game(props) {
 
     if (
       ethers.BigNumber.from(result).gte(
-        ethers.utils.parseEther(IN_GAME_MONO_AMOUNT.toString())
+        ethers.utils.parseEther(
+          (
+            IN_GAME_MONO_AMOUNT + (pawnBalance.toNumber() > 0 ? 0 : 1)
+          ).toString()
+        )
       )
     ) {
       console.log("updateValues()");
@@ -414,7 +414,11 @@ function Game(props) {
     try {
       result = await Mono.approve(
         Bank.address,
-        ethers.utils.parseEther(IN_GAME_MONO_AMOUNT.toString())
+        ethers.utils.parseEther(
+          (
+            IN_GAME_MONO_AMOUNT + (pawnBalance.toNumber() > 0 ? 0 : 1)
+          ).toString()
+        )
       );
 
       setIsPerforming(false);
@@ -509,7 +513,10 @@ function Game(props) {
             </Card.Header>
             <Card.Body>
               You must give us allowance to spent{" "}
-              {IN_GAME_MONO_AMOUNT.toString()} $MONO
+              {(
+                IN_GAME_MONO_AMOUNT + (pawnBalance.toNumber() > 0 ? 0 : 1)
+              ).toString()}{" "}
+              $MONO
             </Card.Body>
             <Card.Footer>
               <Button variant="primary" onClick={approveSpent}>
