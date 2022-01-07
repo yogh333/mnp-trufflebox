@@ -20,9 +20,7 @@ contract("Board", async (accounts) => {
     const initialSetUp = async () => {
 
         pawnInstance = await Pawn.new("pawn", "PAWN", "https://server.com/pawn/", {from: _contractOwner});
-        boardInstance = await Board.new(pawnInstance.address, {
-            from: _contractOwner,
-        });
+        boardInstance = await Board.new( {from: _contractOwner});
     };
 
     describe("Test of the random function", () => {
@@ -37,13 +35,13 @@ contract("Board", async (accounts) => {
 
             for (const item of emptyArray) {
                 const latest = await time.latestBlock();
-                console.log("Current block where I am:", ${latest});
+                //console.log("Current block where I am:", ${latest});
                 const number = await boardInstance.getRandomKeccak256();
 
                 await time.advanceBlockTo(parseInt(latest) + 20);
 
                 const current = await time.latestBlock();
-                console.log(" After the operation of ",time.advanceBlockTo, " I am here in this block:" ${current});
+                //console.log(" After the operation of ",time.advanceBlockTo, " I am here in this block:" ${current});
                 results.push(Number(number.toString()));
             }
             console.log('result', results);
