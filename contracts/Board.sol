@@ -46,7 +46,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	mapping(uint16 => BoardInfo) private boards;
 
 	bytes32 internal keyHash;
-	uint256 internal fee;
+	uint256 public fee;
 	uint256 public randomResult;
 
 	/// @notice constructor
@@ -65,8 +65,6 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		_setRoleAdmin(MANAGER_ROLE, ADMIN_ROLE);
 
 		editionMax = 0;
-
-		Pawn = PawnContract(PawnAddress);
 
 		BoardInfo storage b = boards[0];
 
