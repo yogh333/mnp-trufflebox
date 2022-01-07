@@ -12,7 +12,6 @@ contract("BoardContract", async (accounts) => {
     deployer = accounts[0];
   });
 
-
   it("should return proper number of lands ", async function () {
     expect((await BoardInstance.getNbLands(0)).toNumber()).to.equal(40);
   });
@@ -46,7 +45,6 @@ contract("BoardContract", async (accounts) => {
       max_pawns: 100,
 
     };
-
 
     let result = await BoardInstance.newBoard(
       b.lands,

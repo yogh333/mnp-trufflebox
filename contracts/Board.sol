@@ -149,7 +149,6 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
 
 		randomResult = (randomness % 6) + 1;
-
 	}
 
 	/**
