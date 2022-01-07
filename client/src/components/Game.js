@@ -125,7 +125,7 @@ function Game(props) {
       <div className="info-area-1">
         <h2>User info</h2>
         {provider && (
-          <User provider={provider} address={address} network_id={networkId} />
+          <User provider={provider} address={address} network_id={networkId} max_lands={board.maxLands}/>
         )}
       </div>
       <div className="info-area-2">

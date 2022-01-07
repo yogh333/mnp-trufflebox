@@ -6,10 +6,11 @@ import MonoJson from "../contracts/MonoContract.json";
 import BankJson from "../contracts/BankContract.json";
 import PropJson from "../contracts/PropContract.json";
 import BoardJson from "../contracts/BoardContract.json";
-import BuildJson from "../contracts/BuildContract.json";
 
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
+
+
 
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -17,6 +18,7 @@ export default function User(props) {
   const provider = props.provider;
   const address = props.address;
   const networkId = props.network_id;
+  const maxCells = props.max_lands;
 
   const [Bank, setBank] = useState(null);
   const [Board, setBoard] = useState(null);
@@ -71,36 +73,20 @@ export default function User(props) {
     if (Board == null) return;
 
     //Generates a random number by function keccak256 of solidity
-    //pb to see
-    const Keccak256RandomNumber1 = await Board.getKeccak256RandomNumber();
-    console.log("Keccak256RandomNumber: ", Keccak256RandomNumber1);
-
-    const Keccak256RandomNumber2 = await Board.getKeccak256RandomNumber();
-    console.log("Keccak256RandomNumber2: ", Keccak256RandomNumber2);
+    //pb to see: the result seems to be buffered somewhere
+    const result = await Board.getRandomKeccak256();
+    const generateNewNumber = () => Math.floor(Math.random(result) * 6 + 1);
+    const number1 = generateNewNumber();
+    const number2 = generateNewNumber();
+    console.log({number1, number2});
 
     console.log({ rollDice });
-
-    const total = calculateTotal(Keccak256RandomNumber1, Keccak256RandomNumber2);
+    const total = calculateTotal(number1, number2);
     handleNewPosition(currentPosition, total);
     console.log("total:", { total });
-    setRollDice([Keccak256RandomNumber1, Keccak256RandomNumber2]);
-
+    setRollDice([number1, number2]);
 
     //TODO: Replace by the call at the oracle
-    //Generates a random number by JS
-    /*const generateNewNumber = () => Math.floor(Math.random() * 6 + 1);
-
-    const newValue1 = generateNewNumber();
-    const newValue2 = generateNewNumber();
-
-    console.log({ rollDice });
-
-    const total = calculateTotal(newValue1, newValue2);
-    handleNewPosition(currentPosition, total);
-    console.log("total:", { total });
-    setRollDice([newValue1, newValue2]);
-
-     */
   }
 
   /**
@@ -110,10 +96,8 @@ export default function User(props) {
    * @param total
    */
   function handleNewPosition(previousPosition, total) {
-    const newCell = previousPosition + total;
-
-    //TODO: to define more accurately
-    if (newCell >= 40) return;
+    const newCell = (previousPosition + total) % maxCells;
+    
     highlightCurrentCell(newCell);
     setCurrentPosition(newCell);
     forgetPreviousPosition(previousPosition);
@@ -168,7 +152,7 @@ export default function User(props) {
       </Button>
 
       <div className="mt-3 ml-150">
-        {/* first dice display */}
+        {/* first die display */}
         <img
           className="dice-display"
           src={require(`../assets/dice_face_${rollDice[0]}.png`).default}
@@ -177,7 +161,7 @@ export default function User(props) {
       </div>
 
       <div className="mt-3 ml-150">
-        {/* second dice display */}
+        {/* second die display */}
         <img
           className="dice-display"
           src={require(`../assets/dice_face_${rollDice[1]}.png`).default}

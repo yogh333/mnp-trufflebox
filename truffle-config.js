@@ -46,6 +46,16 @@ module.exports = {
       network_id: "*", // Any network (default: none)
     },
 
+    kovan: {
+      provider: () =>
+        new HDWalletProvider('solar such lumber firm inhale combine old hint neutral obscure fiber dumb', 'wss://kovan.infura.io/ws/v3/df38882d8ddf470c8dc5f7eaf2250a46'),
+      network_id: 42,
+      gas: 8500000,
+      gasprice: 25000000000
+    },
+
+
+
     // Another network with more advanced options...
     // advanced: {
     // port: 8777,             // Custom port
@@ -57,14 +67,16 @@ module.exports = {
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    // ropsten: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/YOUR-PROJECT-ID`),
-    // network_id: 3,       // Ropsten's id
-    // gas: 5500000,        // Ropsten has a lower block limit than mainnet
-    // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
-    // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-    // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-    // },
+    kovan: {
+      provider: () =>
+        new HDWalletProvider(
+          "seed phrase",
+          `https://kovan.infura.io/v3/YOUR_INFURA_ID`
+        ),
+      network_id: 42,
+      gas: 8500000,
+      gasprice: 25000000000,
+    },
     // Useful for private networks
     // private: {
     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
