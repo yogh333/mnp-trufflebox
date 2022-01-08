@@ -5,6 +5,7 @@ ethers = require("ethers");
 Paris = require("../client/src/data/Paris.json");
 
 const Link = artifacts.require("Link");
+const LinkForChainlinkVRF = artifacts.require("LinkForChainlinkVRF");
 const Matic = artifacts.require("Matic");
 const Mono = artifacts.require("MonoContract");
 
@@ -38,8 +39,14 @@ module.exports = async function (deployer, network, accounts) {
   switch (network) {
     case "development":
       // others ERC20 tokens
-      await deployer.deploy(Link);
-      LinkInstance = await Link.deployed();
+
+      // Deploy this one if not using Chainlink VRF
+      //await deployer.deploy(Link);
+      //LinkInstance = await Link.deployed();
+
+      // Deploy this Link contract to simulate Chainlink VRF
+      await deployer.deploy(LinkForChainlinkVRF);
+      LinkInstance = await LinkForChainlinkVRF.deployed();
 
       /*await deployer.deploy(Matic);
       MaticInstance = await Matic.deployed();*/
@@ -82,7 +89,13 @@ module.exports = async function (deployer, network, accounts) {
   await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
   const PawnInstance = await Pawn.deployed();
 
-  await deployer.deploy(Board);
+  await deployer.deploy(
+    Board,
+    LinkInstance.address, // VRF Coordinator is Link contract
+    LinkInstance.address,
+    "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+    0.0001 * 10 ** 18
+  );
   const BoardInstance = await Board.deployed();
 
   await deployer.deploy(
@@ -113,10 +126,15 @@ module.exports = async function (deployer, network, accounts) {
 
   switch (network) {
     case "development":
-      /*await LinkInstance.faucet(
+      await LinkInstance.faucet(
         BankInstance.address,
         ethers.utils.parseEther("1500")
-      );*/
+      );
+
+      await LinkInstance.faucet(
+        BoardInstance.address,
+        ethers.utils.parseEther("1000")
+      );
 
       /*console.log("LinkInstance.balanceOf(BankInstance.address)");
       let balance = await LinkInstance.balanceOf(BankInstance.address);

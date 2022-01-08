@@ -48,6 +48,7 @@ function Game(props) {
   const [inGameStep, setInGameStep] = useState(1);
   const [isRegistered, setIsRegistered] = useState(false);
 
+  const [pawnID, setPawnID] = useState(false);
   const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [monoBalance, setMonoBalance] = useState(null);
   const [pawnBalance, setPawnBalance] = useState(ethers.utils.parseEther("0"));
@@ -156,10 +157,10 @@ function Game(props) {
     const _monoBalance = await Mono.balanceOf(address);
     const _pawnBalance = await Pawn.balanceOf(address);
 
-    let _isRegistered;
+    let _isRegistered, _pawnID;
 
     if (_pawnBalance.toNumber() > 0) {
-      const _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
+      _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
       _isRegistered = await Board.isRegistered(props.edition_id, _pawnID);
     }
 
@@ -177,6 +178,7 @@ function Game(props) {
       setPawnBalance(_pawnBalance);
       setIsRegistered(_isRegistered);
       setMonoToBuy(_monoToBuy);
+      setPawnID(_pawnID);
     };
 
     if (
@@ -193,9 +195,7 @@ function Game(props) {
 
     if (
       _isRegistered &&
-      ethers.BigNumber.from(_monoBalance).gte(
-        ethers.utils.parseEther("1") //todo qui paye le gas qd le contr ct tranfertFrom MONO ?
-      ) &&
+      ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1")) &&
       ethers.BigNumber.from(allowance).gte(ethers.utils.parseEther("1")) &&
       _pawnBalance.toNumber() > 0
     ) {
@@ -361,11 +361,6 @@ function Game(props) {
       return;
     }
 
-    const _pawnBalance = await Pawn.balanceOf(address);
-
-    console.log(_pawnBalance);
-    console.log(pawnBalance);
-
     setIsPerforming(true);
 
     let result;
@@ -387,7 +382,6 @@ function Game(props) {
         )
       )
     ) {
-      console.log("updateValues()");
       updateValues();
       return;
     }
@@ -408,7 +402,6 @@ function Game(props) {
       }
 
       // Not waiting for Approve event
-      console.log("updateValues()");
       updateValues();
     } catch (error) {
       console.error(error);
@@ -557,7 +550,14 @@ function Game(props) {
       <div className="info-area-1">
         <h2>User info</h2>
         {provider && (
-          <User provider={provider} address={address} network_id={networkId} max_lands={board.maxLands}/>
+          <User
+            provider={provider}
+            address={address}
+            network_id={networkId}
+            edition_id={props.edition_id}
+            max_lands={board.maxLands}
+            pawn_id={pawnID}
+          />
         )}
       </div>
       <div className="info-area-2">
