@@ -108,7 +108,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	function enrollPlayer(uint16 _edition) public {
 		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 		require(
-			Mono.allowance(msg.sender, address(this)) == enroll_fee,
+			Mono.allowance(msg.sender, address(this)) >= enroll_fee,
 			"player has to approve Bank for 50 $MONO"
 		);
 
