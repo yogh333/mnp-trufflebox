@@ -40,6 +40,16 @@ contract("Bank royalties", async (accounts) => {
   };
 
   const initialSetUp = async () => {
+    /* with 'test' network, contracts are deployed in migration.
+    PawnInstance = await PawnStub.deployed();
+    BuildInstance = await BuildStub.deployed();
+    MonoInstance = await MonoStub.deployed();
+    LinkInstance = await ERC20TokenStub.deployed();
+    MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.deployed();
+    BoardInstance = await Board.deployed();
+    PropInstance = await Prop.deployed();
+    StakingInstance = await Staking.deployed();
+    BankInstance = await Bank.deployed();*/
     PawnInstance = await PawnStub.new({ from: _contractOwner });
 
     BuildInstance = await BuildStub.new({ from: _contractOwner });

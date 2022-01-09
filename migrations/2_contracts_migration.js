@@ -6,7 +6,6 @@ Paris = require("../client/src/data/Paris.json");
 
 const Link = artifacts.require("Link");
 const LinkForChainlinkVRF = artifacts.require("LinkForChainlinkVRF");
-const Matic = artifacts.require("Matic");
 const Mono = artifacts.require("MonoContract");
 
 const EthUsdPriceFeed = artifacts.require("EthUsdPriceFeed");
@@ -21,9 +20,16 @@ const Pawn = artifacts.require("PawnContract");
 const Prop = artifacts.require("PropContract");
 const Staking = artifacts.require("StakingContract");
 
+// Stubs
+const BoardStub = artifacts.require("BoardStub");
+const BuildStub = artifacts.require("BuildStub");
+const ChainlinkPriceFeedStub = artifacts.require("ChainlinkPriceFeedStub");
+const ERC20TokenStub = artifacts.require("ERC20TokenStub");
+const MonoStub = artifacts.require("MonoStub");
+const PawnStub = artifacts.require("PawnStub");
+
 let LinkInstance,
   MonoInstance,
-  MaticInstance,
   StakingInstance,
   EthUsdPriceFeedInstance,
   LinkUsdPriceFeedInstance,
@@ -31,12 +37,16 @@ let LinkInstance,
   MonoUsdPriceFeedInstance;
 
 module.exports = async function (deployer, network, accounts) {
+  console.log(`deploying for '${network}' network ...`);
+  if (network === "test") return; // todo Deploy contracts instances for test here
+
   // deploy ERC20 token contracts and price feeds and use these addresses in following deployment
   // ERC20 MONO token
   await deployer.deploy(Mono, ethers.utils.parseEther("300000"));
   MonoInstance = await Mono.deployed();
 
   switch (network) {
+    case "test":
     case "development":
       // others ERC20 tokens
 
@@ -60,8 +70,9 @@ module.exports = async function (deployer, network, accounts) {
 
       await deployer.deploy(EthUsdPriceFeed, 3800 * 10 ** 8);
       EthUsdPriceFeedInstance = await EthUsdPriceFeed.deployed();
-      /*await deployer.deploy(MaticUsdPriceFeed, 2.48 * 10 ** 8);
-      MaticUsdPriceFeedInstance = await MaticUsdPriceFeed.deployed();*/
+
+      await deployer.deploy(MaticUsdPriceFeed, 2.48 * 10 ** 8);
+      MaticUsdPriceFeedInstance = await MaticUsdPriceFeed.deployed();
 
       await deployer.deploy(LinkUsdPriceFeed, 21.86 * 10 ** 8);
       LinkUsdPriceFeedInstance = await LinkUsdPriceFeed.deployed();
@@ -125,6 +136,7 @@ module.exports = async function (deployer, network, accounts) {
   const BankInstance = await Bank.deployed();
 
   switch (network) {
+    case "test":
     case "development":
       await LinkInstance.faucet(
         BankInstance.address,
@@ -183,6 +195,16 @@ module.exports = async function (deployer, network, accounts) {
 
     default:
       console.log(`Can't deploy contract on this network : ${network}.`);
+  }
+
+  // Deploy stubs
+  if (network === "test") {
+    await deployer.deploy(BoardStub, PawnInstance.address);
+    await deployer.deploy(BuildStub);
+    await deployer.deploy(ChainlinkPriceFeedStub, 0.1 * 10 ** 8, 8);
+    await deployer.deploy(ERC20TokenStub, "ERC20 token", "ERC20");
+    await deployer.deploy(MonoStub);
+    await deployer.deploy(PawnStub);
   }
 
   // Setup roles
