@@ -1,5 +1,9 @@
 build
 client/src/contracts
 node_modules
+
+#env
+.env
+
 #ide
 .idea

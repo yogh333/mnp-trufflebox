@@ -10,8 +10,6 @@ import BoardJson from "../contracts/BoardContract.json";
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
 
-
-
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
@@ -26,6 +24,9 @@ export default function User(props) {
   const [prop, setProp] = useState(spinner);
   const [rollDice, setRollDice] = useState([1, 2]);
   const [currentPosition, setCurrentPosition] = useState(0);
+  const [startBlockNumber, setStartBlockNumber] = useState(null);
+
+  let requestedID;
 
   useEffect(() => {
     if (!(provider && address && networkId)) {
@@ -44,49 +45,88 @@ export default function User(props) {
       provider
     );
 
-    const Bank = new ethers.Contract(
-      BankJson.networks[networkId].address,
-      BankJson.abi,
-      provider.getSigner()
+    setBank(
+      new ethers.Contract(
+        BankJson.networks[networkId].address,
+        BankJson.abi,
+        provider.getSigner()
+      )
     );
 
-    const Board = new ethers.Contract(
-      BoardJson.networks[networkId].address,
-      BoardJson.abi,
-      provider.getSigner()
+    setBoard(
+      new ethers.Contract(
+        BoardJson.networks[networkId].address,
+        BoardJson.abi,
+        provider.getSigner()
+      )
     );
 
-    setBank(Bank);
-    setBoard(Board);
     Mono.balanceOf(address).then((value) =>
       setBalance(ethers.utils.formatUnits(value))
     );
     Prop.balanceOf(address).then((value) => setProp(value.toNumber()));
+
+    provider
+      .getBlockNumber()
+      .then((_blockNumber) => setStartBlockNumber(_blockNumber));
   }, [address, provider, networkId]);
+
+  /*  useEffect(() => {
+    if (!Board) {
+      return;
+    }
+
+    Board.getPawn().then((_position) => setCurrentPosition(_position));
+  }, [Board]);*/
+
+  useEffect(() => {
+    if (!startBlockNumber || !Board) {
+      return;
+    }
+
+    subscribeContractsEvents();
+  }, [startBlockNumber, Board]);
+
+  useEffect(() => {
+    if (!rollDice) {
+      return;
+    }
+
+    handleNewPosition(currentPosition, rollDice[0] + rollDice[1]);
+  }, [rollDice]);
+
+  const subscribeContractsEvents = () => {
+    Board.on("RandomNumberRequested", (_player, _requestID, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+      if (address.toLowerCase() !== _player.toLowerCase()) return;
+
+      requestedID = _requestID;
+    });
+
+    Board.on("RandomReady", (_requestID, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+      if (requestedID !== _requestID) return;
+
+      Board.getRandomNumbers(props.edition_id, props.pawn_id).then(
+        (_numbers) => {
+          setRollDice(_numbers);
+        }
+      );
+    });
+  };
 
   /**
    * name: rollDiceFunction
    * description: simulates the roll of dice to move the game forward and to move on the pawn
-   * @returns {Promise<void>}
    */
-  async function rollDiceFunction() {
-    if (Board == null) return;
+  function rollDiceFunction() {
+    if (!Board || !props.edition_id || !props.pawn_id) return;
 
-    //Generates a random number by function keccak256 of solidity
-    //pb to see: the result seems to be buffered somewhere
-    const result = await Board.getRandomKeccak256();
-    const generateNewNumber = () => Math.floor(Math.random(result) * 6 + 1);
-    const number1 = generateNewNumber();
-    const number2 = generateNewNumber();
-    console.log({number1, number2});
+    // todo Declencher animation roll dices sur le front
 
-    console.log({ rollDice });
-    const total = calculateTotal(number1, number2);
-    handleNewPosition(currentPosition, total);
-    console.log("total:", { total });
-    setRollDice([number1, number2]);
+    Board.requestRandomNumber(props.edition_id, props.pawn_id);
 
-    //TODO: Replace by the call at the oracle
+    // les random numbers sont récupérés avec l'event RandomReady(requestId)
   }
 
   /**
@@ -97,7 +137,9 @@ export default function User(props) {
    */
   function handleNewPosition(previousPosition, total) {
     const newCell = (previousPosition + total) % maxCells;
-    
+
+    // todo STOPPER animation roll dices sur le front et lancer l'animation 3D puis à la fin :
+
     highlightCurrentCell(newCell);
     setCurrentPosition(newCell);
     forgetPreviousPosition(previousPosition);
@@ -122,18 +164,6 @@ export default function User(props) {
   function highlightCurrentCell(total) {
     const activeCell = document.getElementById(`cell-${total}`);
     activeCell.classList.add("active");
-  }
-
-  /**
-   * name: calculateTotal
-   * description: calculate the sum of the results of the dice
-   * @param args
-   * @returns {*}
-   */
-  function calculateTotal(...args) {
-    console.log({ args });
-    //sum the parameters
-    return args.reduce((total, current) => total + current, 0);
   }
 
   return (

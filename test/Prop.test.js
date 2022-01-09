@@ -4,7 +4,12 @@ const utils = require("./utils.js");
 
 contract("PropContract", async (accounts) => {
   beforeEach(async function () {
-    BoardInstance = await Board.new();
+    BoardInstance = await Board.new(
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+      0.0001 * 10 ** 18
+    );
     PropInstance = await Prop.new(
       BoardInstance.address,
       "TMWPROP",
@@ -85,8 +90,8 @@ contract("PropContract", async (accounts) => {
   });
 
   it("proper number of minted PROPs shall be returned", async function () {
-    let nb_minted_prop = Math.round(Math.random() * 100);
-    let p = {
+    const nb_minted_prop = 3;
+    const p = {
       edition: 0,
       land: 1,
       rarity: 2,
@@ -108,7 +113,7 @@ contract("PropContract", async (accounts) => {
       rarity: 2,
     };
 
-    let nb_minted_prop = Math.round(Math.random() * 10 ** p.rarity);
+    let nb_minted_prop = 10;
     for (let i = 0; i < nb_minted_prop; i++) {
       let user = accounts[i % accounts.length];
       let result = await PropInstance.mint(user, p.edition, p.land, p.rarity);
@@ -158,7 +163,7 @@ contract("PropContract", async (accounts) => {
   });
 
   it("should mint all PROPs for one land", async function () {
-    for (let r = 0; r < 3; r++) {
+    for (let r = 0; r < 2; r++) {
       for (let n = 0; n < 10 ** r; n++) {
         let prop = {
           edition: 0,
@@ -184,7 +189,7 @@ contract("PropContract", async (accounts) => {
   });
 
   it("should fail when trying to mint a PROP for a land with all PROPs already minted", async function () {
-    for (let r = 0; r < 3; r++) {
+    for (let r = 0; r < 2; r++) {
       for (let n = 0; n < 10 ** r; n++) {
         let prop = {
           edition: 0,
@@ -232,7 +237,7 @@ contract("PropContract", async (accounts) => {
   });
 
   it("should return total number of tokens", async function () {
-    let nb_minted_prop = Math.round(Math.random() * 100);
+    let nb_minted_prop = 5;
 
     for (let i = 0; i < nb_minted_prop; i++) {
       await PropInstance.mint(owner1, 0, 37, 2);

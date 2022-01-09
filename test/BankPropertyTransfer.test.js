@@ -4,10 +4,13 @@ Paris = require("../client/src/data/Paris.json");
 
 const Bank = artifacts.require("BankContract");
 const Prop = artifacts.require("PropContract");
+const Staking = artifacts.require("StakingContract"); // Create Staking Stub
 const PawnStub = artifacts.require("PawnStub");
-const BoardStub = artifacts.require("BoardStub");
+const Board = artifacts.require("BoardContract");
 const MonoStub = artifacts.require("MonoStub");
 const BuildStub = artifacts.require("BuildStub");
+const MonoUsdPriceFeed = artifacts.require("MonoUsdPriceFeed");
+const ERC20TokenStub = artifacts.require("ERC20TokenStub");
 
 const truffleAssert = require("truffle-assertions");
 const { assert } = require("chai");
@@ -25,6 +28,9 @@ contract("Bank royalties", async (accounts) => {
   let MonoInstance;
   let PawnInstance;
   let PropInstance;
+  let StakingInstance;
+  let MonoUsdPriceFeedInstance;
+  let LinkInstance;
 
   let ADMIN_ROLE;
   let BANKER_ROLE;
@@ -34,17 +40,48 @@ contract("Bank royalties", async (accounts) => {
   };
 
   const initialSetUp = async () => {
+    /* with 'test' network, contracts are deployed in migration.
+    PawnInstance = await PawnStub.deployed();
+    BuildInstance = await BuildStub.deployed();
+    MonoInstance = await MonoStub.deployed();
+    LinkInstance = await ERC20TokenStub.deployed();
+    MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.deployed();
+    BoardInstance = await Board.deployed();
+    PropInstance = await Prop.deployed();
+    StakingInstance = await Staking.deployed();
+    BankInstance = await Bank.deployed();*/
     PawnInstance = await PawnStub.new({ from: _contractOwner });
+
     BuildInstance = await BuildStub.new({ from: _contractOwner });
     MonoInstance = await MonoStub.new({ from: _contractOwner });
-    BoardInstance = await BoardStub.new(PawnInstance.address, {
+    LinkInstance = await ERC20TokenStub.new("Chainlink token", "LINK", {
       from: _contractOwner,
     });
+    MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.new(0.01 * 10 ** 8, {
+      from: _contractOwner,
+    });
+    BoardInstance = await Board.new(
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+      0.0001 * 10 ** 18,
+      {
+        from: _contractOwner,
+      }
+    );
     PropInstance = await Prop.new(
       BoardInstance.address,
       "Property",
       "PROP",
       "https://server.com/prop/",
+      { from: _contractOwner }
+    );
+
+    StakingInstance = await Staking.new(
+      MonoInstance.address,
+      MonoUsdPriceFeedInstance.address,
+      "100", // yield
+      "ETH", // network token symbol
       { from: _contractOwner }
     );
 
@@ -54,6 +91,8 @@ contract("Bank royalties", async (accounts) => {
       PropInstance.address,
       BuildInstance.address,
       MonoInstance.address,
+      LinkInstance.address,
+      StakingInstance.address,
       { from: _contractOwner }
     );
 

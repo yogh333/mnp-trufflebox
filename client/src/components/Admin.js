@@ -7,12 +7,20 @@ import "../css/Admin.css";
 import Paris from "../data/Paris.json";
 
 import BankJson from "../contracts/BankContract.json";
-import Button from "react-bootstrap/Button";
-import Spinner from "react-bootstrap/Spinner";
-import Container from "react-bootstrap/Container";
 import MonoJson from "../contracts/MonoContract.json";
 import PropJson from "../contracts/PropContract.json";
 import BuildJson from "../contracts/BuildContract.json";
+import StakingJson from "../contracts/StakingContract.json";
+
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Row,
+  Spinner,
+} from "react-bootstrap";
 
 function Admin(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -24,6 +32,13 @@ function Admin(props) {
   const [Bank, setBank] = useState(null);
   const [adminRole, setAdminRole] = useState(null);
   const [isReadyToRender, setIsReadyToRender] = useState(false);
+  const [isAddingPool, setIsAddingPool] = useState(false);
+
+  let newPool = {
+    token: null,
+    prideFeed: null,
+    yield: null,
+  };
 
   useEffect(() => {
     setIsReadyToRender(false);
@@ -123,6 +138,28 @@ function Admin(props) {
     );
   }
 
+  const addPool = async () => {
+    const Staking = new ethers.Contract(
+      StakingJson.networks[networkId].address,
+      StakingJson.abi,
+      provider.getSigner(address)
+    );
+
+    setIsAddingPool(true);
+
+    try {
+      await Staking.addPool(
+        newPool.token.value,
+        newPool.prideFeed.value,
+        newPool.yield.value
+      );
+    } catch (error) {
+      console.error(error);
+    }
+
+    setIsAddingPool(false);
+  };
+
   if (!isReadyToRender) {
     return <></>;
   }
@@ -131,13 +168,84 @@ function Admin(props) {
     <div className="Admin">
       <Container>
         <h1>Admin</h1>
-        <Button className="mx-3" variant="primary" onClick={sendPricesToBank}>
-          Send prices to Bank for Paris Board
-        </Button>
 
-        <Button className="mx-3" variant="primary" onClick={setRoles}>
-          Set roles
-        </Button>
+        <Card>
+          <Card.Header className="text-center">
+            <strong>Send prices to Bank for Paris Board</strong>
+          </Card.Header>
+          <Card.Body className="text-center">
+            <Button
+              className="mx-3"
+              variant="primary"
+              onClick={sendPricesToBank}
+            >
+              Send
+            </Button>
+          </Card.Body>
+        </Card>
+
+        <Card>
+          <Card.Header className="text-center">
+            <strong>Set default roles</strong>
+          </Card.Header>
+          <Card.Body className="text-center">
+            <Button className="mx-3" variant="primary" onClick={setRoles}>
+              Set
+            </Button>
+          </Card.Body>
+        </Card>
+
+        <Card>
+          <Card.Header className="text-center">
+            <strong>Add a new pool</strong>
+          </Card.Header>
+          <Card.Body className="text-center">
+            <Form id="addPool">
+              <Row className="mb-3">
+                <Form.Group as={Col}>
+                  <Form.Label>Token address</Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="poolTokenAddress"
+                    ref={(input) => {
+                      newPool.token = input;
+                    }}
+                  />
+                </Form.Group>
+
+                <Form.Group as={Col}>
+                  <Form.Label>Token price feed</Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="poolTokenPriceFeed"
+                    ref={(input) => {
+                      newPool.prideFeed = input;
+                    }}
+                  />
+                </Form.Group>
+
+                <Form.Group as={Col}>
+                  <Form.Label>Yield in %</Form.Label>
+                  <Form.Control
+                    type="text"
+                    id="poolYield"
+                    ref={(input) => {
+                      newPool.yield = input;
+                    }}
+                  />
+                </Form.Group>
+              </Row>
+
+              <Button variant="primary" onClick={addPool}>
+                {isAddingPool ? (
+                  <Spinner as="span" animation="border" size="sm" />
+                ) : (
+                  "Add"
+                )}
+              </Button>
+            </Form>
+          </Card.Body>
+        </Card>
       </Container>
     </div>
   );

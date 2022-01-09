@@ -8,22 +8,29 @@ import boards from "../data/boards.json";
 import Grid from "./Grid";
 import User from "./User";
 import Land from "./Land";
+import InGame from "./InGame";
 
 import BankJson from "../contracts/BankContract.json";
+import BoardJson from "../contracts/BoardContract.json";
+import MonoJson from "../contracts/MonoContract.json";
+import PawnJson from "../contracts/PawnContract.json";
 import Spinner from "react-bootstrap/Spinner";
 
 function Game(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
+  const editionID = parseInt(props.edition_id);
 
-  const board = require(`../data/${boards[parseInt(props.edition_id)]}.json`);
+  const board = require(`../data/${boards[editionID]}.json`);
 
   const provider = props.provider;
   const networkId = props.network_id;
   const address = props.address;
 
   const [Bank, setBank] = useState(null);
+  const [Mono, setMono] = useState(null);
+  const [Board, setBoard] = useState(null);
+  const [Pawn, setPawn] = useState(null);
   const [visual, setVisual] = useState(<div>Property visual</div>);
-  //const [currentLandId, setCurrentLandId] = useState(0);
   const [landInfo, setLandInfo] = useState({
     id: null,
     title: "undefined",
@@ -32,14 +39,11 @@ function Game(props) {
   });
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [isRetrievingInfo, setIsRetrievingInfo] = useState(false);
+  const [canPlay, setCanPlay] = useState(false);
+
+  const [pawnID, setPawnID] = useState(false);
 
   useEffect(() => {
-    /*if (window.ethereum && !window.ethereum.selectedAddress) { // Redirect to Home if disconnected
-      window.location.href = "/"
-
-      return
-    }
-*/
     if (!(provider && address && networkId)) {
       return;
     }
@@ -51,6 +55,30 @@ function Game(props) {
         provider.getSigner(address)
       )
     );
+
+    setMono(
+      new ethers.Contract(
+        MonoJson.networks[networkId].address,
+        MonoJson.abi,
+        provider.getSigner(address)
+      )
+    );
+
+    setBoard(
+      new ethers.Contract(
+        BoardJson.networks[networkId].address,
+        BoardJson.abi,
+        provider.getSigner(address)
+      )
+    );
+
+    setPawn(
+      new ethers.Contract(
+        PawnJson.networks[networkId].address,
+        PawnJson.abi,
+        provider.getSigner(address)
+      )
+    );
   }, [provider, address, networkId]);
 
   useEffect(() => {
@@ -58,17 +86,46 @@ function Game(props) {
       return;
     }
 
+    updateValues();
     setIsReadyToRender(true);
   }, [Bank]);
 
-  const retrieveCellPrices = async (editionId, cellID) => {
+  const updateValues = () => {
+    updatePlayerInfos();
+  };
+
+  const updatePlayerInfos = async () => {
+    const _monoBalance = await Mono.balanceOf(address);
+    const _pawnBalance = await Pawn.balanceOf(address);
+
+    let _isRegistered, _pawnID;
+    if (_pawnBalance.toNumber() > 0) {
+      _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
+      _isRegistered = await Board.isRegistered(props.edition_id, _pawnID);
+    }
+
+    if (
+      _isRegistered &&
+      ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1"))
+    ) {
+      setPawnID(_pawnID);
+      setCanPlay(true);
+
+      return;
+    }
+
+    setCanPlay(false);
+    setPawnID(_pawnID);
+  };
+
+  const retrieveCellPrices = async (_editionId, _cellID) => {
     console.log("get prices !");
 
     let propertiesPrices = [];
     for (let rarity = 0; rarity < board.maxLandRarities; rarity++) {
       propertiesPrices[rarity] = await Bank.getPriceOfProp(
-        editionId,
-        cellID,
+        _editionId,
+        _cellID,
         rarity
       );
     }
@@ -77,13 +134,13 @@ function Game(props) {
     const HOTEL = 1;
     let buildingsPrices = [];
     buildingsPrices[HOUSE] = await Bank.getPriceOfBuild(
-      editionId,
-      cellID,
+      _editionId,
+      _cellID,
       HOUSE
     );
     buildingsPrices[HOTEL] = await Bank.getPriceOfBuild(
-      editionId,
-      cellID,
+      _editionId,
+      _cellID,
       HOTEL
     );
 
@@ -120,12 +177,36 @@ function Game(props) {
     return <>{spinner}</>;
   }
 
+  if (!canPlay) {
+    return (
+      <InGame
+        provider={provider}
+        address={address}
+        network_id={networkId}
+        bank_contract={Bank}
+        mono_contract={Mono}
+        board_contract={Board}
+        pawn_contract={Pawn}
+        pawn_id={pawnID}
+        edition_id={props.edition_id}
+        parent_update_values_function={updateValues}
+      />
+    );
+  }
+
   return (
     <div className="Game">
       <div className="info-area-1">
         <h2>User info</h2>
         {provider && (
-          <User provider={provider} address={address} network_id={networkId} max_lands={board.maxLands}/>
+          <User
+            provider={provider}
+            address={address}
+            network_id={networkId}
+            edition_id={props.edition_id}
+            max_lands={board.maxLands}
+            pawn_id={pawnID}
+          />
         )}
       </div>
       <div className="info-area-2">

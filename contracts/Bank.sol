@@ -4,12 +4,14 @@ pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./Pawn.sol";
 import "./Board.sol";
 import "./Mono.sol";
 import "./Prop.sol";
 import "./Build.sol";
+import "./Staking.sol";
 
 contract BankContract is AccessControl, IERC721Receiver {
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
@@ -20,12 +22,11 @@ contract BankContract is AccessControl, IERC721Receiver {
 	PropContract private immutable Prop;
 	BuildContract private immutable Build;
 	MonoContract private immutable Mono;
+	IERC20 private immutable Link;
+	StakingContract private immutable Staking;
 
 	/// @dev fee to be paid when player enrolls (in $MONO)
 	uint256 public enroll_fee = 50 * 1 ether;
-
-	/// @dev fee to be paid for each roll of dices (in $MONO)
-	uint256 public dices_fee = 1 ether;
 
 	/// @dev price of PROP by rarity by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private propPrices;
@@ -35,32 +36,40 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 	event eBuyProp(address indexed to, uint256 indexed prop_id);
 	event eBuyBuild(address indexed to, uint256 indexed build_id, uint32 nb);
-	event eBuyPawn(address indexed to, uint256 indexed pawn_id);
+	event PawnBought(address indexed to, uint256 indexed pawn_id);
 	event eSellProp(address indexed seller, uint256 indexed prop_id, uint256 price);
 	event eSellBuild(address indexed seller, uint256 indexed prop_id, uint256 price);
 	event eWithdraw(address indexed to, uint256 value);
 
-	event eEnrollPlayer(uint16 _edition, address indexed player);
-	event eMovePawn(address player, uint8 dices);
+	event PlayerEnrolled(uint16 _edition, address indexed player);
+	event PawnMoved(address player, uint8 dices);
+	event DicesRollsPrepaid(address indexed player, uint8 quantity);
+	event MonoBought(address indexed player, uint256 amount);
 
 	constructor(
 		address PawnAddress,
 		address BoardAddress,
 		address PropAddress,
 		address BuildAddress,
-		address MonoAddress
+		address MonoAddress,
+		address LinkAddress,
+		address StakingAddress
 	) {
 		require(PawnAddress != address(0), "PAWN token smart contract address must be provided");
 		require(BoardAddress != address(0), "BOARD smart contract address must be provided");
 		require(PropAddress != address(0), "PROP token smart contract address must be provided");
 		require(BuildAddress != address(0), "BUILD token smart contract address must be provided");
 		require(MonoAddress != address(0), "MONO token smart contract address must be provided");
+		require(LinkAddress != address(0), "LINK token smart contract address must be provided");
+		require(StakingAddress != address(0), "LINK token smart contract address must be provided");
 
 		Pawn = PawnContract(PawnAddress);
 		Board = BoardContract(BoardAddress);
 		Prop = PropContract(PropAddress);
 		Build = BuildContract(BuildAddress);
 		Mono = MonoContract(MonoAddress);
+		Link = IERC20(LinkAddress);
+		Staking = StakingContract(StakingAddress);
 
 		// Set roles
 		_setupRole(ADMIN_ROLE, msg.sender);
@@ -75,7 +84,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 		uint256 pawn_id = Pawn.mint(msg.sender);
 
-		emit eBuyPawn(msg.sender, pawn_id);
+		emit PawnBought(msg.sender, pawn_id);
 	}
 
 	/// @notice locate pawn on game's board
@@ -92,33 +101,56 @@ contract BankContract is AccessControl, IERC721Receiver {
 		position_ = Board.getPawn(_edition, pawnID);
 	}
 
-	function enrollPlayer(uint16 _edition) external {
-		require(Pawn.balanceOf(msg.sender) == 1, "player does not own a pawn");
+	/**
+     * @notice To enroll a player, this player must have a pawn and register it in Board contract and give allowance to this contract to spent 50 $MONO
+     * @param _edition board edition
+     */
+	function enrollPlayer(uint16 _edition) public {
+		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 		require(
-			Mono.allowance(msg.sender, address(this)) == enroll_fee,
-			"player has to approbe Bank for 50 $MONO"
+			Mono.allowance(msg.sender, address(this)) >= enroll_fee,
+			"player has to approve Bank for 50 $MONO"
 		);
 
 		uint256 pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0);
 
 		require(Board.register(_edition, pawnID), "error when enrolling");
 
-		emit eEnrollPlayer(_edition, msg.sender);
+		emit PlayerEnrolled(_edition, msg.sender);
 	}
 
 	function rollDices(uint16 _edition) external {
-		require(Pawn.balanceOf(msg.sender) == 1, "player does not own a pawn");
+		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 		uint256 pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0);
 		require(Board.isRegistered(_edition, pawnID), "player does not enroll");
+		uint256 chainlinkFee = Board.fee();
+		require(Link.balanceOf(address(Board)) > chainlinkFee, "not enough LINK in Board contract");
 
-		// Bank must be paid here (1 $MONO)
-		Mono.transferFrom(msg.sender, address(this), dices_fee);
+		// Bank must be paid here for a roll
+		uint256 monoLastPrice = uint256(Staking.getLastPrice(address(Mono)));
+		uint256 linkLastPrice = uint256(Staking.getLastPrice(address(Link)));
+		Mono.transferFrom(msg.sender, address(this), chainlinkFee * linkLastPrice / monoLastPrice);
 
 		// Bank must provide LINK to Board
-
 		uint8 dices = Board.play(_edition, pawnID);
 
-		emit eMovePawn(msg.sender, dices);
+		emit PawnMoved(msg.sender, dices);
+	}
+
+	/**
+     * @notice To buy Mono from Token network
+     */
+	function buyMono() payable public {
+		uint256 MonoBalance = Mono.balanceOf(address(this));
+		uint256 MonoUsdLastPrice = uint256(Staking.getLastPrice(address(Mono)));
+		//address _address = Staking.poolAddressBySymbol("MATIC");
+		address _address = Staking.NETWORK_TOKEN_VIRTUAL_ADDRESS();
+		uint256 TokenNetworkUsdLastPrice = uint256(Staking.getLastPrice(_address));
+		uint256 amountToBuy = msg.value * TokenNetworkUsdLastPrice / MonoUsdLastPrice;
+		require(amountToBuy > 0, "You need to send some network token");
+		require(amountToBuy <= MonoBalance, "Not enough tokens in the reserve");
+		Mono.transfer(msg.sender, amountToBuy);
+		emit MonoBought(msg.sender, amountToBuy);
 	}
 
 	function buyProp(
@@ -287,7 +319,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		uint256 royaltyAmount;
 		(receiver, royaltyAmount) = Prop.royaltyInfo(_tokenId, _salePrice);
 
-		// Ajout du prix de la transaction en gas => oracle ? ou estimation large ?
+		// todo Ajout du prix de la transaction en gas => oracle ? ou estimation large ?
 		require(Mono.balanceOf(_to) > _salePrice, "Not sufficient token balance");
 
 		require(Mono.transferFrom(_to, _from, _salePrice));

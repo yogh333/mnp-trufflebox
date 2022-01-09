@@ -4,6 +4,9 @@ const Prop = artifacts.require("PropContract");
 const Build = artifacts.require("BuildContract");
 const Bank = artifacts.require("BankContract");
 const Mono = artifacts.require("MonoContract");
+const Staking = artifacts.require("StakingContract");
+const ERC20TokenStub = artifacts.require("ERC20TokenStub");
+const MonoUsdPriceFeed = artifacts.require("MonoUsdPriceFeed");
 
 const utils = require("./utils.js");
 
@@ -21,7 +24,12 @@ contract("BankContract", async (accounts) => {
     PawnInstance = await Pawn.new("NAME", "SYMBOL", "URI");
 
     /* Deploy Board */
-    BoardInstance = await Board.new();
+    BoardInstance = await Board.new(
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+      0.0001 * 10 ** 18
+    );
 
     /* Deploy Prop */
     PropInstance = await Prop.new(
@@ -37,13 +45,26 @@ contract("BankContract", async (accounts) => {
       "https://token-cdn/"
     );
 
+    LinkInstance = await ERC20TokenStub.new("Chainlink token", "LINK");
+
+    MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.new(0.01 * 10 ** 8);
+
+    StakingInstance = await Staking.new(
+      MonoInstance.address,
+      MonoUsdPriceFeedInstance.address,
+      "100", // yield
+      "ETH" // network token symbol
+    );
+
     /* Deploy Bank */
     BankInstance = await Bank.new(
       PawnInstance.address,
       BoardInstance.address,
       PropInstance.address,
       BuildInstance.address,
-      MonoInstance.address
+      MonoInstance.address,
+      LinkInstance.address,
+      StakingInstance.address
     );
 
     /* grant MINTER_ROLE to Bank smartcontract */
