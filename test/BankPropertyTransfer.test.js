@@ -50,9 +50,15 @@ contract("Bank royalties", async (accounts) => {
     MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.new(0.01 * 10 ** 8, {
       from: _contractOwner,
     });
-    BoardInstance = await BoardStub.new(PawnInstance.address, {
-      from: _contractOwner,
-    });
+    BoardInstance = await Board.new(
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+      0.0001 * 10 ** 18,
+      {
+        from: _contractOwner,
+      }
+    );
     PropInstance = await Prop.new(
       BoardInstance.address,
       "Property",

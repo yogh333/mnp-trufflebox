@@ -159,6 +159,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		uint256 randomness = randomInfoByRequestId[_requestId].randomness;
 		require(randomness != 0,'randomness is not prepared');
 
+		// Maybe Bitwise cost fewer than uint256(keccak256(abi.encode( but Chainlink don't speak about this to reach limit of 200000 gas fast.
 		// /!\ Don't forgot to change the range of array !!!
 		uint8[4] memory randomNumbers;
 		uint8 maxDices = 2;
@@ -183,6 +184,8 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 */
 	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
 		randomInfoByRequestId[requestId].randomness = randomness;
+
+		// Bitwise operations here ?
 		// todo record position NOW
 		// todo Must call method HERE to calculate result NOW, we can't waiting for security reasons.
 		// ex. throw tax payment if player's pawn is in a tax land now.

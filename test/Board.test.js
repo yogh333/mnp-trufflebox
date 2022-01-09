@@ -1,13 +1,16 @@
 // Board.test.js
 
 const Board = artifacts.require("BoardContract");
-
-
 const utils = require("./utils.js");
 
 contract("BoardContract", async (accounts) => {
   beforeEach(async function () {
-    BoardInstance = await Board.new();
+    BoardInstance = await Board.new(
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+      0.0001 * 10 ** 18
+    );
 
     deployer = accounts[0];
   });
@@ -43,7 +46,6 @@ contract("BoardContract", async (accounts) => {
       build_lvl: 4,
       buildings: [1, 2, 3, 6, 8],
       max_pawns: 100,
-
     };
 
     let result = await BoardInstance.newBoard(
@@ -71,5 +73,4 @@ contract("BoardContract", async (accounts) => {
       ).to.equal(true);
     }
   });
-
 });

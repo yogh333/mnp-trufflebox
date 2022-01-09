@@ -48,13 +48,14 @@ module.exports = {
 
     kovan: {
       provider: () =>
-        new HDWalletProvider('solar such lumber firm inhale combine old hint neutral obscure fiber dumb', 'wss://kovan.infura.io/ws/v3/df38882d8ddf470c8dc5f7eaf2250a46'),
+        new HDWalletProvider(
+          "solar such lumber firm inhale combine old hint neutral obscure fiber dumb",
+          "wss://kovan.infura.io/ws/v3/df38882d8ddf470c8dc5f7eaf2250a46"
+        ),
       network_id: 42,
       gas: 8500000,
-      gasprice: 25000000000
+      gasprice: 25000000000,
     },
-
-
 
     // Another network with more advanced options...
     // advanced: {
@@ -67,16 +68,6 @@ module.exports = {
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    kovan: {
-      provider: () =>
-        new HDWalletProvider(
-          "seed phrase",
-          `https://kovan.infura.io/v3/YOUR_INFURA_ID`
-        ),
-      network_id: 42,
-      gas: 8500000,
-      gasprice: 25000000000,
-    },
     // Useful for private networks
     // private: {
     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),

@@ -83,7 +83,7 @@ module.exports = async function (deployer, network, accounts) {
 
       break;
     default:
-      alert(`Can't deploy contract on this network : ${network}.`);
+      console.log(`Can't deploy contract on this network : ${network}.`);
   }
 
   await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
@@ -182,7 +182,7 @@ module.exports = async function (deployer, network, accounts) {
       break;
 
     default:
-      alert(`Can't deploy contract on this network : ${network}.`);
+      console.log(`Can't deploy contract on this network : ${network}.`);
   }
 
   // Setup roles

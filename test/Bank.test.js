@@ -24,7 +24,12 @@ contract("BankContract", async (accounts) => {
     PawnInstance = await Pawn.new("NAME", "SYMBOL", "URI");
 
     /* Deploy Board */
-    BoardInstance = await Board.new();
+    BoardInstance = await Board.new(
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x514910771af9ca656af840dff83e8264ecf986ca",
+      "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+      0.0001 * 10 ** 18
+    );
 
     /* Deploy Prop */
     PropInstance = await Prop.new(
