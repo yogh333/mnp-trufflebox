@@ -14,6 +14,7 @@ contract MonoUsdPriceFeed is AggregatorV3Interface, Ownable {
     uint256 startedAt;
     uint256 updatedAt;
     uint80 answeredInRound;
+    uint8 private _decimals = 8;
 
     // @param _value: précision à 6 chiffres
     constructor(int256 _value) {
@@ -21,7 +22,7 @@ contract MonoUsdPriceFeed is AggregatorV3Interface, Ownable {
     }
 
     function decimals() override external view returns (uint8) {
-        return 8;
+        return _decimals;
     }
 
     function description() override external pure returns (string memory) {

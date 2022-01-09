@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 contract PawnStub is ERC721Enumerable, AccessControl {
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 	bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+	string private _tokenURI = "https://server.com/pawn/";
 
 	mapping(address => uint256) playerToPawn;
 
@@ -21,7 +22,7 @@ contract PawnStub is ERC721Enumerable, AccessControl {
 	}
 
 	function tokenURI(uint256 _id) public view override returns (string memory) {
-		return "https://server.com/pawn/";
+		return string(abi.encodePacked(_tokenURI, _id));
 	}
 
 	function mint(address _to) external onlyRole(MINTER_ROLE) returns (uint256 id_) {
