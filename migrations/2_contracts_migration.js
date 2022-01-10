@@ -38,13 +38,22 @@ let LinkInstance,
 
 module.exports = async function (deployer, network, accounts) {
   console.log(`deploying for '${network}' network ...`);
+
   if (network === "test") return; // todo Deploy contracts instances for test here
 
   // deploy ERC20 token contracts and price feeds and use these addresses in following deployment
-  // ERC20 MONO token
-  await deployer.deploy(Mono, ethers.utils.parseEther("300000"));
-  MonoInstance = await Mono.deployed();
 
+  if (network !== "polygon_infura_testnet") {
+    // Deploy MONO
+    await deployer.deploy(Mono, ethers.utils.parseEther("300000"));
+    MonoInstance = await Mono.deployed();
+
+    // Deploy PAWN
+    await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
+    const PawnInstance = await Pawn.deployed();
+  }
+
+  // Deploy BOARD
   switch (network) {
     case "test":
     case "development":
@@ -86,58 +95,70 @@ module.exports = async function (deployer, network, accounts) {
       );
       StakingInstance = await Staking.deployed();
 
+      await deployer.deploy(
+        Board,
+        LinkInstance.address, // VRF Coordinator is Link contract
+        LinkInstance.address,
+        "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
+        0.0001 * 10 ** 18
+      );
+
       break;
 
-    case "mumbai":
+    case "polygon_infura_testnet":
       // Using an already deployed LINK
       // const linkAddress = "0x...."
+      const LINK = "0x326C977E6efc84E512bB9C30f76E30c160eD06FB";
+      const VRFCoordinator = "0x8C7382F9D8f56b33781fE506E897a4F1e2d17255";
+      const KEYHASH =
+        "0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4";
+      const FEE = web3.utils.toWei("0.0001", "ether");
+
+      await deployer.deploy(Board, VRFCoordinator, LINK, KEYHASH, FEE);
 
       break;
     default:
       console.log(`Can't deploy contract on this network : ${network}.`);
   }
-
-  await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
-  const PawnInstance = await Pawn.deployed();
-
-  await deployer.deploy(
-    Board,
-    LinkInstance.address, // VRF Coordinator is Link contract
-    LinkInstance.address,
-    "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
-    0.0001 * 10 ** 18
-  );
   const BoardInstance = await Board.deployed();
 
-  await deployer.deploy(
-    Prop,
-    BoardInstance.address,
-    "MNW Properties",
-    "MWP",
-    "http://token-cdn-uri/"
-  );
+  if (network !== "polygon_infura_testnet") {
+    // Deploy PROP
+    await deployer.deploy(
+      Prop,
+      BoardInstance.address,
+      "MNW Properties",
+      "MWP",
+      "http://token-cdn-uri/"
+    );
+    const PropInstance = await Prop.deployed();
 
-  await deployer.deploy(Build, BoardInstance.address, "http://token-cdn-uri/");
+    // Deploy BUILD
+    await deployer.deploy(
+      Build,
+      BoardInstance.address,
+      "http://token-cdn-uri/"
+    );
+    const BuildInstance = await Build.deployed();
+  }
 
-  const PropInstance = await Prop.deployed();
-  const BuildInstance = await Build.deployed();
-
-  await deployer.deploy(
-    Bank,
-    PawnInstance.address,
-    BoardInstance.address,
-    PropInstance.address,
-    BuildInstance.address,
-    MonoInstance.address,
-    LinkInstance.address,
-    StakingInstance.address
-  );
-
-  const BankInstance = await Bank.deployed();
-
+  // Deploy BANK
   switch (network) {
     case "test":
     case "development":
+      await deployer.deploy(
+        Bank,
+        PawnInstance.address,
+        BoardInstance.address,
+        PropInstance.address,
+        BuildInstance.address,
+        MonoInstance.address,
+        LinkInstance.address,
+        StakingInstance.address
+      );
+
+      const BankInstance = await Bank.deployed();
+
       await LinkInstance.faucet(
         BankInstance.address,
         ethers.utils.parseEther("1500")
@@ -186,11 +207,10 @@ module.exports = async function (deployer, network, accounts) {
 
       break;
 
-    case "mumbai":
+    case "polygon_infura_testnet":
       // Price feeds are stored with Staking informations
       // MATIC / USD	8	0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada
       // LINK / USD and MONO / USD are owned simulate feed contracts
-
       break;
 
     default:
@@ -207,65 +227,67 @@ module.exports = async function (deployer, network, accounts) {
     await deployer.deploy(PawnStub);
   }
 
-  // Setup roles
-  const MINTER_ROLE = await PropInstance.MINTER_ROLE();
-  await PropInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-    from: accounts[0],
-  });
-  await BuildInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-    from: accounts[0],
-  });
-  const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
-  await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
-    from: accounts[0],
-  });
-  await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-    from: accounts[0],
-  });
+  if (network !== "polygon_infura_testnet") {
+    // Setup roles
+    const MINTER_ROLE = await PropInstance.MINTER_ROLE();
+    await PropInstance.grantRole(MINTER_ROLE, BankInstance.address, {
+      from: accounts[0],
+    });
+    await BuildInstance.grantRole(MINTER_ROLE, BankInstance.address, {
+      from: accounts[0],
+    });
+    const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
+    await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
+      from: accounts[0],
+    });
+    await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
+      from: accounts[0],
+    });
 
-  // initialize Paris board prices
-  let commonLandPrices = [];
-  let housePrices = [];
-  Paris.lands.forEach((land, index) => {
-    commonLandPrices[index] = 0;
-    if (land.hasOwnProperty("commonPrice")) {
-      commonLandPrices[index] = land.commonPrice;
-    }
+    // initialize Paris board prices
+    let commonLandPrices = [];
+    let housePrices = [];
+    Paris.lands.forEach((land, index) => {
+      commonLandPrices[index] = 0;
+      if (land.hasOwnProperty("commonPrice")) {
+        commonLandPrices[index] = land.commonPrice;
+      }
 
-    housePrices[index] = 0;
-    if (land.hasOwnProperty("housePrice")) {
-      housePrices[index] = land.housePrice;
-    }
-  });
+      housePrices[index] = 0;
+      if (land.hasOwnProperty("housePrice")) {
+        housePrices[index] = land.housePrice;
+      }
+    });
 
-  await BankInstance.setPrices(
-    Paris.id,
-    Paris.maxLands,
-    Paris.maxLandRarities,
-    Paris.rarityMultiplier,
-    Paris.buildingMultiplier,
-    commonLandPrices,
-    housePrices,
-    { from: accounts[0] }
-  );
+    await BankInstance.setPrices(
+      Paris.id,
+      Paris.maxLands,
+      Paris.maxLandRarities,
+      Paris.rarityMultiplier,
+      Paris.buildingMultiplier,
+      commonLandPrices,
+      housePrices,
+      { from: accounts[0] }
+    );
 
-  // Mint tokens for accounts
-  const amount = ethers.utils.parseEther("1000");
-  await MonoInstance.mint(accounts[1], amount);
-  await LinkInstance.faucet(accounts[1], amount);
+    // Mint tokens for accounts
+    const amount = ethers.utils.parseEther("1000");
+    await MonoInstance.mint(accounts[1], amount);
+    await LinkInstance.faucet(accounts[1], amount);
 
-  // Give allowance to contract to spend all $MONO
-  await MonoInstance.approve(BankInstance.address, amount, {
-    from: accounts[1],
-  });
+    // Give allowance to contract to spend all $MONO
+    await MonoInstance.approve(BankInstance.address, amount, {
+      from: accounts[1],
+    });
 
-  // Allow Bank contract and OpenSea's ERC721 Proxy Address
-  await PropInstance.setIsOperatorAllowed(BankInstance.address, true);
-  await PropInstance.setIsOperatorAllowed(
-    "0x58807baD0B376efc12F5AD86aAc70E78ed67deaE",
-    true
-  );
+    // Allow Bank contract and OpenSea's ERC721 Proxy Address
+    await PropInstance.setIsOperatorAllowed(BankInstance.address, true);
+    await PropInstance.setIsOperatorAllowed(
+      "0x58807baD0B376efc12F5AD86aAc70E78ed67deaE",
+      true
+    );
 
-  // Mint pawn to players
-  await PawnInstance.mint(accounts[1]);
+    // Mint pawn to players
+    await PawnInstance.mint(accounts[1]);
+  }
 };

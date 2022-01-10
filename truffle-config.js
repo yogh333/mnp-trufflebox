@@ -18,9 +18,10 @@
  *
  */
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
+const mnemonic = process.env["MNEMONIC"];
+const infuraProjectId = process.env["INFURA_PROJECT_ID"];
 
 module.exports = {
   /**
@@ -54,13 +55,31 @@ module.exports = {
 
     kovan: {
       provider: () =>
-        new HDWalletProvider(
-          "solar such lumber firm inhale combine old hint neutral obscure fiber dumb",
-          "wss://kovan.infura.io/ws/v3/df38882d8ddf470c8dc5f7eaf2250a46"
-        ),
+        new HDWalletProvider({
+          mnemonic: {
+            phrase: mnemonic,
+          },
+          providerOrUrl: "wss://kovan.infura.io/ws/v3/" + infuraProjectId,
+        }),
       network_id: 42,
       gas: 8500000,
       gasprice: 25000000000,
+    },
+    //polygon Infura testnet
+    polygon_infura_testnet: {
+      provider: () =>
+        new HDWalletProvider({
+          mnemonic: {
+            phrase: mnemonic,
+          },
+          providerOrUrl:
+            "https://polygon-mumbai.infura.io/v3/" + infuraProjectId,
+        }),
+      network_id: 80001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+      chainId: 80001,
     },
 
     // Another network with more advanced options...
