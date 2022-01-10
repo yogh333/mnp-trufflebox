@@ -42,7 +42,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	event eWithdraw(address indexed to, uint256 value);
 
 	event PlayerEnrolled(uint16 _edition, address indexed player);
-	event PawnMoved(address player, uint8 dices);
+	event RollingDices(address player, uint16 _edition, bytes32 requestID);
 	event DicesRollsPrepaid(address indexed player, uint8 quantity);
 	event MonoBought(address indexed player, uint256 amount);
 
@@ -102,15 +102,12 @@ contract BankContract is AccessControl, IERC721Receiver {
 	}
 
 	/**
-     * @notice To enroll a player, this player must have a pawn and register it in Board contract and give allowance to this contract to spent 50 $MONO
-     * @param _edition board edition
-     */
+	 * @notice To enroll a player, this player must have a pawn and register it in Board contract and give allowance to this contract to spent 50 $MONO
+	 * @param _edition board edition
+	 */
 	function enrollPlayer(uint16 _edition) public {
 		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
-		require(
-			Mono.allowance(msg.sender, address(this)) >= enroll_fee,
-			"player has to approve Bank for 50 $MONO"
-		);
+		require(Mono.allowance(msg.sender, address(this)) >= enroll_fee, "player has to approve Bank for 50 $MONO");
 
 		uint256 pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0);
 
@@ -129,24 +126,24 @@ contract BankContract is AccessControl, IERC721Receiver {
 		// Bank must be paid here for a roll
 		uint256 monoLastPrice = uint256(Staking.getLastPrice(address(Mono)));
 		uint256 linkLastPrice = uint256(Staking.getLastPrice(address(Link)));
-		Mono.transferFrom(msg.sender, address(this), chainlinkFee * linkLastPrice / monoLastPrice);
+		Mono.transferFrom(msg.sender, address(this), (chainlinkFee * linkLastPrice) / monoLastPrice);
 
 		// Bank must provide LINK to Board
-		uint8 dices = Board.play(_edition, pawnID);
+		bytes32 rollDicesID = Board.play(_edition, pawnID);
 
-		emit PawnMoved(msg.sender, dices);
+		emit RollingDices(msg.sender, _edition, rollDicesID);
 	}
 
 	/**
-     * @notice To buy Mono from Token network
-     */
-	function buyMono() payable public {
+	 * @notice To buy Mono from Token network
+	 */
+	function buyMono() public payable {
 		uint256 MonoBalance = Mono.balanceOf(address(this));
 		uint256 MonoUsdLastPrice = uint256(Staking.getLastPrice(address(Mono)));
 		//address _address = Staking.poolAddressBySymbol("MATIC");
 		address _address = Staking.NETWORK_TOKEN_VIRTUAL_ADDRESS();
 		uint256 TokenNetworkUsdLastPrice = uint256(Staking.getLastPrice(_address));
-		uint256 amountToBuy = msg.value * TokenNetworkUsdLastPrice / MonoUsdLastPrice;
+		uint256 amountToBuy = (msg.value * TokenNetworkUsdLastPrice) / MonoUsdLastPrice;
 		require(amountToBuy > 0, "You need to send some network token");
 		require(amountToBuy <= MonoBalance, "Not enough tokens in the reserve");
 		Mono.transfer(msg.sender, amountToBuy);
@@ -314,7 +311,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		uint256 _tokenId,
 		uint256 _salePrice
 	) external onlyRole(BANKER_ROLE) {
-		require (Prop.isApprovedForAll(_from, address(this)), "Contract is not allowed");
+		require(Prop.isApprovedForAll(_from, address(this)), "Contract is not allowed");
 		address receiver;
 		uint256 royaltyAmount;
 		(receiver, royaltyAmount) = Prop.royaltyInfo(_tokenId, _salePrice);
@@ -325,7 +322,8 @@ contract BankContract is AccessControl, IERC721Receiver {
 		require(Mono.transferFrom(_to, _from, _salePrice));
 
 		if (receiver != address(0) && royaltyAmount > 0) {
-			if (receiver != Prop.ownerOf(_tokenId)) { // royalties receiver pay nothing
+			if (receiver != Prop.ownerOf(_tokenId)) {
+				// royalties receiver pay nothing
 				Mono.transferFrom(_from, receiver, royaltyAmount); // pay royalties
 			}
 		}
