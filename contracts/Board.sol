@@ -184,6 +184,9 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 */
 	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
 		randomInfoByRequestId[requestId].randomness = randomness;
+		//uint8 dicesSum = ((randomness % 11) + 2) % boards[_edition].nbOfLands;
+		//randomInfoByRequestId[requestId].dicesSum = randomness;
+		//boards[_edition].pawns[_pawnID].position += ((randomness % 11) + 2) % boards[_edition].nbOfLands;
 
 		// Bitwise operations here ?
 		// todo record position NOW

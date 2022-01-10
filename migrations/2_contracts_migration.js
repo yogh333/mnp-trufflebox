@@ -47,6 +47,7 @@ module.exports = async function (deployer, network, accounts) {
 
   switch (network) {
     case "test":
+    case "develop":
     case "development":
       // others ERC20 tokens
 
@@ -137,6 +138,7 @@ module.exports = async function (deployer, network, accounts) {
 
   switch (network) {
     case "test":
+    case "develop":
     case "development":
       await LinkInstance.faucet(
         BankInstance.address,
