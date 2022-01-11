@@ -30,6 +30,10 @@ const PawnStub = artifacts.require("PawnStub");
 
 let LinkInstance,
   MonoInstance,
+  PawnInstance,
+  PropInstance,
+  BuildInstance,
+  BankInstance,
   StakingInstance,
   EthUsdPriceFeedInstance,
   LinkUsdPriceFeedInstance,
@@ -50,7 +54,7 @@ module.exports = async function (deployer, network, accounts) {
 
     // Deploy PAWN
     await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
-    const PawnInstance = await Pawn.deployed();
+    PawnInstance = await Pawn.deployed();
   }
 
   // Deploy BOARD
@@ -131,7 +135,7 @@ module.exports = async function (deployer, network, accounts) {
       "MWP",
       "http://token-cdn-uri/"
     );
-    const PropInstance = await Prop.deployed();
+    PropInstance = await Prop.deployed();
 
     // Deploy BUILD
     await deployer.deploy(
@@ -139,7 +143,7 @@ module.exports = async function (deployer, network, accounts) {
       BoardInstance.address,
       "http://token-cdn-uri/"
     );
-    const BuildInstance = await Build.deployed();
+    BuildInstance = await Build.deployed();
   }
 
   // Deploy BANK
@@ -157,7 +161,7 @@ module.exports = async function (deployer, network, accounts) {
         StakingInstance.address
       );
 
-      const BankInstance = await Bank.deployed();
+      BankInstance = await Bank.deployed();
 
       await LinkInstance.faucet(
         BankInstance.address,

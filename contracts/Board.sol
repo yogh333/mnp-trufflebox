@@ -11,8 +11,9 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 contract BoardContract is AccessControl, VRFConsumerBase {
 	/// @dev structure used to store pawn's attribute
 	struct PawnInfo {
-		bool isOnBoard;
+		uint256 random;
 		uint8 position;
+		bool isOnBoard;
 	}
 
 	/// @dev structure used to store pawn's attribute
@@ -53,7 +54,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	/// @param _pawnID pawn's ID
 	event ePawn(uint16 indexed _edition, uint256 indexed _pawnID);
 
-	event RandomReady(bytes32 requestId, uint8 dice0, uint8 dice1);
+	event RandomReady(bytes32 requestId);
 
 	/// @notice constructor
 	constructor(
@@ -135,17 +136,13 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @dev /!\ Maximum Gas for Callback : If your fulfillRandomness function uses more than 200k gas, the transaction will fail.
 	 */
 	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
-		uint8[2] memory dices;
-		for (uint8 n = 0; n < 2; n++) {
-			dices[n] = uint8((uint256(keccak256(abi.encode(randomness, n))) % 6) + 1);
-		}
-
 		PlayInfo storage p = playInfoByRequestId[requestId];
 
-		boards[p.edition].pawns[p.pawnID].position += dices[0] + dices[1];
+		boards[p.edition].pawns[p.pawnID].position += uint8(randomness % 11) + 2;
 		boards[p.edition].pawns[p.pawnID].position %= boards[p.edition].nbOfLands;
+		boards[p.edition].pawns[p.pawnID].random = randomness;
 
-		emit RandomReady(requestId, dices[0], dices[1]); // Throw dices in front
+		emit RandomReady(requestId); // Throw dices in front
 	}
 
 	/**
@@ -271,10 +268,10 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @notice get position of a Pawn on a board
 	 * @param _edition board edition
 	 * @param _pawnID pawn ID
-	 * @return index of land
+	 * @return p Pawn information
 	 */
-	function getPawn(uint16 _edition, uint256 _pawnID) external view returns (uint8) {
+	function getPawn(uint16 _edition, uint256 _pawnID) external view returns (PawnInfo memory p) {
 		require(isRegistered(_edition, _pawnID), "pawn has not been regsitered");
-		return boards[_edition].pawns[_pawnID].position;
+		return boards[_edition].pawns[_pawnID];
 	}
 }

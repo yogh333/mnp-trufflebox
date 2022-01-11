@@ -89,8 +89,8 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 	/// @notice locate pawn on game's board
 	/// @param _edition edition number
-	/// @return position_ position on board
-	function locatePlayer(uint16 _edition) external view returns (uint8 position_) {
+	/// @return p_ Pawn information
+	function locatePlayer(uint16 _edition) external view returns (BoardContract.PawnInfo memory p_) {
 		require(_edition <= Board.getMaxEdition(), "unknown edition");
 		require(Pawn.balanceOf(msg.sender) == 1, "player does not own a pawn");
 
@@ -98,7 +98,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 		require(Board.isRegistered(_edition, pawnID), "player does not enroll");
 
-		position_ = Board.getPawn(_edition, pawnID);
+		p_ = Board.getPawn(_edition, pawnID);
 	}
 
 	/**
@@ -264,6 +264,11 @@ contract BankContract is AccessControl, IERC721Receiver {
 		uint256 tokenId,
 		bytes calldata data
 	) external pure override returns (bytes4) {
+		// silent warning
+		operator;
+		from;
+		tokenId;
+		data;
 		return this.onERC721Received.selector;
 	}
 
