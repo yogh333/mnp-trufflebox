@@ -142,7 +142,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		boards[p.edition].pawns[p.pawnID].position %= boards[p.edition].nbOfLands;
 		boards[p.edition].pawns[p.pawnID].random = randomness;
 
-		emit RandomReady(requestId); // Throw dices in front
+		emit RandomReady(requestId);
 	}
 
 	/**

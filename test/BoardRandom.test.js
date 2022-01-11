@@ -29,8 +29,8 @@ contract("Board", async (accounts) => {
       { from: _contractOwner }
     );
 
-      //LinkInstance = await ERC20TokenStub.new("Chainlink token", "LINK");
-      //ChainLinkVRFInstance = await ChainLinkVRFStub.new();
+    chainLinkVRFInstance = await ChainLinkVRFStub.new({from: _contractOwner});
+
   };
 
   describe("A. Test of the getRandomKeccak256() function", () => {
@@ -60,7 +60,6 @@ contract("Board", async (accounts) => {
     describe("B. Test of the requestRandomNumber function", () => {
         before("SETUP", async () => {
             await initialSetUp();
-
         });
 
         xit("2. Reverts request of random number if the paw is not registered", async function () {
@@ -95,23 +94,44 @@ contract("Board", async (accounts) => {
 
     });
 
-    describe("C. Test of the getRandomNumbers function", () => {
+    describe("C. Test of the fulfillRandomness function", () => {
 
-        xit("6. Reverts request of random number if the paw is not registered", async function () {
-            await expectRevert(boardInstance.requestRandomNumber(new BN(0), new BN(1)),
-                "pawn has not been registered" );
+        before("SETUP", async () => {
+            await initialSetUp();
+
+        });
+
+        xit("6. We test the modulos", async function() {
+
+        });
+
+        xit("7. Emits an event after the release of the random number", async function () {
+
         });
     });
 
+    describe("D. Test of the function play", () =>  {
 
-    describe("D. Test of the fulfillRandomness function", () => {
+        before("SETUP", async () => {
+            await initialSetUp();
 
+        });
 
+        xit("8. Reverts if the player isn't a manager", async function() {
+
+        });
+
+        xit("9. Reverts playing if the paw is not registered", async function() {
+
+            await expectRevert(boardInstance.play(new BN(0), new BN(1)),
+                "Unregistered pawn");
+        });
     });
 
+    describe("E. In Bank.sol : test of the function rolldices", () => {
 
-
-
+        xit("10. Reverts if the player does not own a pawn")
+    });
 
 
 });
