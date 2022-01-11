@@ -40,8 +40,9 @@ function Game(props) {
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [isRetrievingInfo, setIsRetrievingInfo] = useState(false);
   const [canPlay, setCanPlay] = useState(false);
-
   const [pawnID, setPawnID] = useState(false);
+  const [startBlockNumber, setStartBlockNumber] = useState(null);
+  const [toggleUpdateValues, setToggleUpdateValues] = useState(null);
 
   useEffect(() => {
     if (!(provider && address && networkId)) {
@@ -79,6 +80,10 @@ function Game(props) {
         provider.getSigner(address)
       )
     );
+
+    provider
+      .getBlockNumber()
+      .then((_blockNumber) => setStartBlockNumber(_blockNumber));
   }, [provider, address, networkId]);
 
   useEffect(() => {
@@ -89,6 +94,25 @@ function Game(props) {
     updateValues();
     setIsReadyToRender(true);
   }, [Bank]);
+
+  useEffect(() => {
+    if (!startBlockNumber || !Board) {
+      return;
+    }
+
+    subscribeContractsEvents();
+  }, [startBlockNumber, Board]);
+
+  const subscribeContractsEvents = () => {
+    Bank.on("PropertyBought", (_player, _propID, event) => {
+      console.log(event);
+      if (event.blockNumber <= startBlockNumber) return;
+      if (address.toLowerCase() !== _player.toLowerCase()) return;
+
+      updateValues();
+      setToggleUpdateValues(!toggleUpdateValues);
+    });
+  };
 
   const updateValues = () => {
     updatePlayerInfos();
@@ -153,11 +177,16 @@ function Game(props) {
   async function displayInfo(cellID) {
     setVisual(<img className="land" src={board.lands[cellID].visual} />);
     if (Bank != null) {
+      if (board.lands[cellID].type !== "property") {
+        return;
+      }
+
       setIsRetrievingInfo(true);
       const prices = await retrieveCellPrices(board.id, cellID);
       const land = {
         id: cellID,
         title: board.lands[cellID].name,
+        type: board.lands[cellID].type,
         prices: {
           rare: ethers.utils.formatUnits(prices.properties[0]),
           uncommon: ethers.utils.formatUnits(prices.properties[1]),
@@ -168,6 +197,7 @@ function Game(props) {
           hotel: ethers.utils.formatUnits(prices.buildings[1]),
         },
       };
+
       setLandInfo(land);
       setIsRetrievingInfo(false);
     }
@@ -206,6 +236,8 @@ function Game(props) {
             edition_id={props.edition_id}
             max_lands={board.maxLands}
             pawn_id={pawnID}
+            display_info={displayInfo}
+            toggle_update_user_values={toggleUpdateValues}
           />
         )}
       </div>
@@ -222,12 +254,16 @@ function Game(props) {
           spinner
         ) : (
           <Land
-            land_info={landInfo}
-            bank_contract={Bank}
-            edition_id={props.edition_id}
             address={address}
             network_id={networkId}
             provider={provider}
+            land_info={landInfo}
+            bank_contract={Bank}
+            edition_id={props.edition_id}
+            max_rarity={board.maxLandRarities}
+            rarity_multiplier={board.rarityMultiplier}
+            rarity_names={board.rarityNames}
+            toggle_update_values={toggleUpdateValues}
           />
         )}
       </div>

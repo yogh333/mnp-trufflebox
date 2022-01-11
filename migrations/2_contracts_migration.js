@@ -60,6 +60,7 @@ module.exports = async function (deployer, network, accounts) {
   // Deploy BOARD
   switch (network) {
     case "test":
+    case "develop":
     case "development":
       // others ERC20 tokens
 
@@ -149,6 +150,7 @@ module.exports = async function (deployer, network, accounts) {
   // Deploy BANK
   switch (network) {
     case "test":
+    case "develop":
     case "development":
       await deployer.deploy(
         Bank,

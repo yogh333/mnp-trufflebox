@@ -17,14 +17,21 @@ export default function User(props) {
   const address = props.address;
   const networkId = props.network_id;
   const maxCells = props.max_lands;
+  const toggleUpdateValues = props.toggle_update_user_values;
+
+  // functions
+  const displayInfo = props.display_info;
 
   const [Bank, setBank] = useState(null);
+  const [Mono, setMono] = useState(null);
+  const [Prop, setProp] = useState(null);
   const [Board, setBoard] = useState(null);
   const [balance, setBalance] = useState(spinner);
-  const [prop, setProp] = useState(spinner);
-  const [rollDice, setRollDice] = useState([1, 2]);
+  const [propertyCount, setPropertyCount] = useState(spinner);
+  const [rollDice, setRollDice] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(0);
   const [startBlockNumber, setStartBlockNumber] = useState(null);
+  const [areDicesDisplayed, setAreDicesDisplayed] = useState(false);
 
   let requestedID;
 
@@ -33,16 +40,20 @@ export default function User(props) {
       return;
     }
 
-    const Mono = new ethers.Contract(
-      MonoJson.networks[networkId].address,
-      MonoJson.abi,
-      provider
+    setMono(
+      new ethers.Contract(
+        MonoJson.networks[networkId].address,
+        MonoJson.abi,
+        provider
+      )
     );
 
-    const Prop = new ethers.Contract(
-      PropJson.networks[networkId].address,
-      PropJson.abi,
-      provider
+    setProp(
+      new ethers.Contract(
+        PropJson.networks[networkId].address,
+        PropJson.abi,
+        provider
+      )
     );
 
     setBank(
@@ -61,15 +72,36 @@ export default function User(props) {
       )
     );
 
-    Mono.balanceOf(address).then((value) =>
-      setBalance(ethers.utils.formatUnits(value))
-    );
-    Prop.balanceOf(address).then((value) => setProp(value.toNumber()));
+    //todo retrieve original position
+    const initialPosition = 0;
+    highlightCurrentCell(initialPosition);
+    displayInfo(initialPosition);
 
     provider
       .getBlockNumber()
       .then((_blockNumber) => setStartBlockNumber(_blockNumber));
   }, [address, provider, networkId]);
+
+  useEffect(() => {
+    if (!Mono || !Prop) return;
+
+    updateValues();
+  }, [Mono, Prop]);
+
+  const updateValues = () => {
+    Mono.balanceOf(address).then((value) =>
+      setBalance(ethers.utils.formatUnits(value))
+    );
+    Prop.balanceOf(address).then((value) => setPropertyCount(value.toNumber()));
+  };
+
+  useEffect(() => {
+    if (toggleUpdateValues === null) {
+      return;
+    }
+
+    updateValues();
+  }, [toggleUpdateValues]);
 
   /*  useEffect(() => {
     if (!Board) {
@@ -92,6 +124,7 @@ export default function User(props) {
       return;
     }
 
+    setAreDicesDisplayed(true);
     handleNewPosition(currentPosition, rollDice[0] + rollDice[1]);
   }, [rollDice]);
 
@@ -141,6 +174,7 @@ export default function User(props) {
     // todo STOPPER animation roll dices sur le front et lancer l'animation 3D puis à la fin :
 
     highlightCurrentCell(newCell);
+    displayInfo(newCell);
     setCurrentPosition(newCell);
     forgetPreviousPosition(previousPosition);
   }
@@ -169,7 +203,7 @@ export default function User(props) {
   return (
     <div>
       <div>{balance} MONO$</div>
-      <div>{prop} PROP$</div>
+      <div>{propertyCount} PROP$</div>
 
       <Button
         type="submit"
@@ -181,22 +215,30 @@ export default function User(props) {
         Roll the dice!
       </Button>
 
-      <div className="mt-3 ml-150">
-        {/* first die display */}
-        <img
-          className="dice-display"
-          src={require(`../assets/dice_face_${rollDice[0]}.png`).default}
-          alt="dice display"
-        />
-      </div>
+      <div id="dices" className={areDicesDisplayed ? "d-block" : "d-none"}>
+        <div className="mt-3 ml-150">
+          {/* first die display */}
+          <img
+            className="dice-display"
+            src={
+              require(`../assets/dice_face_${rollDice ? rollDice[0] : 1}.png`)
+                .default
+            }
+            alt="dice display"
+          />
+        </div>
 
-      <div className="mt-3 ml-150">
-        {/* second die display */}
-        <img
-          className="dice-display"
-          src={require(`../assets/dice_face_${rollDice[1]}.png`).default}
-          alt="dice display"
-        />
+        <div className="mt-3 ml-150">
+          {/* second die display */}
+          <img
+            className="dice-display"
+            src={
+              require(`../assets/dice_face_${rollDice ? rollDice[1] : 1}.png`)
+                .default
+            }
+            alt="dice display"
+          />
+        </div>
       </div>
     </div>
   );
