@@ -34,7 +34,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/// @dev price of BUILD by type by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private buildPrices;
 
-	event eBuyProp(address indexed to, uint256 indexed prop_id);
+	event PropertyBought(address indexed to, uint256 indexed prop_id);
 	event eBuyBuild(address indexed to, uint256 indexed build_id, uint32 nb);
 	event PawnBought(address indexed to, uint256 indexed pawn_id);
 	event eSellProp(address indexed seller, uint256 indexed prop_id, uint256 price);
@@ -165,7 +165,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 		uint256 prop_id = Prop.mint(msg.sender, _edition, _land, _rarity);
 
-		emit eBuyProp(msg.sender, prop_id);
+		emit PropertyBought(msg.sender, prop_id);
 	}
 
 	function sellProp(uint256 _id) public {

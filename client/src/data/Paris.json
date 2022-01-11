@@ -3,6 +3,11 @@
     "name": "Paris",
     "maxLands": 40,
     "maxLandRarities": 3,
+    "raritiesNames": [
+        "rare",
+        "uncommon",
+        "common"
+    ],
     "rarityMultiplier": 10,
     "buildingMultiplier": 2,
     "lands": [
