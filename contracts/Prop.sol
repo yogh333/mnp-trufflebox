@@ -81,8 +81,7 @@ contract PropContract is ERC721Enumerable, AccessControl, Ownable, IERC2981 {
 			(edition <= Board.getMaxEdition()) &&
 			(land <= Board.getNbLands(edition)) &&
 			(Board.isBuildingLand(edition, land)) &&
-			(rarity <= Board.getRarityLevel(edition))
-		;
+			(rarity <= Board.getRarityLevel(edition));
 	}
 
 	function _baseURI() internal view override returns (string memory) {
@@ -104,7 +103,7 @@ contract PropContract is ERC721Enumerable, AccessControl, Ownable, IERC2981 {
 	 * @param _edition board edition
 	 * @param _land land id
 	 * @param _rarity rarity
-     */
+	 */
 	function mint(
 		address _to,
 		uint16 _edition,
@@ -171,41 +170,33 @@ contract PropContract is ERC721Enumerable, AccessControl, Ownable, IERC2981 {
 
 	/** Set default royalties percentage basis point. Can be only made by admin role.
 	 * @param _percentageBasisPoints royalties percentage basis point i.e. 500 = 5%
-     */
+	 */
 	function setDefaultRoyaltyPercentageBasisPoints(uint96 _percentageBasisPoints) public onlyRole(ADMIN_ROLE) {
 		defaultRoyaltyPercentageBasisPoints = _percentageBasisPoints;
 	}
 
 	/** Set royalties for a NFT token id at percentage basis point. Can be only made by admin role.
 	 * @param _tokenId NFT token id
-     * @param _percentageBasisPoints royalties percentage basis point i.e. 500 = 5%
-     */
-	function setRoyalties(
-		uint256 _tokenId,
-		uint96 _percentageBasisPoints
-	) public onlyRole(ADMIN_ROLE) {
+	 * @param _percentageBasisPoints royalties percentage basis point i.e. 500 = 5%
+	 */
+	function setRoyalties(uint256 _tokenId, uint96 _percentageBasisPoints) public onlyRole(ADMIN_ROLE) {
 		_setRoyalties(_tokenId, _percentageBasisPoints);
 	}
 
 	/** @dev Set royalties for a NFT token id at default percentage basis point.
 	 * default value should be set with this.setDefaultRoyaltyPercentageBasisPoints
 	 * @param _tokenId NFT token id
-     * @dev See this._setRoyalties(uint256 _tokenId, uint96 _percentageBasisPoints)
-     */
-	function _setRoyalties(
-		uint256 _tokenId
-	) internal {
+	 * @dev See this._setRoyalties(uint256 _tokenId, uint96 _percentageBasisPoints)
+	 */
+	function _setRoyalties(uint256 _tokenId) internal {
 		_setRoyalties(_tokenId, defaultRoyaltyPercentageBasisPoints);
 	}
 
 	/** Set royalties for a NFT token id at a percentage basis point. Assuming that royalties receiver is contract's owner
 	 * @param _tokenId NFT token id
 	 * @param _percentageBasisPoints royalties percentage basis point i.e. 500 = 5%
-     */
-	function _setRoyalties(
-		uint256 _tokenId,
-		uint96 _percentageBasisPoints
-	) internal {
+	 */
+	function _setRoyalties(uint256 _tokenId, uint96 _percentageBasisPoints) internal {
 		require(_percentageBasisPoints < 10000, "Royalty value should be < 10000");
 
 		royaltiesValuesByTokenId[_tokenId] = _percentageBasisPoints;
@@ -219,18 +210,16 @@ contract PropContract is ERC721Enumerable, AccessControl, Ownable, IERC2981 {
 	 * @param _salePrice sale price
 	 * @return receiver royalty receiver address
 	 * @return royaltyAmount royalty amount to pay to receiver
-     * @dev Override isApprovedForAll to auto-approve confident operator contracts
-     *      See {ERC721-isApprovedForAll}
-     * 		See https://docs.opensea.io/docs/polygon-basic-integration#overriding-isapprovedforall-to-reduce-trading-friction
-     * @inheritdoc IERC2981
-     */
-	function royaltyInfo(
-		uint256 _tokenId,
-		uint256 _salePrice
-	) external view returns (
-		address receiver,
-		uint256 royaltyAmount
-	) {
+	 * @dev Override isApprovedForAll to auto-approve confident operator contracts
+	 *      See {ERC721-isApprovedForAll}
+	 * 		See https://docs.opensea.io/docs/polygon-basic-integration#overriding-isapprovedforall-to-reduce-trading-friction
+	 * @inheritdoc IERC2981
+	 */
+	function royaltyInfo(uint256 _tokenId, uint256 _salePrice)
+		external
+		view
+		returns (address receiver, uint256 royaltyAmount)
+	{
 		uint96 royaltyValue = royaltiesValuesByTokenId[_tokenId];
 		if (royaltyValue > 0) {
 			return (this.owner(), (_salePrice * royaltyValue) / 10000);
@@ -239,13 +228,13 @@ contract PropContract is ERC721Enumerable, AccessControl, Ownable, IERC2981 {
 		return (address(0), 0);
 	}
 
-	function isApprovedForAll(
-		address _owner,
-		address _operator
-	) public override view returns (bool) {
+	function isApprovedForAll(address _owner, address _operator) public view override returns (bool) {
 		if (isOperatorAllowed[_operator]) {
 			return true;
 		}
+
+		// silent warning
+		_owner;
 
 		return false;
 	}
@@ -259,9 +248,9 @@ contract PropContract is ERC721Enumerable, AccessControl, Ownable, IERC2981 {
 	}
 
 	/**
-     * @dev Override _isApprovedOrOwner to limit approval to confident operators only.
-     *      See {IERC721-_isApprovedOrOwner}.
-     */
+	 * @dev Override _isApprovedOrOwner to limit approval to confident operators only.
+	 *      See {IERC721-_isApprovedOrOwner}.
+	 */
 	function _isApprovedOrOwner(address spender, uint256 tokenId) internal view override returns (bool) {
 		require(_exists(tokenId), "ERC721: operator query for nonexistent token");
 		address owner = ERC721.ownerOf(tokenId);
