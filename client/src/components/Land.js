@@ -31,9 +31,7 @@ export default function Land(props) {
     useState(_propertyInformationByRarity);
 
   useEffect(() => {
-    if (!(provider && address && networkId && landInfo.id && editionId)) {
-      return;
-    }
+    if (!(provider && address && networkId && landInfo.id && editionId)) return;
 
     setProp(
       new ethers.Contract(
@@ -59,17 +57,13 @@ export default function Land(props) {
   };
 
   useEffect(() => {
-    if (toggleUpdateValues === null) {
-      return;
-    }
+    if (toggleUpdateValues === null) return;
 
     updateValues();
   }, [toggleUpdateValues]);
 
   useEffect(() => {
-    if (!propBalance || !Prop) {
-      return;
-    }
+    if (propBalance === null || !Prop) return;
 
     const fetchNbOfPropsByRarity = async () => {
       let _nbOfPropsByRarity = [];
@@ -87,9 +81,7 @@ export default function Land(props) {
   }, [propBalance, Prop]);
 
   useEffect(() => {
-    if (nbOfPropsByRarity.length !== maxRarity || !Prop) {
-      return;
-    }
+    if (nbOfPropsByRarity.length !== maxRarity || !Prop) return;
 
     const fetchPropertiesData = async () => {
       let properties = [];
@@ -107,9 +99,7 @@ export default function Land(props) {
   }, [nbOfPropsByRarity, Prop]);
 
   useEffect(() => {
-    if (propertiesCountByRarity.length !== maxRarity) {
-      return;
-    }
+    if (propertiesCountByRarity.length !== maxRarity) return;
 
     let _propertyInformationByRarity = [];
     for (let rarity = 0; rarity < maxRarity; rarity++) {
@@ -123,9 +113,7 @@ export default function Land(props) {
   }, [propertiesCountByRarity]);
 
   const buyProperty = async (event) => {
-    if (!(Bank && editionId && landInfo.id && networkId)) {
-      return;
-    }
+    if (!(Bank && editionId && landInfo.id && networkId)) return;
 
     const rarity = event.target.getAttribute("data-rarity");
     Bank.buyProp(editionId, landInfo.id, rarity).then((value) =>
