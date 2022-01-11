@@ -254,12 +254,15 @@ function Game(props) {
           spinner
         ) : (
           <Land
-            land_info={landInfo}
-            bank_contract={Bank}
-            edition_id={props.edition_id}
             address={address}
             network_id={networkId}
             provider={provider}
+            land_info={landInfo}
+            bank_contract={Bank}
+            edition_id={props.edition_id}
+            max_rarity={board.maxLandRarities}
+            rarity_multiplier={board.rarityMultiplier}
+            rarity_names={board.rarityNames}
             toggle_update_values={toggleUpdateValues}
           />
         )}

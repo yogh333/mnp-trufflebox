@@ -2,20 +2,20 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 
 import PropJson from "../contracts/PropContract.json";
-import BuildJson from "../contracts/BuildContract.json";
 
-import Button from "react-bootstrap/Button";
-import Spinner from "react-bootstrap/Spinner";
+import { Button, Spinner } from "react-bootstrap";
 
 export default function Land(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
-  const landInfo = props.land_info;
-  const Bank = props.bank_contract;
-  const editionId = props.edition_id;
   const networkId = props.network_id;
   const address = props.address;
   const provider = props.provider;
+  const landInfo = props.land_info;
+  const Bank = props.bank_contract;
+  const editionId = props.edition_id;
+  const maxRarity = props.max_rarity;
+  const rarityMultiplier = props.rarity_multiplier;
   const toggleUpdateValues = props.toggle_update_values;
 
   const [Prop, setProp] = useState(null);
@@ -23,12 +23,12 @@ export default function Land(props) {
   const [nbOfPropsByRarity, setNbOfPropsByRarity] = useState([]);
   const [propertiesCountByRarity, setPropertiesCountByRarity] = useState([]);
 
-  const [propRare, setPropRare] = useState(spinner);
-  const [propUncommon, setPropUncommon] = useState(spinner);
-  const [propCommon, setPropCommon] = useState(spinner);
-  const [propRareLeft, setPropRareLeft] = useState(spinner);
-  const [propUncommonLeft, setPropUncommonLeft] = useState(spinner);
-  const [propCommonLeft, setPropCommonLeft] = useState(spinner);
+  let _propertyInformationByRarity = [];
+  for (let rarity = 0; rarity < maxRarity; rarity++) {
+    _propertyInformationByRarity[rarity] = { owned: spinner, left: spinner };
+  }
+  const [propertyInformationByRarity, setPropertyInformationByRarity] =
+    useState(_propertyInformationByRarity);
 
   useEffect(() => {
     if (!(provider && address && networkId && landInfo.id && editionId)) {
@@ -71,23 +71,23 @@ export default function Land(props) {
       return;
     }
 
-    let _nbOfPropsByRarity = [];
-    const fetchNbOfPropsByRarity = async (rarity) => {
-      Prop.getNbOfProps(editionId, landInfo.id, rarity).then((value) => {
-        _nbOfPropsByRarity[rarity] = value;
-        setNbOfPropsByRarity(_nbOfPropsByRarity);
-      });
+    const fetchNbOfPropsByRarity = async () => {
+      let _nbOfPropsByRarity = [];
+      for (let rarity = 0; rarity < maxRarity; rarity++) {
+        _nbOfPropsByRarity[rarity] = await Prop.getNbOfProps(
+          editionId,
+          landInfo.id,
+          rarity
+        );
+      }
+      setNbOfPropsByRarity(_nbOfPropsByRarity);
     };
 
-    if (landInfo.type === "property") {
-      for (let rarity = 0; rarity < 3; rarity++) {
-        fetchNbOfPropsByRarity(rarity);
-      }
-    }
+    fetchNbOfPropsByRarity();
   }, [propBalance, Prop]);
 
   useEffect(() => {
-    if (nbOfPropsByRarity.length === 0 || !Prop) {
+    if (nbOfPropsByRarity.length !== maxRarity || !Prop) {
       return;
     }
 
@@ -107,16 +107,19 @@ export default function Land(props) {
   }, [nbOfPropsByRarity, Prop]);
 
   useEffect(() => {
-    if (propertiesCountByRarity.length === 0) {
+    if (propertiesCountByRarity.length !== maxRarity) {
       return;
     }
 
-    setPropRare(nbOfPropsByRarity[0]);
-    setPropUncommon(nbOfPropsByRarity[1]);
-    setPropCommon(nbOfPropsByRarity[2]);
-    setPropRareLeft(1 - nbOfPropsByRarity[0]);
-    setPropUncommonLeft(10 - nbOfPropsByRarity[1]);
-    setPropCommonLeft(100 - nbOfPropsByRarity[2]);
+    let _propertyInformationByRarity = [];
+    for (let rarity = 0; rarity < maxRarity; rarity++) {
+      _propertyInformationByRarity[rarity] = {
+        owned: nbOfPropsByRarity[rarity],
+        left: rarityMultiplier ** rarity - nbOfPropsByRarity[rarity],
+      };
+    }
+
+    setPropertyInformationByRarity(_propertyInformationByRarity);
   }, [propertiesCountByRarity]);
 
   const buyProperty = async (event) => {
@@ -131,11 +134,7 @@ export default function Land(props) {
   };
 
   if (landInfo.type !== "property") {
-    return (
-      <>
-        <div>Select a land on board</div>
-      </>
-    );
+    return <></>;
   }
 
   return (
@@ -152,7 +151,8 @@ export default function Land(props) {
         >
           Buy
         </Button>{" "}
-        balance: {propRare}, {propRareLeft} left
+        balance: {propertyInformationByRarity[0].owned},{" "}
+        {propertyInformationByRarity[0].left} left
       </div>
       <div>
         Uncommon price: {landInfo.prices.uncommon} MONO$
@@ -165,7 +165,8 @@ export default function Land(props) {
         >
           Buy
         </Button>{" "}
-        balance: {propUncommon}, {propUncommonLeft} left
+        balance: {propertyInformationByRarity[1].owned},{" "}
+        {propertyInformationByRarity[1].left} left
       </div>
       <div>
         Common price: {landInfo.prices.common} MONO$
@@ -178,7 +179,8 @@ export default function Land(props) {
         >
           Buy
         </Button>{" "}
-        balance: {propCommon}, {propCommonLeft} left
+        balance: {propertyInformationByRarity[2].owned},{" "}
+        {propertyInformationByRarity[2].left} left
       </div>
     </>
   );
