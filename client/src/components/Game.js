@@ -238,6 +238,7 @@ function Game(props) {
             pawn_id={pawnID}
             display_info={displayInfo}
             toggle_update_user_values={toggleUpdateValues}
+            bank_contract={Bank}
           />
         )}
       </div>

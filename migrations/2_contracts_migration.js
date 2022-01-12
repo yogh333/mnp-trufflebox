@@ -6,6 +6,7 @@ Paris = require("../client/src/data/Paris.json");
 
 const Link = artifacts.require("Link");
 const LinkForChainlinkVRF = artifacts.require("LinkForChainlinkVRF");
+const CoordinatorVRF = artifacts.require("VRFCoordinatorContract");
 const Mono = artifacts.require("MonoContract");
 
 const EthUsdPriceFeed = artifacts.require("EthUsdPriceFeed");
@@ -29,6 +30,7 @@ const MonoStub = artifacts.require("MonoStub");
 const PawnStub = artifacts.require("PawnStub");
 
 let LinkInstance,
+  VRFCoordinatorInstance,
   MonoInstance,
   PawnInstance,
   PropInstance,
@@ -68,8 +70,14 @@ module.exports = async function (deployer, network, accounts) {
       //await deployer.deploy(Link);
       //LinkInstance = await Link.deployed();
 
+      // Deploy the VRF Coordinator
+      await deployer.deploy(CoordinatorVRF);
+      VRFCoordinatorInstance = await CoordinatorVRF.deployed();
       // Deploy this Link contract to simulate Chainlink VRF
-      await deployer.deploy(LinkForChainlinkVRF);
+      await deployer.deploy(
+        LinkForChainlinkVRF,
+        VRFCoordinatorInstance.address
+      );
       LinkInstance = await LinkForChainlinkVRF.deployed();
 
       /*await deployer.deploy(Matic);
@@ -102,7 +110,7 @@ module.exports = async function (deployer, network, accounts) {
 
       await deployer.deploy(
         Board,
-        LinkInstance.address, // VRF Coordinator is Link contract
+        VRFCoordinatorInstance.address,
         LinkInstance.address,
         "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
         0.0001 * 10 ** 18
@@ -242,11 +250,11 @@ module.exports = async function (deployer, network, accounts) {
     await BuildInstance.grantRole(MINTER_ROLE, BankInstance.address, {
       from: accounts[0],
     });
-    const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
-    await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
+    await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
       from: accounts[0],
     });
-    await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
+    const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
+    await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
       from: accounts[0],
     });
 
@@ -295,5 +303,11 @@ module.exports = async function (deployer, network, accounts) {
 
     // Mint pawn to players
     await PawnInstance.mint(accounts[1]);
+
+    // Register pawns
+    const pawnID = await PawnInstance.tokenOfOwnerByIndex(accounts[1], 0);
+    await BoardInstance.register(Paris.id, pawnID, {
+      from: accounts[0], // BankInstance.address, Error: Returned error: sender account not recognized
+    });
   }
 };

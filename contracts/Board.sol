@@ -109,19 +109,6 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	}
 
 	/**
-	 * @dev pseudo-random function to simulate the roll of dice in the game
-	 * @return a random value in between [0, type(uint16).max]
-	 */
-
-	function getRandomKeccak256() public view returns (uint16) {
-		return
-			uint16(
-				((uint256(keccak256(abi.encodePacked(block.difficulty, block.timestamp, msg.sender))) %
-					type(uint16).max) % 6) + 1
-			);
-	}
-
-	/**
 	 * @notice Requests randomness
 	 */
 	function requestRandomNumber() internal returns (bytes32 requestId) {

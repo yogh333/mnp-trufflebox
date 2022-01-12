@@ -126,7 +126,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		// Bank must be paid here for a roll
 		uint256 monoLastPrice = uint256(Staking.getLastPrice(address(Mono)));
 		uint256 linkLastPrice = uint256(Staking.getLastPrice(address(Link)));
-		Mono.transferFrom(msg.sender, address(this), (chainlinkFee * linkLastPrice) / monoLastPrice);
+		Mono.transferFrom(msg.sender, address(this), (chainlinkFee * linkLastPrice) / monoLastPrice + 10**18);
 
 		// Bank must provide LINK to Board
 		bytes32 rollDicesID = Board.play(_edition, pawnID);
