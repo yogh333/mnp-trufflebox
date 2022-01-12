@@ -3,7 +3,8 @@
 pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+//import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+import "./Stubs/ChainLinkVRFStub.sol";
 
 /// @title Board
 /// @author Jerome Caporossi, Stéphane Chaunard, Alexandre Gautier
@@ -135,7 +136,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @param randomness randomness must be requested from an oracle, which generates a number and a cryptographic proof
 	 * @dev /!\ Maximum Gas for Callback : If your fulfillRandomness function uses more than 200k gas, the transaction will fail.
 	 */
-	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
+	function fulfillRandomness(bytes32 requestId, uint256 randomness) public override {
 		PlayInfo storage p = playInfoByRequestId[requestId];
 
 		boards[p.edition].pawns[p.pawnID].position += uint8(randomness % 11) + 2;

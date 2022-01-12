@@ -12,8 +12,14 @@ import "../Board.sol";
 contract LinkForChainlinkVRF is ERC20 { // https://github.com/rsksmart/erc677/blob/master/contracts/ERC677.sol
     /* keyHash */ /* nonce */
     mapping(bytes32 => uint256) private nonces;
-
-    constructor() ERC20('Chainlink Token', 'LINK') {}
+    ERC20 public LINK;
+    
+    constructor(
+    address _vrfCoordinator,
+    address _link
+  ) ERC20('Chainlink Token', 'LINK') {
+    LINK = this;
+  }
 
     // to create LINK
     function faucet(address recipient, uint amount) external {
