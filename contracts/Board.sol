@@ -3,7 +3,8 @@
 pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+//import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
+import "./Stubs/ChainLinkVRFStub.sol";
 
 /// @title Board
 /// @author Jerome Caporossi, Stéphane Chaunard, Alexandre Gautier
@@ -112,6 +113,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @notice Requests randomness
 	 */
 	function requestRandomNumber() internal returns (bytes32 requestId) {
+		////====================== ?   TODO: correction for the require
 		require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
 		requestId = requestRandomness(keyHash, fee);
 	}
@@ -122,14 +124,14 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @param randomness randomness must be requested from an oracle, which generates a number and a cryptographic proof
 	 * @dev /!\ Maximum Gas for Callback : If your fulfillRandomness function uses more than 200k gas, the transaction will fail.
 	 */
-	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
+	function rawFulfillRandomness(bytes32 requestId, uint256 randomness) public override {
 		PlayInfo storage p = playInfoByRequestId[requestId];
 
 		boards[p.edition].pawns[p.pawnID].position += uint8(randomness % 11) + 2;
 		boards[p.edition].pawns[p.pawnID].position %= boards[p.edition].nbOfLands;
 		boards[p.edition].pawns[p.pawnID].random = randomness;
 
-		emit RandomReady(requestId); // Throw dices in front
+		emit RandomReady(requestId);
 	}
 
 	/**
