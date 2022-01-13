@@ -14,11 +14,7 @@ contract LinkForChainlinkVRF is ERC20 { // https://github.com/rsksmart/erc677/bl
     mapping(bytes32 => uint256) private nonces;
     ERC20 public LINK;
     
-    constructor(
-    address _vrfCoordinator,
-    address _link
-  ) ERC20('Chainlink Token', 'LINK') {
-    LINK = this;
+    constructor() ERC20('Chainlink Token', 'LINK') {
   }
 
     // to create LINK

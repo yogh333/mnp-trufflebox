@@ -8,10 +8,11 @@ import "../Board.sol";
 
 // @dev only used for local development with Ganache
 // @dev /!\ Vrf Coordinator address must be this one /!\
-contract VRFConsumerBase is ERC20 { // https://github.com/rsksmart/erc677/blob/master/contracts/ERC677.sol
+contract VRFConsumerBase /*ChainLinkVRFStub*/ is ERC20 { // https://github.com/rsksmart/erc677/blob/master/contracts/ERC677.sol
     /* keyHash */ /* nonce */
     mapping(bytes32 => uint256) private nonces;
 
+    ERC20 LINK = ERC20(address(this));
     constructor(address _vrfCoordinator,
         address _link
     ) ERC20('Chainlink Token', 'LINK') {}
@@ -41,7 +42,9 @@ contract VRFConsumerBase is ERC20 { // https://github.com/rsksmart/erc677/blob/m
 
         // /!\ Vrf Coordinator address in Board contract must be this one /!\
         BoardContract Board = BoardContract(msg.sender);
-        Board.fulfillRandomness(requestId, randomness);
+        Board.rawFulfillRandomness(requestId, randomness);
     }
+
+    function rawFulfillRandomness(bytes32 requestId, uint256 randomness) public virtual {}
 
 }
