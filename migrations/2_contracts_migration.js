@@ -19,6 +19,7 @@ const Build = artifacts.require("BuildContract");
 const Prop = artifacts.require("PropContract");
 const Bank = artifacts.require("BankContract");
 const Staking = artifacts.require("StakingContract");
+const Faucet = artifacts.require("FaucetContract");
 
 // Stubs
 const BoardStub = artifacts.require("BoardStub");
@@ -67,6 +68,10 @@ module.exports = async function (deployer, network, accounts) {
       // Deploy MONO
       await deployer.deploy(Mono, ethers.utils.parseEther("300000"));
       MonoInstance = await Mono.deployed();
+
+      // Deploy FAUCET
+      await deployer.deploy(Faucet, MonoInstance.address);
+      FaucetInstance = await Faucet.deployed();
 
       // Deploy PAWN
       await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
@@ -146,6 +151,10 @@ module.exports = async function (deployer, network, accounts) {
       // Deploy MONO
       await deployer.deploy(Mono, ethers.utils.parseEther("300000"));
       MonoInstance = await Mono.deployed();
+
+      // Deploy FAUCET
+      await deployer.deploy(Faucet, MonoInstance.address);
+      FaucetInstance = await Faucet.deployed();
 
       // Deploy PAWN
       await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
@@ -293,6 +302,12 @@ module.exports = async function (deployer, network, accounts) {
         from: accounts[0],
       });
 
+      // Mint 10000 $MONO to Faucet
+      await MonoInstance.mint(
+        FaucetInstance.address,
+        ethers.utils.parseEther("10000")
+      );
+
       break;
 
     case "polygon_infura_testnet":
@@ -315,6 +330,13 @@ module.exports = async function (deployer, network, accounts) {
       await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
         from: accounts[0],
       });
+
+      // Mint 10000 $MONO to Faucet
+      await MonoInstance.mint(
+        FaucetInstance.address,
+        ethers.utils.parseEther("10000")
+      );
+
       break;
 
     default:
