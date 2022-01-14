@@ -1,5 +1,7 @@
 // BoardRandom.test.js
 
+ethers = require("ethers");
+
 const Board = artifacts.require("BoardContract");
 const Pawn = artifacts.require("PawnContract");
 const Bank = artifacts.require("BankContract");
@@ -15,19 +17,7 @@ contract("Board", async (accounts) => {
   //====================== ?
   const requestId = 0x0002;
 
-  let boardInstance, pawnInstance, LinkInstance;
-
-  let BankInstance;
-  let BoardInstance;
-  let BuildInstance;
-  let MonoInstance;
-  let PawnInstance;
-  let PropInstance;
-  let StakingInstance;
-  let MonoUsdPriceFeedInstance;
-
-  let ADMIN_ROLE;
-  let BANKER_ROLE;
+  let boardInstance, pawnInstance;
 
   const etherToWei = (ethers) => {
     return web3.utils.toWei(ethers.toString(), "ether");
@@ -43,13 +33,6 @@ contract("Board", async (accounts) => {
           "0x514910771af9ca656af840dff83e8264ecf986ca",
           {from: _contractOwner});
 
-    /*
-    LinkInstance = await ERC20TokenStub.new("Chainlink token", "LINK", {
-          from: _contractOwner,
-    });
-
-
-     */
     boardInstance = await Board.new(
         VRFConsumerBaseInstance.address,
         VRFConsumerBaseInstance.address,
@@ -57,19 +40,7 @@ contract("Board", async (accounts) => {
       0.0001 * 10 ** 18,
       { from: _contractOwner }
     );
-/*
-    BankInstance = await Bank.new(
-      PawnInstance.address,
-      BoardInstance.address,
-      PropInstance.address,
-      BuildInstance.address,
-      MonoInstance.address,
-      LinkInstance.address,
-      StakingInstance.address,
-      { from: _contractOwner }
-    );*/
 
-    //ADMIN_ROLE = await BankInstance.ADMIN_ROLE();
 
   };
 
@@ -103,41 +74,21 @@ contract("Board", async (accounts) => {
         });
 
         //====================== ?
-        xit("2. Reverts if the LINK balance of the contract is lower than the fee", async function () {
-            /*let fee = new BN(10);
+        it("2. Reverts if the LINK balance of the contract is lower than the fee", async function () {
 
-            const kovanLinkAddress = 0xa36085F69e2889c224210F603D836748e7dC0088;
-            await boardInstance.LINK(kovanLinkAddress).to(boardInstance.address);
-            console.log('balance:', balance.toString());
-             */
+            //Registering new pawn
+            await boardInstance.register(new BN(0), new BN(1));
 
-            //test with LinkForChainlinkVRF or ChainLinkVRFStub ERC20 token
-
-            //await VRFConsumerBaseInstance.faucet(boardInstance.address,3 * 10 ** 18);
-
-           // await expectRevert(boardInstance.play(new BN(0), new BN(1)),
-           //     "XXXXX");
-           await expectRevert(await VRFConsumerBaseInstance.play(0,1));
-
-
+            //call of play method
+            await expectRevert( boardInstance.play(new BN(0), new BN(1)),
+                "Not enough LINK - fill contract with faucet");
         });
 
-      xit("2. Pass if the LINK balance of the contract has enough fees", async function () {
-          /*let fee = new BN(10);
+      xit("3. Pass if the LINK balance of the contract has enough fees", async function () {
 
-          const kovanLinkAddress = 0xa36085F69e2889c224210F603D836748e7dC0088;
-          await boardInstance.LINK(kovanLinkAddress).to(boardInstance.address);
-          console.log('balance:', balance.toString());
-           */
-
-          //test with LinkForChainlinkVRF or ChainLinkVRFStub ERC20 token
-
-          await VRFConsumerBaseInstance.faucet(boardInstance.address,3 * 10 ** 18);
-
-
-          await expect(await VRFConsumerBaseInstance.play(0,1));
-
-
+          await VRFConsumerBaseInstance.faucet(boardInstance.address,web3.utils.toBN(new BN(3).mul(new BN(10).pow(new BN(28)))));
+          
+          expect(await boardInstance.play(new BN(0), new BN(1)));
       });
     });
 
@@ -198,21 +149,24 @@ contract("Board", async (accounts) => {
                 "XXXXX");
         });
 
-        xit("10. Reverts playing if the paw is not registered", async function() {
+        it("10. Reverts playing if the paw is not registered", async function() {
 
             await expectRevert(boardInstance.play(new BN(0), new BN(1)),
                 "Unregistered pawn");
         });
 
-        it("11. Test random number related to the movement of the pawn", async () => {
+        xit("11. Test random number related to the movement of the pawn", async () => {
             //Registering new pawn
             await boardInstance.register(new BN(0), new BN(1));
 
             const random = 6;
             //Set the random number
-            await chainLinkVRFInstance.setRandom(random);
+            await VRFConsumerBaseInstance.setRandom(random);
 
             const oldPositionPawn = await boardInstance.getPawn(new BN(0), new BN(1)).position;
+
+            //We must deposit LINK tokens on the contract before
+
 
             //Call of the play method
             await boardInstance.play(new BN(0), new BN(1));
