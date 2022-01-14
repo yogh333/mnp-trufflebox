@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import Spinner from "react-bootstrap/Spinner";
 
@@ -19,6 +19,7 @@ export default function User(props) {
   const maxCells = props.max_lands;
   const toggleUpdateValues = props.toggle_update_user_values;
   const Bank = props.bank_contract;
+  const monoSymbol = props.mono_symbol;
 
   // functions
   const displayInfo = props.display_info;
@@ -36,6 +37,7 @@ export default function User(props) {
   const [areDicesDisplayed, setAreDicesDisplayed] = useState(false);
   const [isShakerDisplayed, setIsShakerDisplayed] = useState(false);
   const [requestedID, setRequestedID] = useState(null);
+  const [requestID, setRequestID] = useState(null);
 
   useEffect(() => {
     if (!(provider && address && networkId)) {
@@ -79,19 +81,17 @@ export default function User(props) {
       );
     }
 
-    Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
-      setCurrentPosition(_pawnInfo.position);
-    });
-
     provider
       .getBlockNumber()
       .then((_blockNumber) => setStartBlockNumber(_blockNumber));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, provider, networkId]);
 
   useEffect(() => {
     if (!Mono || !Prop) return;
 
     updateValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Mono, Prop]);
 
   const updateValues = () => {
@@ -107,19 +107,42 @@ export default function User(props) {
     }
 
     updateValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toggleUpdateValues]);
 
   useEffect(() => {
-    if (!Bank) {
+    if (!Bank || !props.edition_id) {
       return;
     }
 
     Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
       setCurrentPosition(_pawnInfo.position);
       highlightCurrentCell(_pawnInfo.position);
-      displayInfo(_pawnInfo.position);
+      const rarity = getRandomRarity(_pawnInfo.random);
+      displayInfo(_pawnInfo.position, rarity);
     });
-  }, [Bank]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [Bank, props.edition_id]);
+
+  const getRandomRarity = (randomness) => {
+    const number = getRandomInteger("rarity", 1, 111, randomness);
+    // return rarity
+    if (number <= 100) return 2;
+    if (number <= 110) return 1;
+    return 0;
+  };
+
+  const getRandomInteger = (type, min, max, randomNumber) => {
+    // Simulate another random number from Chainlink VRF random number
+    const modulo = max - min + 1;
+    const value = ethers.utils.defaultAbiCoder.encode(
+      ["uint256", "string"],
+      [ethers.BigNumber.from(randomNumber), type]
+    );
+    const number = ethers.BigNumber.from(ethers.utils.keccak256(value));
+
+    return ethers.BigNumber.from(number).mod(modulo).toNumber() + min;
+  };
 
   useEffect(() => {
     if (!startBlockNumber || !Board || !Bank) {
@@ -127,16 +150,18 @@ export default function User(props) {
     }
 
     subscribeContractsEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startBlockNumber, Board, Bank]);
 
   useEffect(() => {
-    if (!rollDice) {
+    if (!rollDice || !currentPosition) {
       return;
     }
 
     setAreDicesDisplayed(true);
-    setIsShakerDisplayed(false); // todo lancer l'anaimation 3D
-    handleNewPosition(currentPosition, rollDice[0] + rollDice[1]);
+    setIsShakerDisplayed(false); // todo lancer l'animation 3D
+    handleNewPosition(currentPosition, rollDice);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rollDice]);
 
   const subscribeContractsEvents = () => {
@@ -144,88 +169,106 @@ export default function User(props) {
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
-      console.log(event);
+      console.log("event", event);
+      setIsShakerDisplayed(true);
+      setAreDicesDisplayed(false);
       setRequestedID(_requestID);
+    });
+    Board.on("RandomReady", (_requestID, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+
+      console.log("event", event);
+      setRequestID(_requestID);
     });
   };
 
   useEffect(() => {
-    if (!requestedID || !Board || !Bank) {
-      return;
-    }
-
-    if (
-      window.location.hostname === "127.0.0.1" ||
-      window.location.hostname === "localhost"
-    ) {
-      simulateVRFCoordinatorResponse();
-    }
-
-    Board.on("RandomReady", (_requestID, event) => {
-      if (event.blockNumber <= startBlockNumber) return;
-      if (requestedID !== _requestID) return;
-
-      console.log(event);
-      Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
-        setRollDice(calculateDicesNumbers(_pawnInfo.random)); // to throw dices 3D animation and display dices results
-      });
-    });
-  }, [requestedID]);
-
-  const calculateDicesNumbers = (_randomness) => {
-    const dicesSum = ethers.BigNumber.from(_randomness).mod(11).toNumber() + 2;
-    console.log("dicesSum", dicesSum);
-    const diceA =
-      Math.floor(Math.random() * Math.min(dicesSum - 1, 6)) +
-      Math.max(1, dicesSum - 6);
-    console.log("diceA", diceA);
-    const diceB = dicesSum - diceA;
-    console.log("diceB", diceB);
-
-    return [diceA, diceB];
-  };
-
-  const simulateVRFCoordinatorResponse = () => {
     if (
       !(
         window.location.hostname === "127.0.0.1" ||
         window.location.hostname === "localhost"
       ) ||
-      !requestedID
+      !requestedID ||
+      !VRFCoordinator
     )
       return;
-    VRFCoordinator.sendRandomness(requestedID).then(() =>
-      console.log("VRFCoordinator response asked")
-    );
+
+    VRFCoordinator.sendRandomness(requestedID).then(() => {
+      console.log("VRFCoordinator response asked");
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestedID]);
+
+  useEffect(() => {
+    if (!requestID || !Bank || !requestedID || !props.edition_id) return;
+    if (requestID !== requestedID) return;
+
+    Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
+      setRollDice(calculateDicesNumbers(_pawnInfo)); // to throw dices 3D animation and display dices results
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestID]);
+
+  useEffect(() => {
+    if (!rollDice) {
+      return;
+    }
+
+    setAreDicesDisplayed(true);
+    setIsShakerDisplayed(false); // todo lancer l'animation 3D
+    handleNewPosition(currentPosition, rollDice);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rollDice]);
+
+  /**
+   * Calculate dices values [1;6]
+   * @param pawnInfo
+   * @return pawnInfo
+   */
+  const calculateDicesNumbers = (pawnInfo) => {
+    const dicesSum =
+      ethers.BigNumber.from(pawnInfo.random).mod(11).toNumber() + 2;
+    console.log("dicesSum", dicesSum);
+    const min = Math.min(6, dicesSum - 1);
+    const max = Math.max(1, dicesSum - 6);
+    const diceA = Math.floor(Math.random() * (min - max + 1)) + max;
+    console.log("diceA", diceA);
+    const diceB = dicesSum - diceA;
+    console.log("diceB", diceB);
+
+    return {
+      random: pawnInfo.random,
+      position: pawnInfo.position,
+      dices: [diceA, diceB],
+      dicesSum: dicesSum,
+    };
   };
 
   /**
    * name: rollDices
    * description: simulates the roll of dice to move the game forward and to move on the pawn
+   * random is retrieved with RandomReady(requestId) event
    */
   function rollDices() {
     if (!Bank || !props.edition_id) return;
 
-    setIsShakerDisplayed(true);
-
     Bank.rollDices(props.edition_id);
-
-    // random is retrieved with RandomReady(requestId) event
   }
 
   /**
    * name: handleNewPosition
    * description: make all the operations to determine and to display the new position of the future pawn
    * @param previousPosition
-   * @param total
+   * @param pawnInfo
    */
-  function handleNewPosition(previousPosition, total) {
-    const newCell = (previousPosition + total) % maxCells;
+  function handleNewPosition(previousPosition, pawnInfo) {
+    const newCell = (previousPosition + pawnInfo.dicesSum) % maxCells;
 
     // todo STOPPER animation roll dices sur le front et lancer l'animation 3D puis à la fin :
 
     highlightCurrentCell(newCell);
-    displayInfo(newCell);
+    const rarity = getRandomInteger("rarity", 0, 2, pawnInfo.random);
+    displayInfo(pawnInfo.position, rarity);
     setCurrentPosition(newCell);
     forgetPreviousPosition(previousPosition);
   }
@@ -253,8 +296,11 @@ export default function User(props) {
 
   return (
     <div>
-      <div>{balance} MONO$</div>
-      <div>{propertyCount} PROP$</div>
+      <div className="price">
+        {balance}
+        {monoSymbol}
+      </div>
+      <div>{propertyCount} NFT</div>
 
       <Button
         type="submit"
@@ -276,6 +322,7 @@ export default function User(props) {
             src={require("../assets/dices_shaker.gif").default}
             alt="dices shaker"
           />
+          <p>Waiting for randomness...</p>
         </div>
       </div>
 
@@ -285,8 +332,9 @@ export default function User(props) {
           <img
             className="dice-display d-inline-block m-2"
             src={
-              require(`../assets/dice_face_${rollDice ? rollDice[0] : 1}.png`)
-                .default
+              require(`../assets/dice_face_${
+                rollDice ? rollDice.dices[0] : 1
+              }.png`).default
             }
             alt="dice display"
           />
@@ -294,8 +342,9 @@ export default function User(props) {
           <img
             className="dice-display d-inline-block m-2"
             src={
-              require(`../assets/dice_face_${rollDice ? rollDice[1] : 1}.png`)
-                .default
+              require(`../assets/dice_face_${
+                rollDice ? rollDice.dices[1] : 1
+              }.png`).default
             }
             alt="dice display"
           />

@@ -45,6 +45,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	event RollingDices(address player, uint16 _edition, bytes32 requestID);
 	event DicesRollsPrepaid(address indexed player, uint8 quantity);
 	event MonoBought(address indexed player, uint256 amount);
+	event PropertyRentPayed(address indexed player, uint256 amount);
 
 	constructor(
 		address PawnAddress,
@@ -90,7 +91,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/// @notice locate pawn on game's board
 	/// @param _edition edition number
 	/// @return p_ Pawn information
-	function locatePlayer(uint16 _edition) external view returns (BoardContract.PawnInfo memory p_) {
+	function locatePlayer(uint16 _edition) public view returns (BoardContract.PawnInfo memory p_) {
 		require(_edition <= Board.getMaxEdition(), "unknown edition");
 		require(Pawn.balanceOf(msg.sender) == 1, "player does not own a pawn");
 
@@ -150,68 +151,46 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit MonoBought(msg.sender, amountToBuy);
 	}
 
-	function buyProp(
-		uint16 _edition,
-		uint8 _land,
-		uint8 _rarity
-	) public {
-		require(Prop.isValidProp(_edition, _land, _rarity), "PROP does not exist");
-		uint256 price = propPrices[_edition][_land][_rarity];
-
+	function buyProp(uint16 _edition) public {
+		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		uint8 _rarity = retrievePropertyRarity(p.random);
+		require(Prop.isValidProp(_edition, p.position, _rarity), "PROP does not exist");
+		uint256 price = propPrices[_edition][p.position][_rarity];
 		require(Mono.transferFrom(msg.sender, address(this), price), "$MONO transfer failed");
-
-		uint256 prop_id = Prop.mint(msg.sender, _edition, _land, _rarity);
+		uint256 prop_id = Prop.mint(msg.sender, _edition, p.position, _rarity);
 
 		emit PropertyBought(msg.sender, prop_id);
 	}
 
-	function sellProp(uint256 _id) public {
-		require(Prop.ownerOf(_id) == msg.sender, "cannot sell a non owned property");
+	function payRent(uint16 _edition) public {
+		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		uint8 _rarity = retrievePropertyRarity(p.random);
 
-		//(version, cell, rarity, serial) = Prop.get(_id);
-		PropContract.Property memory prop = Prop.get(_id);
+		require(Prop.isValidProp(_edition, p.position, _rarity), "PROP does not exist");
 
-		/* Bank buys PROP at 30% of selling price */
-		uint256 price = (propPrices[prop.edition][prop.land][prop.rarity] * 30) / 100;
+		uint256 amount = retrievePropertyTax(_edition, p.position, _rarity);
+		require(Mono.transferFrom(msg.sender, address(this), amount), "Tax payment failed");
 
-		require(Mono.balanceOf(address(this)) >= price, "Bank does not own enough funds");
-
-		Prop.safeTransferFrom(msg.sender, address(this), _id);
-
-		Mono.transfer(msg.sender, price);
-
-		emit eSellProp(msg.sender, _id, price);
+		emit PropertyRentPayed(msg.sender, amount);
 	}
 
-	function buyBuild(
-		uint16 _edition,
-		uint8 _land,
-		uint8 _buildType,
-		uint32 _amount
-	) public payable {
-		require(Build.isValidBuild(_edition, _land, _buildType), "BUILD does not exist");
-		uint256 price = buildPrices[_edition][_land][_buildType];
-
-		require(Mono.transferFrom(msg.sender, address(this), _amount * price), "$MONO transfer failed");
-
-		uint256 build_id = Build.mint(msg.sender, _edition, _land, _buildType, _amount);
-
-		emit eBuyBuild(msg.sender, build_id, _amount);
+	function retrievePropertyTax(uint16 _edition, uint8 _land, uint8 _rarity) internal view returns(uint256){
+		return propPrices[_edition][_land][_rarity] / 100 > 10**18 ? propPrices[_edition][_land][_rarity] : 10**18;
 	}
 
-	function sellBuild(uint256 _id, uint32 _amount) public {
-		BuildContract.Building memory b = Build.get(_id);
+	function retrievePropertyRarity(uint256 randomness) internal pure returns(uint8){
+		uint256 number = calculateRandomInteger("rarity", 1, 111, randomness);
 
-		/* Bank buys BUILD at 30% of selling price */
-		uint256 price = (buildPrices[b.edition][b.land][b.buildType] * 30 * _amount) / 100;
+		if (number <= 100) return 2;
+		if (number <= 110) return 1;
+		return 0;
+	}
 
-		require(Mono.balanceOf(address(this)) >= price, "Bank does not own enough funds");
+	function calculateRandomInteger(string memory _type, uint256 min, uint256 max, uint256 randomness) internal pure returns(uint256) {
+		uint256 modulo = max - min + 1;
+		uint256 number = uint256(keccak256(abi.encode(randomness, _type)));
 
-		Build.burn(msg.sender, _id, _amount);
-
-		Mono.transfer(msg.sender, price);
-
-		emit eSellBuild(msg.sender, _id, price);
+		return number % modulo + min;
 	}
 
 	function getPriceOfProp(
