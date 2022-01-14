@@ -4,7 +4,9 @@ pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 //import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
-import "./Stubs/ChainLinkVRFStub.sol";
+import "./Stubs/VRFConsumerBase.sol";
+
+
 
 /// @title Board
 /// @author Jerome Caporossi, Stéphane Chaunard, Alexandre Gautier
@@ -113,7 +115,6 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @notice Requests randomness
 	 */
 	function requestRandomNumber() internal returns (bytes32 requestId) {
-		////====================== ?   TODO: correction for the require
 		require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
 		requestId = requestRandomness(keyHash, fee);
 	}
