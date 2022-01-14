@@ -24,7 +24,7 @@ const Staking = artifacts.require("StakingContract");
 // Stubs
 const BoardStub = artifacts.require("BoardStub");
 const BuildStub = artifacts.require("BuildStub");
-const ChainlinkPriceFeedStub = artifacts.require("ChainlinkPriceFeedStub");
+const ChainlinkPriceFeedStub = artifacts.require("ChainLinkPriceFeedStub");
 const ERC20TokenStub = artifacts.require("ERC20TokenStub");
 const MonoStub = artifacts.require("MonoStub");
 const PawnStub = artifacts.require("PawnStub");
