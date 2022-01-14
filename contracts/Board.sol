@@ -17,6 +17,9 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		uint256 random;
 		uint8 position;
 		bool isOnBoard;
+		bool hasBoughtProperty;
+		bool hasPaidTax;
+		bool isRoundCompleted;
 	}
 
 	/// @dev structure used to store pawn's attribute
@@ -131,6 +134,9 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		boards[p.edition].pawns[p.pawnID].position += uint8(randomness % 11) + 2;
 		boards[p.edition].pawns[p.pawnID].position %= boards[p.edition].nbOfLands;
 		boards[p.edition].pawns[p.pawnID].random = randomness;
+		boards[p.edition].pawns[p.pawnID].hasBoughtProperty = false;
+		boards[p.edition].pawns[p.pawnID].hasPaidTax = false;
+		boards[p.edition].pawns[p.pawnID].isRoundCompleted = false;
 
 		emit RandomReady(requestId);
 	}
@@ -263,5 +269,10 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	function getPawn(uint16 _edition, uint256 _pawnID) external view returns (PawnInfo memory p) {
 		require(isRegistered(_edition, _pawnID), "pawn has not been regsitered");
 		return boards[_edition].pawns[_pawnID];
+	}
+
+	function setPawnInfo(uint16 _edition, uint256 _pawnID, uint256 _random, uint8 _position) internal {
+		boards[_edition].pawns[_pawnID].random = _random;
+		boards[_edition].pawns[_pawnID].position = _position;
 	}
 }

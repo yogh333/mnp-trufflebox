@@ -14,7 +14,8 @@ import BankJson from "../contracts/BankContract.json";
 import BoardJson from "../contracts/BoardContract.json";
 import MonoJson from "../contracts/MonoContract.json";
 import PawnJson from "../contracts/PawnContract.json";
-import Spinner from "react-bootstrap/Spinner";
+
+import { Button, Form, Modal, Spinner } from "react-bootstrap";
 
 function Game(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -25,6 +26,14 @@ function Game(props) {
   const provider = props.provider;
   const networkId = props.network_id;
   const address = props.address;
+
+  const monoSymbol = props.mono_symbol;
+
+  // functions
+  const setIsModalShown = props.set_is_modal_shown;
+  const setModalHTML = props.set_modal_html;
+  const doModalAction = props.do_modal_action;
+  const setIsDoingModalAction = props.set_is_doing_modal_action;
 
   const [Bank, setBank] = useState(null);
   const [Mono, setMono] = useState(null);
@@ -92,7 +101,6 @@ function Game(props) {
     }
 
     updateValues();
-    setIsReadyToRender(true);
   }, [Bank]);
 
   useEffect(() => {
@@ -102,6 +110,14 @@ function Game(props) {
 
     subscribeContractsEvents();
   }, [startBlockNumber, Board]);
+
+  useEffect(() => {
+    if (!doModalAction) return;
+
+    if (doModalAction === "payRent") {
+      payRent();
+    }
+  }, [doModalAction]);
 
   const subscribeContractsEvents = () => {
     Bank.on("PropertyBought", (_player, _propID, event) => {
@@ -122,24 +138,19 @@ function Game(props) {
     const _monoBalance = await Mono.balanceOf(address);
     const _pawnBalance = await Pawn.balanceOf(address);
 
-    let _isRegistered, _pawnID;
+    let _isRegistered = false,
+      _pawnID;
     if (_pawnBalance.toNumber() > 0) {
       _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
       _isRegistered = await Board.isRegistered(props.edition_id, _pawnID);
     }
 
-    if (
+    setCanPlay(
       _isRegistered &&
-      ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1"))
-    ) {
-      setPawnID(_pawnID);
-      setCanPlay(true);
-
-      return;
-    }
-
-    setCanPlay(false);
+        ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1"))
+    );
     setPawnID(_pawnID);
+    setIsReadyToRender(true);
   };
 
   const retrieveCellPrices = async (_editionId, _cellID) => {
@@ -174,15 +185,40 @@ function Game(props) {
     };
   };
 
-  async function displayInfo(cellID) {
-    setVisual(<img className="land" src={board.lands[cellID].visual} />);
+  const buyProperty = (event) => {
+    if (!(Bank && props.edition_id)) return;
+
+    Bank.buyProp(props.edition_id).then((value) => {
+      console.log("Property bought");
+      updateValues();
+    });
+  };
+
+  const payRent = (event) => {
+    if (!(Bank && props.edition_id)) return;
+
+    Bank.payRent(props.edition_id).then((value) => {
+      console.log("rent payed");
+      setIsDoingModalAction(false);
+      setIsModalShown(false);
+      updateValues();
+    });
+  };
+
+  const borderColor = (rarity) => {
+    const COLORS = ["yellow", "green", "blue"];
+    return COLORS[rarity];
+  };
+
+  async function displayInfo(cellID, rarity) {
+    let prices;
     if (Bank != null) {
       if (board.lands[cellID].type !== "property") {
         return;
       }
 
       setIsRetrievingInfo(true);
-      const prices = await retrieveCellPrices(board.id, cellID);
+      prices = await retrieveCellPrices(board.id, cellID);
       const land = {
         id: cellID,
         title: board.lands[cellID].name,
@@ -200,6 +236,62 @@ function Game(props) {
 
       setLandInfo(land);
       setIsRetrievingInfo(false);
+    }
+
+    if (rarity) {
+      setVisual(
+        <>
+          <img
+            className="land m-3"
+            style={{ border: `1rem solid ${borderColor(rarity)}` }}
+            src={board.lands[cellID].visual}
+          />
+          <div className="price">
+            <span>
+              price : {ethers.utils.formatEther(prices.properties[rarity])}
+            </span>
+            {monoSymbol}
+          </div>
+          <div>
+            <Button
+              className="m-1"
+              variant="success"
+              size="sm"
+              onClick={buyProperty}
+              data-rarity={rarity.toString()}
+              data-land-id={cellID.toString()}
+            >
+              Buy
+            </Button>
+            <Button
+              className="m-1"
+              variant="danger"
+              size="sm"
+              onClick={() => {
+                setModalHTML({
+                  title: "Pay the rent",
+                  body: "To continue, you must pay a rent. This rent will be shares between NFT owners of this land.",
+                  button: "Pay",
+                  action: "payRent",
+                });
+                setIsModalShown(true);
+              }}
+            >
+              Don't
+            </Button>
+          </div>
+        </>
+      );
+    } else {
+      setVisual(
+        <>
+          <img
+            className="land m-3 text-center"
+            style={{ border: `3rem solid ${borderColor(rarity)}` }}
+            src={board.lands[cellID].visual}
+          />
+        </>
+      );
     }
   }
 
@@ -226,7 +318,7 @@ function Game(props) {
 
   return (
     <div className="Game">
-      <div className="info-area-1">
+      <div className="info-area-1 text-center">
         <h2>User info</h2>
         {provider && (
           <User
@@ -239,18 +331,16 @@ function Game(props) {
             display_info={displayInfo}
             toggle_update_user_values={toggleUpdateValues}
             bank_contract={Bank}
+            mono_symbol={monoSymbol}
           />
         )}
       </div>
-      <div className="info-area-2">
-        <h2>Property Visual</h2>
-        {visual}
-      </div>
+      <div className="info-area-2 text-center">{visual}</div>
       <div className="info-area-3">
         <h2>Misc</h2>
       </div>
-      <div className="info-area-4">
-        <h2>Property Info</h2>
+      <div className="info-area-4 text-center">
+        <h2>NFT Info</h2>
         {isRetrievingInfo ? (
           spinner
         ) : (
@@ -265,11 +355,16 @@ function Game(props) {
             rarity_multiplier={board.rarityMultiplier}
             rarity_names={board.rarityNames}
             toggle_update_values={toggleUpdateValues}
+            mono_symbol={monoSymbol}
           />
         )}
       </div>
       <div className="main-area">
-        <Grid board={board} displayInfo={displayInfo} />
+        <Grid
+          board={board}
+          displayInfo={displayInfo}
+          mono_symbol={monoSymbol}
+        />
       </div>
     </div>
   );

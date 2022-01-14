@@ -16,8 +16,11 @@ import { ethers } from "ethers";
 import StakingJson from "../contracts/StakingContract.json";
 import AggregatorV3InterfaceJson from "../contracts/AggregatorV3Interface.json";
 import ERC20Json from "../contracts/ERC20.json";
+import { Modal, Spinner } from "react-bootstrap";
 
 function App() {
+  const spinner = <Spinner as="span" animation="border" size="sm" />;
+
   const [provider, setProvider] = useState(null);
   const [networkId, setNetworkId] = useState(null);
   const [address, setAddress] = useState(null);
@@ -30,8 +33,23 @@ function App() {
   const [rewardTokenIcon, setRewardTokenIcon] = useState(null);
   const [rewardTokenPriceFeed, setRewardTokenPriceFeed] = useState(null);
   const [rewardTokenPrice, setRewardTokenPrice] = useState(null);
+  const monoSymbol = (
+    <img
+      className="symbol"
+      alt="$MONO"
+      title="$MONO"
+      src={require("../assets/mono-symbol.svg").default}
+    />
+  );
 
   const [isRewardTokenDisplay, setIsRewardTokenDisplay] = useState(false);
+  const [isModalShown, setIsModalShown] = useState(false);
+  const [isDoingModalAction, setIsDoingModalAction] = useState(false);
+  const [modalHTML, setModalHTML] = useState({
+    title: "",
+    body: "",
+  });
+  const [doModalAction, setDoModalAction] = useState(null);
 
   const aggregatorV3InterfaceABI = AggregatorV3InterfaceJson.abi;
 
@@ -164,9 +182,7 @@ function App() {
       setRewardTokenSymbol(_symbol);
       setRewardTokenIcon("/images/tokens/" + _symbol.toLowerCase() + ".svg");
     });
-    RewardTokenInstance.decimals().then((_decimals) =>
-      setRewardTokenName(_decimals)
-    );
+    RewardTokenInstance.decimals();
   }, [Staking, rewardTokenAddress, rewardTokenPriceFeed]);
 
   useEffect(() => {
@@ -222,6 +238,37 @@ function App() {
 
   return (
     <div className="App">
+      <Modal show={isModalShown} centered backdrop="static">
+        <Modal.Header>
+          <Modal.Title>
+            <div dangerouslySetInnerHTML={{ __html: `${modalHTML.title}` }} />
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body id="Description__tooltip">
+          <div dangerouslySetInnerHTML={{ __html: `${modalHTML.body}` }} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setIsDoingModalAction(true);
+              setDoModalAction(modalHTML.action);
+            }}
+          >
+            {isDoingModalAction ? (
+              spinner
+            ) : (
+              <span
+                dangerouslySetInnerHTML={{ __html: `${modalHTML.button}` }}
+              />
+            )}
+          </Button>
+          <Button variant="secondary" onClick={() => setIsModalShown(false)}>
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <BrowserRouter>
         <Navbar className="px-3" bg="light">
           <Container>
@@ -266,6 +313,7 @@ function App() {
                 provider={provider}
                 network_id={networkId}
                 address={address}
+                mono_symbol={monoSymbol}
               />
             }
           />
@@ -277,6 +325,7 @@ function App() {
                 provider={provider}
                 network_id={networkId}
                 address={address}
+                mono_symbol={monoSymbol}
               />
             }
           />
@@ -289,6 +338,11 @@ function App() {
                 network_id={networkId}
                 address={address}
                 edition_id="0"
+                mono_symbol={monoSymbol}
+                set_is_modal_shown={setIsModalShown}
+                set_modal_html={setModalHTML}
+                do_modal_action={doModalAction}
+                set_is_doing_modal_action={setIsDoingModalAction}
               />
             }
           />
@@ -306,6 +360,7 @@ function App() {
                 reward_token_address={rewardTokenAddress}
                 reward_token_price={rewardTokenPrice}
                 reward_token_price_feed={rewardTokenPriceFeed}
+                mono_symbol={monoSymbol}
               />
             }
           />

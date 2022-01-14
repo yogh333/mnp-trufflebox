@@ -17,6 +17,7 @@ export default function Land(props) {
   const maxRarity = props.max_rarity;
   const rarityMultiplier = props.rarity_multiplier;
   const toggleUpdateValues = props.toggle_update_values;
+  const monoSymbol = props.mono_symbol;
 
   const [Prop, setProp] = useState(null);
   const [propBalance, setPropBalance] = useState(null);
@@ -112,63 +113,36 @@ export default function Land(props) {
     setPropertyInformationByRarity(_propertyInformationByRarity);
   }, [propertiesCountByRarity]);
 
-  const buyProperty = async (event) => {
-    if (!(Bank && editionId && landInfo.id && networkId)) return;
-
-    const rarity = event.target.getAttribute("data-rarity");
-    Bank.buyProp(editionId, landInfo.id, rarity).then((value) =>
-      console.log("Property buy")
-    );
-  };
-
   if (landInfo.type !== "property") {
     return <></>;
   }
 
   return (
     <>
-      <div>{landInfo.title}</div>
-      <div>
-        Rare price: {landInfo.prices.rare} MONO$
-        <br />
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={buyProperty}
-          data-rarity="0"
-        >
-          Buy
-        </Button>{" "}
-        balance: {propertyInformationByRarity[0].owned},{" "}
-        {propertyInformationByRarity[0].left} left
+      <h3 className="mb-2">{landInfo.title}</h3>
+      <div className="price">
+        Rare {landInfo.prices.rare}
+        {monoSymbol}
       </div>
-      <div>
-        Uncommon price: {landInfo.prices.uncommon} MONO$
-        <br />
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={buyProperty}
-          data-rarity="1"
-        >
-          Buy
-        </Button>{" "}
-        balance: {propertyInformationByRarity[1].owned},{" "}
-        {propertyInformationByRarity[1].left} left
+      <div className="mb-2">
+        mine {propertyInformationByRarity[0].owned}, left{" "}
+        {propertyInformationByRarity[0].left}
       </div>
-      <div>
-        Common price: {landInfo.prices.common} MONO$
-        <br />
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={buyProperty}
-          data-rarity="2"
-        >
-          Buy
-        </Button>{" "}
-        balance: {propertyInformationByRarity[2].owned},{" "}
-        {propertyInformationByRarity[2].left} left
+      <div className="price">
+        Uncommon {landInfo.prices.uncommon}
+        {monoSymbol}
+      </div>
+      <div className="mb-2">
+        mine {propertyInformationByRarity[1].owned}, left{" "}
+        {propertyInformationByRarity[1].left}
+      </div>
+      <div className="price">
+        Common {landInfo.prices.common}
+        {monoSymbol}
+      </div>
+      <div className="mb-2">
+        mine {propertyInformationByRarity[2].owned}, left{" "}
+        {propertyInformationByRarity[2].left}
       </div>
     </>
   );

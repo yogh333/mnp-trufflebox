@@ -23,8 +23,6 @@ import {
 } from "react-bootstrap";
 
 function Admin(props) {
-  const spinner = <Spinner as="span" animation="border" size="sm" />;
-
   const provider = props.provider;
   const networkId = props.network_id;
   const address = props.address;
@@ -82,7 +80,7 @@ function Admin(props) {
 
       setIsReadyToRender(true);
     });
-  }, [adminRole, address]);
+  }, [adminRole, address, Bank]);
 
   async function sendPricesToBank() {
     let commonLandPrices = [];
@@ -111,11 +109,6 @@ function Admin(props) {
   }
 
   async function setRoles() {
-    const Mono = new ethers.Contract(
-      MonoJson.networks[networkId].address,
-      MonoJson.abi,
-      provider.getSigner(address)
-    );
     const Prop = new ethers.Contract(
       PropJson.networks[networkId].address,
       PropJson.abi,
@@ -127,7 +120,6 @@ function Admin(props) {
       provider.getSigner(address)
     );
 
-    const ADMIN_ROLE = await Prop.ADMIN_ROLE();
     const MINTER_ROLE = await Prop.MINTER_ROLE();
 
     Prop.grantRole(MINTER_ROLE, BankJson.networks[networkId].address).then(

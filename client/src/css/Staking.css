@@ -10,6 +10,19 @@ img.token {
     margin: 0.3rem;
 }
 
+img.symbol {
+    width: 1rem;
+    height: 1rem;
+    margin-left: 0.3rem;
+    margin-bottom: -0.2rem;
+}
+
+.price {
+    display: flex;
+    align-items:center;
+    justify-content: center;
+}
+
 .right {
     text-align: right;
 }
