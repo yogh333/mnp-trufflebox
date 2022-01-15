@@ -3,11 +3,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { ethers } from "ethers";
 
 import "../css/Game.css";
-
 import boards from "../data/boards.json";
+
 import Grid from "./Grid";
 import User from "./User";
 import Land from "./Land";
+import Visual from "./Visual";
 import InGame from "./InGame";
 
 import BankJson from "../contracts/BankContract.json";
@@ -15,13 +16,11 @@ import BoardJson from "../contracts/BoardContract.json";
 import MonoJson from "../contracts/MonoContract.json";
 import PawnJson from "../contracts/PawnContract.json";
 
-import { Button, Form, Modal, Spinner } from "react-bootstrap";
-
 function Game(props) {
-  const spinner = <Spinner as="span" animation="border" size="sm" />;
-  const editionID = parseInt(props.edition_id);
+  const spinner = props.spinner;
+  const editionID = "0";
 
-  const board = require(`../data/${boards[editionID]}.json`);
+  const board = require(`../data/${boards[parseInt(editionID)]}.json`);
 
   const provider = props.provider;
   const networkId = props.network_id;
@@ -32,14 +31,13 @@ function Game(props) {
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
-  const doModalAction = props.do_modal_action;
   const setIsDoingModalAction = props.set_is_doing_modal_action;
+  const doModalAction = props.do_modal_action;
 
   const [Bank, setBank] = useState(null);
   const [Mono, setMono] = useState(null);
   const [Board, setBoard] = useState(null);
   const [Pawn, setPawn] = useState(null);
-  const [visual, setVisual] = useState(<div>Property visual</div>);
   const [landInfo, setLandInfo] = useState({
     id: null,
     title: "undefined",
@@ -111,14 +109,6 @@ function Game(props) {
     subscribeContractsEvents();
   }, [startBlockNumber, Board]);
 
-  useEffect(() => {
-    if (!doModalAction) return;
-
-    if (doModalAction === "payRent") {
-      payRent();
-    }
-  }, [doModalAction]);
-
   const subscribeContractsEvents = () => {
     Bank.on("PropertyBought", (_player, _propID, event) => {
       console.log(event);
@@ -142,7 +132,7 @@ function Game(props) {
       _pawnID;
     if (_pawnBalance.toNumber() > 0) {
       _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
-      _isRegistered = await Board.isRegistered(props.edition_id, _pawnID);
+      _isRegistered = await Board.isRegistered(editionID, _pawnID);
     }
 
     setCanPlay(
@@ -165,134 +155,34 @@ function Game(props) {
       );
     }
 
-    const HOUSE = 0;
-    const HOTEL = 1;
-    let buildingsPrices = [];
-    buildingsPrices[HOUSE] = await Bank.getPriceOfBuild(
-      _editionId,
-      _cellID,
-      HOUSE
-    );
-    buildingsPrices[HOTEL] = await Bank.getPriceOfBuild(
-      _editionId,
-      _cellID,
-      HOTEL
-    );
-
     return {
       properties: propertiesPrices,
-      buildings: buildingsPrices,
     };
   };
 
-  const buyProperty = (event) => {
-    if (!(Bank && props.edition_id)) return;
+  async function retrieveLandInfo(cellID, rarity) {
+    setIsRetrievingInfo(true);
+    let _prices;
+    let _landInfo = {
+      id: cellID,
+      title: board.lands[cellID].name,
+      type: board.lands[cellID].type,
+      rarity: null,
+      prices: [0, 0, 0],
+    };
 
-    Bank.buyProp(props.edition_id).then((value) => {
-      console.log("Property bought");
-      updateValues();
-    });
-  };
-
-  const payRent = (event) => {
-    if (!(Bank && props.edition_id)) return;
-
-    Bank.payRent(props.edition_id).then((value) => {
-      console.log("rent payed");
-      setIsDoingModalAction(false);
-      setIsModalShown(false);
-      updateValues();
-    });
-  };
-
-  const borderColor = (rarity) => {
-    const COLORS = ["yellow", "green", "blue"];
-    return COLORS[rarity];
-  };
-
-  async function displayInfo(cellID, rarity) {
-    let prices;
-    if (Bank != null) {
-      if (board.lands[cellID].type !== "property") {
-        return;
-      }
-
-      setIsRetrievingInfo(true);
-      prices = await retrieveCellPrices(board.id, cellID);
-      const land = {
-        id: cellID,
-        title: board.lands[cellID].name,
-        type: board.lands[cellID].type,
-        prices: {
-          rare: ethers.utils.formatUnits(prices.properties[0]),
-          uncommon: ethers.utils.formatUnits(prices.properties[1]),
-          common: ethers.utils.formatUnits(prices.properties[2]),
-        },
-        bprices: {
-          house: ethers.utils.formatUnits(prices.buildings[0]),
-          hotel: ethers.utils.formatUnits(prices.buildings[1]),
-        },
-      };
-
-      setLandInfo(land);
-      setIsRetrievingInfo(false);
+    if (Bank != null && board.lands[cellID].type === "property") {
+      _prices = await retrieveCellPrices(board.id, cellID);
+      _landInfo.prices = [
+        ethers.utils.formatUnits(_prices.properties[0]),
+        ethers.utils.formatUnits(_prices.properties[1]),
+        ethers.utils.formatUnits(_prices.properties[2]),
+      ];
+      _landInfo.rarity = rarity;
     }
 
-    if (rarity) {
-      setVisual(
-        <>
-          <img
-            className="land m-3"
-            style={{ border: `1rem solid ${borderColor(rarity)}` }}
-            src={board.lands[cellID].visual}
-          />
-          <div className="price">
-            <span>
-              price : {ethers.utils.formatEther(prices.properties[rarity])}
-            </span>
-            {monoSymbol}
-          </div>
-          <div>
-            <Button
-              className="m-1"
-              variant="success"
-              size="sm"
-              onClick={buyProperty}
-              data-rarity={rarity.toString()}
-              data-land-id={cellID.toString()}
-            >
-              Buy
-            </Button>
-            <Button
-              className="m-1"
-              variant="danger"
-              size="sm"
-              onClick={() => {
-                setModalHTML({
-                  title: "Pay the rent",
-                  body: "To continue, you must pay a rent. This rent will be shares between NFT owners of this land.",
-                  button: "Pay",
-                  action: "payRent",
-                });
-                setIsModalShown(true);
-              }}
-            >
-              Don't
-            </Button>
-          </div>
-        </>
-      );
-    } else {
-      setVisual(
-        <>
-          <img
-            className="land m-3 text-center"
-            style={{ border: `3rem solid ${borderColor(rarity)}` }}
-            src={board.lands[cellID].visual}
-          />
-        </>
-      );
-    }
+    setLandInfo(_landInfo);
+    setIsRetrievingInfo(false);
   }
 
   if (!isReadyToRender) {
@@ -310,7 +200,7 @@ function Game(props) {
         board_contract={Board}
         pawn_contract={Pawn}
         pawn_id={pawnID}
-        edition_id={props.edition_id}
+        edition_id={editionID}
         parent_update_values_function={updateValues}
       />
     );
@@ -325,17 +215,30 @@ function Game(props) {
             provider={provider}
             address={address}
             network_id={networkId}
-            edition_id={props.edition_id}
+            edition_id={editionID}
             max_lands={board.maxLands}
             pawn_id={pawnID}
-            display_info={displayInfo}
+            retrieve_land_info={retrieveLandInfo}
             toggle_update_user_values={toggleUpdateValues}
             bank_contract={Bank}
             mono_symbol={monoSymbol}
           />
         )}
       </div>
-      <div className="info-area-2 text-center">{visual}</div>
+      <div className="info-area-2 text-center">
+        <Visual
+          spinner={spinner}
+          land_info={landInfo}
+          bank_contract={Bank}
+          edition_id={editionID}
+          mono_symbol={monoSymbol}
+          set_is_modal_shown={setIsModalShown}
+          set_modal_html={setModalHTML}
+          do_modal_action={doModalAction}
+          set_is_doing_modal_action={setIsDoingModalAction}
+          parent_update_values_function={updateValues}
+        />
+      </div>
       <div className="info-area-3">
         <h2>Misc</h2>
       </div>
@@ -350,7 +253,7 @@ function Game(props) {
             provider={provider}
             land_info={landInfo}
             bank_contract={Bank}
-            edition_id={props.edition_id}
+            edition_id={editionID}
             max_rarity={board.maxLandRarities}
             rarity_multiplier={board.rarityMultiplier}
             rarity_names={board.rarityNames}
@@ -362,7 +265,7 @@ function Game(props) {
       <div className="main-area">
         <Grid
           board={board}
-          displayInfo={displayInfo}
+          retrieve_land_info={retrieveLandInfo}
           mono_symbol={monoSymbol}
         />
       </div>

@@ -10,7 +10,6 @@ import "./Pawn.sol";
 import "./Board.sol";
 import "./Mono.sol";
 import "./Prop.sol";
-import "./Build.sol";
 import "./Staking.sol";
 
 contract BankContract is AccessControl, IERC721Receiver {
@@ -20,7 +19,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 	PawnContract private immutable Pawn;
 	BoardContract private immutable Board;
 	PropContract private immutable Prop;
-	BuildContract private immutable Build;
 	MonoContract private immutable Mono;
 	IERC20 private immutable Link;
 	StakingContract private immutable Staking;
@@ -31,14 +29,8 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/// @dev price of PROP by rarity by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private propPrices;
 
-	/// @dev price of BUILD by type by land by edition
-	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private buildPrices;
-
 	event PropertyBought(address indexed to, uint256 indexed prop_id);
-	event eBuyBuild(address indexed to, uint256 indexed build_id, uint32 nb);
 	event PawnBought(address indexed to, uint256 indexed pawn_id);
-	event eSellProp(address indexed seller, uint256 indexed prop_id, uint256 price);
-	event eSellBuild(address indexed seller, uint256 indexed prop_id, uint256 price);
 	event eWithdraw(address indexed to, uint256 value);
 
 	event PlayerEnrolled(uint16 _edition, address indexed player);
@@ -51,7 +43,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 		address PawnAddress,
 		address BoardAddress,
 		address PropAddress,
-		address BuildAddress,
 		address MonoAddress,
 		address LinkAddress,
 		address StakingAddress
@@ -59,7 +50,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 		require(PawnAddress != address(0), "PAWN token smart contract address must be provided");
 		require(BoardAddress != address(0), "BOARD smart contract address must be provided");
 		require(PropAddress != address(0), "PROP token smart contract address must be provided");
-		require(BuildAddress != address(0), "BUILD token smart contract address must be provided");
 		require(MonoAddress != address(0), "MONO token smart contract address must be provided");
 		require(LinkAddress != address(0), "LINK token smart contract address must be provided");
 		require(StakingAddress != address(0), "LINK token smart contract address must be provided");
@@ -67,7 +57,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 		Pawn = PawnContract(PawnAddress);
 		Board = BoardContract(BoardAddress);
 		Prop = PropContract(PropAddress);
-		Build = BuildContract(BuildAddress);
 		Mono = MonoContract(MonoAddress);
 		Link = IERC20(LinkAddress);
 		Staking = StakingContract(StakingAddress);
@@ -159,6 +148,8 @@ contract BankContract is AccessControl, IERC721Receiver {
 		require(Mono.transferFrom(msg.sender, address(this), price), "$MONO transfer failed");
 		uint256 prop_id = Prop.mint(msg.sender, _edition, p.position, _rarity);
 
+
+
 		emit PropertyBought(msg.sender, prop_id);
 	}
 
@@ -202,15 +193,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 		price = propPrices[_edition][_land][_rarity];
 	}
 
-	function getPriceOfBuild(
-		uint16 _edition,
-		uint8 _land,
-		uint8 _buildType
-	) external view returns (uint256 price) {
-		require(Build.isValidBuild(_edition, _land, _buildType), "BUILD does not exist");
-		price = buildPrices[_edition][_land][_buildType];
-	}
-
 	function setPriceOfProp(
 		uint16 _edition,
 		uint8 _land,
@@ -219,16 +201,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 	) public onlyRole(BANKER_ROLE) {
 		require(Prop.isValidProp(_edition, _land, _rarity), "PROP does not exist");
 		propPrices[_edition][_land][_rarity] = _price;
-	}
-
-	function setPriceOfBuild(
-		uint16 _edition,
-		uint8 _land,
-		uint8 _buildType,
-		uint256 _price
-	) public onlyRole(BANKER_ROLE) {
-		require(Build.isValidBuild(_edition, _land, _buildType), "BUILD does not exist");
-		buildPrices[_edition][_land][_buildType] = _price;
 	}
 
 	function withdraw(address _to, uint256 _value) external onlyRole(BANKER_ROLE) {
@@ -256,9 +228,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		uint8 _maxLands,
 		uint8 _maxLandRarities,
 		uint16 _rarityMultiplier,
-		uint16 _buildingMultiplier,
-		uint256[] calldata _commonLandPrices,
-		uint256[] calldata _buildPrices
+		uint256[] calldata _commonLandPrices
 	) external onlyRole(ADMIN_ROLE) {
 		for (uint8 landId = 0; landId < _maxLands; landId++) {
 			if (_commonLandPrices[landId] == 0) {
@@ -271,13 +241,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 					_rarityMultiplier**(_maxLandRarities - rarity - 1) *
 					(1 ether);
 			}
-
-			if (_buildPrices[landId] == 0) {
-				continue;
-			}
-
-			buildPrices[_editionId][landId][0] = _buildPrices[landId] * (1 ether);
-			buildPrices[_editionId][landId][1] = _buildPrices[landId] * _buildingMultiplier * (1 ether);
 		}
 	}
 

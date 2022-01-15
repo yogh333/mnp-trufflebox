@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
+import "../css/App.css";
+import {
+  Button,
+  Container,
+  Modal,
+  Nav,
+  Navbar,
+  Spinner,
+} from "react-bootstrap";
 
 import Admin from "./Admin";
 import Game from "./Game";
 import Home from "./Home";
 import Staker from "./Staker";
 
-import "../css/App.css";
-import { ethers } from "ethers";
 import StakingJson from "../contracts/StakingContract.json";
 import AggregatorV3InterfaceJson from "../contracts/AggregatorV3Interface.json";
 import ERC20Json from "../contracts/ERC20.json";
-import { Modal, Spinner } from "react-bootstrap";
 
 function App() {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -41,6 +44,7 @@ function App() {
       src={require("../assets/mono-symbol.svg").default}
     />
   );
+  const [startBlockNumber, setStartBlockNumber] = useState(null);
 
   const [isRewardTokenDisplay, setIsRewardTokenDisplay] = useState(false);
   const [isModalShown, setIsModalShown] = useState(false);
@@ -146,6 +150,10 @@ function App() {
         provider.getSigner(address)
       )
     );
+
+    provider
+      .getBlockNumber()
+      .then((_blockNumber) => setStartBlockNumber(_blockNumber));
   }, [provider, address, networkId]);
 
   useEffect(() => {
@@ -192,7 +200,8 @@ function App() {
       !rewardTokenPriceFeed ||
       !rewardTokenName ||
       !rewardTokenSymbol ||
-      !rewardTokenIcon
+      !rewardTokenIcon ||
+      !startBlockNumber
     ) {
       return;
     }
@@ -217,6 +226,7 @@ function App() {
     rewardTokenName,
     rewardTokenSymbol,
     rewardTokenIcon,
+    startBlockNumber,
   ]);
 
   function renderOthersLinks() {
@@ -337,7 +347,7 @@ function App() {
                 provider={provider}
                 network_id={networkId}
                 address={address}
-                edition_id="0"
+                spinner={spinner}
                 mono_symbol={monoSymbol}
                 set_is_modal_shown={setIsModalShown}
                 set_modal_html={setModalHTML}
@@ -361,6 +371,8 @@ function App() {
                 reward_token_price={rewardTokenPrice}
                 reward_token_price_feed={rewardTokenPriceFeed}
                 mono_symbol={monoSymbol}
+                staking_contract={Staking}
+                start_block_number={startBlockNumber}
               />
             }
           />

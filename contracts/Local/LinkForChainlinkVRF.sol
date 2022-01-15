@@ -30,6 +30,11 @@ contract LinkForChainlinkVRF is ERC20 { // https://github.com/rsksmart/erc677/bl
         uint256 value,
         bytes memory data
     ) external returns (bool) {
+        bool result = super.transfer(to, value);
+        if (!result) return false;
+
+        emit Transfer(msg.sender, to, value);
+
         (bytes32 _keyHash,uint256 _userSeed) = abi.decode(data, (bytes32, uint256));
         uint256 vRFSeed = uint256(keccak256(abi.encode(_keyHash, _userSeed, msg.sender, nonces[_keyHash])));
         nonces[_keyHash] = nonces[_keyHash] + 1;

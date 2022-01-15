@@ -15,7 +15,7 @@ contract BoardMock is BoardContract {
 		0.0001 * 10 ** 18
 	) {}
 
-	function setPawnInfo(uint16 _edition, uint256 _pawnID, uint8 _position, uint8 _rarity) public {
+	function updatePawnInfo(uint16 _edition, uint256 _pawnID, uint8 _rarity, PawnInfo memory _pawnInfo) public {
 		uint256 _random;
 		/*uint8 rarity;
 		for (uint i=0; rarity == _rarity; i++) {
@@ -45,7 +45,9 @@ contract BoardMock is BoardContract {
 			_random = 1163;
 		}
 
-		setPawnInfo(_edition, _pawnID, _random, _position);
+		_pawnInfo.random = _random;
+
+		setPawnInfo(_edition, _pawnID, _pawnInfo);
 	}
 
 	// Strict copy of Bank functions turned to public type
