@@ -1,7 +1,6 @@
 // Board.test.js
 
 const Board = artifacts.require("BoardContract");
-const utils = require("./utils.js");
 
 contract("BoardContract", async (accounts) => {
   beforeEach(async function () {
@@ -19,12 +18,14 @@ contract("BoardContract", async (accounts) => {
     expect((await BoardInstance.getNbLands(0)).toNumber()).to.equal(40);
   });
 
-  it("should return true when land is a building plot", async function () {
-    expect(await BoardInstance.isBuildingLand(0, 1)).to.equal(true);
-  });
+  it("Lands should have right purchasable status", async function () {
+    const notPurchasableLands = [0, 2, 7, 10, 17, 20, 22, 30, 33, 36];
 
-  it("should return false when a land is not a building plot", async function () {
-    expect(await BoardInstance.isBuildingLand(0, 0)).to.equal(false);
+    for (let landID = 0; landID < 40; landID++) {
+      BoardInstance.isPurchasable(0, landID).then((result) => {
+        expect(result).to.equal(!notPurchasableLands.includes(landID));
+      });
+    }
   });
 
   it("should return proper max edition", async function () {
@@ -35,24 +36,18 @@ contract("BoardContract", async (accounts) => {
     expect((await BoardInstance.getRarityLevel(0)).toNumber()).to.equal(2);
   });
 
-  it("should return proper build type", async function () {
-    expect((await BoardInstance.getBuildType(0)).toNumber()).to.equal(1);
-  });
-
   it("should deploy a new version", async function () {
     let b = {
       lands: 30,
       rarity_lvl: 10,
-      build_lvl: 4,
-      buildings: [1, 2, 3, 6, 8],
+      purchasable_lands: [1, 2, 3, 6, 8],
       max_pawns: 100,
     };
 
     let result = await BoardInstance.newBoard(
       b.lands,
       b.rarity_lvl,
-      b.buildings,
-      b.build_lvl,
+      b.purchasable_lands,
       b.max_pawns
     );
 
@@ -64,12 +59,13 @@ contract("BoardContract", async (accounts) => {
     expect(
       (await BoardInstance.getRarityLevel(edition_nb)).toNumber()
     ).to.equal(b.rarity_lvl);
-    expect((await BoardInstance.getBuildType(edition_nb)).toNumber()).to.equal(
-      b.build_lvl
-    );
-    for (let i = 0; i < b.buildings.length; i++) {
+    //
+    for (let index = 0; index < b.purchasable_lands.length; index++) {
       expect(
-        await BoardInstance.isBuildingLand(edition_nb, b.buildings[i])
+        await BoardInstance.isPurchasable(
+          edition_nb,
+          b.purchasable_lands[index]
+        )
       ).to.equal(true);
     }
   });

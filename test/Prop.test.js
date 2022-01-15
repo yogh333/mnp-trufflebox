@@ -219,7 +219,7 @@ contract("PropContract", async (accounts) => {
   it("should mint a two PROPs with rarity = 0 for the same land but different editions", async function () {
     await PropInstance.mint(owner1, 0, 37, 0);
 
-    await BoardInstance.newBoard(40, 2, [37], 2, 100);
+    await BoardInstance.newBoard(40, 2, [37], 100);
 
     await PropInstance.mint(owner1, 1, 37, 0);
 

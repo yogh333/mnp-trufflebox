@@ -14,8 +14,8 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		uint256 random;
 		uint8 position;
 		bool isOnBoard;
-		bool hasBoughtProperty;
-		bool hasPaidTax;
+		bool isPropertyBought;
+		bool isRentPaid;
 		bool isRoundCompleted;
 	}
 
@@ -23,8 +23,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	struct BoardInfo {
 		uint8 nbOfLands;
 		uint8 rarityLevel;
-		mapping(uint8 => bool) isBuildingLand;
-		uint8 buildType;
+		mapping(uint8 => bool) isPurchasable;
 		mapping(uint256 => PawnInfo) pawns;
 		uint16 nb_pawns_max;
 		uint16 nb_pawns;
@@ -50,7 +49,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 
 	/// @notice event emitted when a new board is created
 	/// @param new_edition_nb new board edition number
-	event eBoard(uint16 indexed new_edition_nb);
+	event BoardCreated(uint16 indexed new_edition_nb);
 
 	/// @notice event emitted when a new pawn is registered on a board
 	/// @param _edition board edition number
@@ -76,39 +75,22 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 
 		editionMax = 0;
 
+		// Paris edition (0)
 		BoardInfo storage b = boards[0];
-
 		b.nbOfLands = 40;
 		b.nb_pawns_max = 1000;
 		b.rarityLevel = 2;
-		b.isBuildingLand[1] = true;
-		b.isBuildingLand[3] = true;
-		b.isBuildingLand[5] = true;
-		b.isBuildingLand[6] = true;
-		b.isBuildingLand[8] = true;
-		b.isBuildingLand[9] = true;
-		b.isBuildingLand[11] = true;
-		b.isBuildingLand[13] = true;
-		b.isBuildingLand[14] = true;
-		b.isBuildingLand[15] = true;
-		b.isBuildingLand[16] = true;
-		b.isBuildingLand[18] = true;
-		b.isBuildingLand[19] = true;
-		b.isBuildingLand[21] = true;
-		b.isBuildingLand[23] = true;
-		b.isBuildingLand[24] = true;
-		b.isBuildingLand[25] = true;
-		b.isBuildingLand[26] = true;
-		b.isBuildingLand[27] = true;
-		b.isBuildingLand[29] = true;
-		b.isBuildingLand[31] = true;
-		b.isBuildingLand[32] = true;
-		b.isBuildingLand[34] = true;
-		b.isBuildingLand[35] = true;
-		b.isBuildingLand[37] = true;
-		b.isBuildingLand[39] = true;
 
-		b.buildType = 1;
+		uint8[10] memory notPurchasableLands = [0, 2, 7, 10, 17, 20, 22, 30, 33, 36];
+		for (uint8 landID; landID < b.nbOfLands; landID++) {
+			b.isPurchasable[landID] = true;
+			for (uint8 n; n < notPurchasableLands.length; n++) {
+				if (landID == notPurchasableLands[n]) {
+					b.isPurchasable[landID] = false;
+					break;
+				}
+			}
+		}
 	}
 
 	/**
@@ -131,21 +113,21 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		boards[p.edition].pawns[p.pawnID].position += uint8(randomness % 11) + 2;
 		boards[p.edition].pawns[p.pawnID].position %= boards[p.edition].nbOfLands;
 		boards[p.edition].pawns[p.pawnID].random = randomness;
-		boards[p.edition].pawns[p.pawnID].hasBoughtProperty = false;
-		boards[p.edition].pawns[p.pawnID].hasPaidTax = false;
+		boards[p.edition].pawns[p.pawnID].isPropertyBought = false;
+		boards[p.edition].pawns[p.pawnID].isRentPaid = false;
 		boards[p.edition].pawns[p.pawnID].isRoundCompleted = false;
 
 		emit RandomReady(requestId);
 	}
 
 	/**
-	 * @notice check if a land can be built (PROP and BUILD tokens available)
+	 * @notice check if a land can be bought (PROP tokens available)
 	 * @param edition board edition
 	 * @param land cell number
 	 * @return true or false
 	 */
-	function isBuildingLand(uint16 edition, uint8 land) external view returns (bool) {
-		return boards[edition].isBuildingLand[land];
+	function isPurchasable(uint16 edition, uint8 land) external view returns (bool) {
+		return boards[edition].isPurchasable[land];
 	}
 
 	/**
@@ -175,42 +157,29 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	}
 
 	/**
-	 * @notice get the number of build types for a board edition
-	 * @param edition board edition
-	 * @return number of build types
-	 */
-	function getBuildType(uint16 edition) external view returns (uint8) {
-		return boards[edition].buildType;
-	}
-
-	/**
 	 * @notice create a new board
 	 * @param _nbOfLands number of lands
 	 * @param _rarityLevel number of rarity levels
-	 * @param _buildingLands array of index of lands which can be built
-	 * @param _buildType number of built types
 	 * @param _maxPawns max number of pawns allowed
 	 */
 	function newBoard(
 		uint8 _nbOfLands,
 		uint8 _rarityLevel,
-		uint8[] calldata _buildingLands,
-		uint8 _buildType,
+		uint8[] calldata _purchasableLands,
 		uint16 _maxPawns
 	) public onlyRole(MANAGER_ROLE) {
 		editionMax += 1;
 		BoardInfo storage b = boards[editionMax];
 		b.nbOfLands = _nbOfLands;
 		b.rarityLevel = _rarityLevel;
-		for (uint8 i = 0; i < _buildingLands.length; i++) {
-			require(_buildingLands[i] < b.nbOfLands, "land index out of range");
-			b.isBuildingLand[_buildingLands[i]] = true;
+		for (uint8 index = 0; index < _purchasableLands.length; index++) {
+			require(_purchasableLands[index] < b.nbOfLands, "land index out of range");
+			b.isPurchasable[_purchasableLands[index]] = true;
 		}
 
-		b.buildType = _buildType;
 		b.nb_pawns_max = _maxPawns;
 
-		emit eBoard(editionMax);
+		emit BoardCreated(editionMax);
 	}
 
 	/**
@@ -268,8 +237,11 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		return boards[_edition].pawns[_pawnID];
 	}
 
-	function setPawnInfo(uint16 _edition, uint256 _pawnID, uint256 _random, uint8 _position) internal {
-		boards[_edition].pawns[_pawnID].random = _random;
-		boards[_edition].pawns[_pawnID].position = _position;
+	function setPawnInfo(
+		uint16 _edition,
+		uint256 _pawnID,
+		PawnInfo memory _pawnInfo
+	) internal {
+		boards[_edition].pawns[_pawnID] = _pawnInfo;
 	}
 }

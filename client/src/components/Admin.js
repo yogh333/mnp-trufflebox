@@ -7,9 +7,7 @@ import "../css/Admin.css";
 import Paris from "../data/Paris.json";
 
 import BankJson from "../contracts/BankContract.json";
-import MonoJson from "../contracts/MonoContract.json";
 import PropJson from "../contracts/PropContract.json";
-import BuildJson from "../contracts/BuildContract.json";
 import StakingJson from "../contracts/StakingContract.json";
 
 import {
@@ -102,9 +100,7 @@ function Admin(props) {
       Paris.maxLands,
       Paris.maxLandRarities,
       Paris.rarityMultiplier,
-      Paris.buildingMultiplier,
-      commonLandPrices,
-      housePrices
+      commonLandPrices
     );
   }
 
@@ -114,18 +110,10 @@ function Admin(props) {
       PropJson.abi,
       provider.getSigner(address)
     );
-    const Build = new ethers.Contract(
-      BuildJson.networks[networkId].address,
-      BuildJson.abi,
-      provider.getSigner(address)
-    );
 
     const MINTER_ROLE = await Prop.MINTER_ROLE();
 
     Prop.grantRole(MINTER_ROLE, BankJson.networks[networkId].address).then(
-      (result) => console.log("minter role granted")
-    );
-    Build.grantRole(MINTER_ROLE, BankJson.networks[networkId].address).then(
       (result) => console.log("minter role granted")
     );
   }

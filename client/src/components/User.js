@@ -22,7 +22,7 @@ export default function User(props) {
   const monoSymbol = props.mono_symbol;
 
   // functions
-  const displayInfo = props.display_info;
+  const retrieveLandInfo = props.retrieve_land_info;
 
   const [Mono, setMono] = useState(null);
   const [Prop, setProp] = useState(null);
@@ -119,7 +119,7 @@ export default function User(props) {
       setCurrentPosition(_pawnInfo.position);
       highlightCurrentCell(_pawnInfo.position);
       const rarity = getRandomRarity(_pawnInfo.random);
-      displayInfo(_pawnInfo.position, rarity);
+      retrieveLandInfo(_pawnInfo.position, rarity);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Bank, props.edition_id]);
@@ -267,8 +267,8 @@ export default function User(props) {
     // todo STOPPER animation roll dices sur le front et lancer l'animation 3D puis à la fin :
 
     highlightCurrentCell(newCell);
-    const rarity = getRandomInteger("rarity", 0, 2, pawnInfo.random);
-    displayInfo(pawnInfo.position, rarity);
+    const rarity = getRandomRarity(pawnInfo.random);
+    retrieveLandInfo(pawnInfo.position, rarity);
     setCurrentPosition(newCell);
     forgetPreviousPosition(previousPosition);
   }

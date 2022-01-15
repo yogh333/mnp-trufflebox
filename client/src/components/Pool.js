@@ -10,6 +10,7 @@ function Pool(props) {
   const provider = props.provider;
   const address = props.address;
   const Staking = props.Staking;
+
   const rewardTokenName = props.reward_token_name;
   const rewardTokenSymbol = props.reward_token_symbol;
   const rewardTokenIcon = props.reward_token_icon;

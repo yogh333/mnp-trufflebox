@@ -1,7 +1,6 @@
 const Pawn = artifacts.require("PawnContract");
 const Board = artifacts.require("BoardMock");
 const Prop = artifacts.require("PropContract");
-const Build = artifacts.require("BuildContract");
 const Bank = artifacts.require("BankContract");
 const Mono = artifacts.require("MonoContract");
 const Staking = artifacts.require("StakingContract");
@@ -35,12 +34,6 @@ contract("BankContract", async (accounts) => {
       "https://token-cdn/"
     );
 
-    /* Deploy Build */
-    BuildInstance = await Build.new(
-      BoardInstance.address,
-      "https://token-cdn/"
-    );
-
     LinkInstance = await ERC20TokenStub.new("Chainlink token", "LINK");
 
     MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.new(0.01 * 10 ** 8);
@@ -57,7 +50,6 @@ contract("BankContract", async (accounts) => {
       PawnInstance.address,
       BoardInstance.address,
       PropInstance.address,
-      BuildInstance.address,
       MonoInstance.address,
       LinkInstance.address,
       StakingInstance.address
@@ -66,10 +58,6 @@ contract("BankContract", async (accounts) => {
     /* grant MINTER_ROLE to Bank smartcontract */
     await PropInstance.grantRole(
       await PropInstance.MINTER_ROLE(),
-      BankInstance.address
-    );
-    await BuildInstance.grantRole(
-      await BuildInstance.MINTER_ROLE(),
       BankInstance.address
     );
 
@@ -86,13 +74,21 @@ contract("BankContract", async (accounts) => {
     });
 
     // set pawn info
-    await BoardInstance.setPawnInfo(0, pawnID, 1, 2);
-    /*BankInstance.locatePlayer(0, { from: user1 }).then((info) => {
-      console.log("locatePlayer ac1", info);
+    const _pawnInfo = {
+      random: ethers.utils.parseEther("0"),
+      position: "1",
+      isOnBoard: true,
+      isPropertyBought: false,
+      isRentPaid: false,
+      isRoundCompleted: false,
+    };
+    await BoardInstance.updatePawnInfo(0, pawnID, 2, _pawnInfo);
+    /*await BankInstance.locatePlayer(0, { from: user1 }).then((info) => {
+      console.log("locatePlayer", info);
     });
 
-    BoardInstance.getPawn(0, pawnID).then((result) => {
-      console.log("getPawn pawnID", result);
+    await BoardInstance.getPawn(0, pawnID).then((result) => {
+      console.log("getPawn", result);
     });*/
   });
 

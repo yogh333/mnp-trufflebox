@@ -16,14 +16,11 @@ const MonoUsdPriceFeed = artifacts.require("MonoUsdPriceFeed");
 
 const Bank = artifacts.require("BankContract");
 const Board = artifacts.require("BoardContract");
-const Build = artifacts.require("BuildContract");
 const Pawn = artifacts.require("PawnContract");
 const Prop = artifacts.require("PropContract");
 const Staking = artifacts.require("StakingContract");
 
 // Stubs
-const BoardStub = artifacts.require("BoardStub");
-const BuildStub = artifacts.require("BuildStub");
 const ChainlinkPriceFeedStub = artifacts.require("ChainLinkPriceFeedStub");
 const ERC20TokenStub = artifacts.require("ERC20TokenStub");
 const MonoStub = artifacts.require("MonoStub");
@@ -34,7 +31,6 @@ let LinkInstance,
   MonoInstance,
   PawnInstance,
   PropInstance,
-  BuildInstance,
   BankInstance,
   StakingInstance,
   EthUsdPriceFeedInstance,
@@ -145,14 +141,6 @@ module.exports = async function (deployer, network, accounts) {
       "http://token-cdn-uri/"
     );
     PropInstance = await Prop.deployed();
-
-    // Deploy BUILD
-    await deployer.deploy(
-      Build,
-      BoardInstance.address,
-      "http://token-cdn-uri/"
-    );
-    BuildInstance = await Build.deployed();
   }
 
   // Deploy BANK
@@ -165,7 +153,6 @@ module.exports = async function (deployer, network, accounts) {
         PawnInstance.address,
         BoardInstance.address,
         PropInstance.address,
-        BuildInstance.address,
         MonoInstance.address,
         LinkInstance.address,
         StakingInstance.address
@@ -233,8 +220,6 @@ module.exports = async function (deployer, network, accounts) {
 
   // Deploy stubs
   if (network === "test") {
-    await deployer.deploy(BoardStub, PawnInstance.address);
-    await deployer.deploy(BuildStub);
     await deployer.deploy(ChainlinkPriceFeedStub, 0.1 * 10 ** 8, 8);
     await deployer.deploy(ERC20TokenStub, "ERC20 token", "ERC20");
     await deployer.deploy(MonoStub);
@@ -247,12 +232,10 @@ module.exports = async function (deployer, network, accounts) {
     await PropInstance.grantRole(MINTER_ROLE, BankInstance.address, {
       from: accounts[0],
     });
-    await BuildInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-      from: accounts[0],
-    });
     await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
       from: accounts[0],
     });
+
     const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
     await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
       from: accounts[0],
@@ -266,11 +249,6 @@ module.exports = async function (deployer, network, accounts) {
       if (land.hasOwnProperty("commonPrice")) {
         commonLandPrices[index] = land.commonPrice;
       }
-
-      housePrices[index] = 0;
-      if (land.hasOwnProperty("housePrice")) {
-        housePrices[index] = land.housePrice;
-      }
     });
 
     await BankInstance.setPrices(
@@ -278,9 +256,7 @@ module.exports = async function (deployer, network, accounts) {
       Paris.maxLands,
       Paris.maxLandRarities,
       Paris.rarityMultiplier,
-      Paris.buildingMultiplier,
       commonLandPrices,
-      housePrices,
       { from: accounts[0] }
     );
 

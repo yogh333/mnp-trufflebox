@@ -121,7 +121,7 @@ export default function Land(props) {
     <>
       <h3 className="mb-2">{landInfo.title}</h3>
       <div className="price">
-        Rare {landInfo.prices.rare}
+        Rare {landInfo.prices[0]}
         {monoSymbol}
       </div>
       <div className="mb-2">
@@ -129,7 +129,7 @@ export default function Land(props) {
         {propertyInformationByRarity[0].left}
       </div>
       <div className="price">
-        Uncommon {landInfo.prices.uncommon}
+        Uncommon {landInfo.prices[1]}
         {monoSymbol}
       </div>
       <div className="mb-2">
@@ -137,7 +137,7 @@ export default function Land(props) {
         {propertyInformationByRarity[1].left}
       </div>
       <div className="price">
-        Common {landInfo.prices.common}
+        Common {landInfo.prices[2]}
         {monoSymbol}
       </div>
       <div className="mb-2">
