@@ -1,17 +1,23 @@
 // Board.test.js
+const truffleAssert = require("truffle-assertions");
+const { assert } = require("chai");
+const { ethers } = require("ethers");
+const { BN } = require("@openzeppelin/test-helpers");
+const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 
 const Board = artifacts.require("BoardContract");
+const Pawn = artifacts.require("PawnContract");
+const Link = artifacts.require("LinkForChainlinkVRF");
+const VRFCoordinator = artifacts.require("VRFCoordinatorContract");
 
 contract("BoardContract", async (accounts) => {
-  beforeEach(async function () {
-    BoardInstance = await Board.new(
-      "0x514910771af9ca656af840dff83e8264ecf986ca",
-      "0x514910771af9ca656af840dff83e8264ecf986ca",
-      "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
-      0.0001 * 10 ** 18
-    );
+  const deployer = accounts[0];
+  const player1 = accounts[1];
+  const player2 = accounts[2];
+  let BoardInstance, PawnInstance, LinkInstance;
 
-    deployer = accounts[0];
+  beforeEach(async function () {
+    BoardInstance = await Board.deployed();
   });
 
   it("should return proper number of lands ", async function () {
@@ -68,5 +74,95 @@ contract("BoardContract", async (accounts) => {
         )
       ).to.equal(true);
     }
+  });
+
+  describe("#register() & #isRegistered()", () => {
+    before("SETUP", async () => {
+      PawnInstance = await Pawn.deployed();
+    });
+    it("Player1 is registered", async () => {
+      const _pawnID = await PawnInstance.tokenOfOwnerByIndex(player1, 0);
+      const isRegistered = await BoardInstance.isRegistered(0, _pawnID);
+      assert.isTrue(isRegistered);
+    });
+    it("Player2 is not registered", async () => {
+      await PawnInstance.mint(player2);
+      const _pawnID = await PawnInstance.tokenOfOwnerByIndex(player2, 0);
+      const isRegistered = await BoardInstance.isRegistered(0, _pawnID);
+      assert.isFalse(isRegistered);
+    });
+  });
+
+  describe("#play() & #requestRandomNumber() & #fulfillRandomness()", () => {
+    before("SETUP", async () => {});
+    it("require a registered pawn", async () => {
+      const _pawnID = await PawnInstance.tokenOfOwnerByIndex(player2, 0);
+      await truffleAssert.reverts(
+        BoardInstance.play(0, _pawnID, {
+          from: deployer,
+        })
+      );
+    });
+    it("Link balance of Board contract not be zero", async () => {
+      LinkInstance = await Link.deployed();
+      // test with a new board instance without any LINK
+      const BoardInstance2 = await Board.new(
+        "0x514910771af9ca656af840dff83e8264ecf986ca", // VRFCoordinator
+        LinkInstance.address, // Link token
+        "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4", // keyHash
+        0.0001 * 10 ** 18 // ChainLink fee
+      );
+      const _pawnID = await PawnInstance.tokenOfOwnerByIndex(player2, 0);
+      await BoardInstance2.register(0, _pawnID, {
+        from: deployer,
+      });
+      await truffleAssert.reverts(
+        BoardInstance2.play(0, _pawnID, {
+          from: deployer,
+        }),
+        "Not enough LINK - fill contract with faucet"
+      );
+    });
+    it("Expected values in #fulfillRandomness()", async () => {
+      const BoardBalanceBefore = await LinkInstance.balanceOf(
+        BoardInstance.address
+      );
+      const _pawnID = await PawnInstance.tokenOfOwnerByIndex(player1, 0);
+      const _result = await BoardInstance.play(0, _pawnID, {
+        from: deployer,
+      });
+      const BoardBalanceAfter = await LinkInstance.balanceOf(
+        BoardInstance.address
+      );
+
+      assert.isTrue(BoardBalanceBefore.gt(BoardBalanceAfter));
+      assert.strictEqual(
+        BoardBalanceBefore.sub(BoardBalanceAfter).toString(),
+        ethers.utils.parseEther("0.0001").toString()
+      );
+
+      const VRFCoordinatorInstance = await VRFCoordinator.deployed();
+      const requestID = await VRFCoordinatorInstance.getLastRequestID();
+      const expectedRandomness =
+        await VRFCoordinatorInstance.getLastRandomness();
+
+      await VRFCoordinatorInstance.sendRandomness(requestID);
+
+      //!\ return object, random BN is parsed to string
+      const _pawnInfo = await BoardInstance.getPawnInfo(0, _pawnID);
+
+      assert.strictEqual(
+        _pawnInfo.random.toString(), // toString() is not necessary
+        expectedRandomness.toString()
+      );
+
+      assert.strictEqual(
+        expectedRandomness.mod(new BN(11)).add(new BN(2)).toString(),
+        _pawnInfo.position
+      );
+      assert.isFalse(_pawnInfo.isPropertyBought);
+      assert.isFalse(_pawnInfo.isRentPaid);
+      assert.isFalse(_pawnInfo.isRoundCompleted);
+    });
   });
 });

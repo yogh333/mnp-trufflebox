@@ -56,7 +56,7 @@ export default function Visual(props) {
     return COLORS[rarity];
   };
 
-  if (!landID) {
+  if (landID === null) {
     return <>{spinner}</>;
   }
 

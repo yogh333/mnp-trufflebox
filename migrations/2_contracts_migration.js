@@ -40,8 +40,19 @@ let LinkInstance,
 
 module.exports = async function (deployer, network, accounts) {
   console.log(`deploying for '${network}' network ...`);
+  const admin = accounts[0];
+  const player1 = accounts[1];
+  const player2 = accounts[2];
 
-  if (network === "test") return; // todo Deploy contracts instances for test here
+  if (network === "test") {
+    // Deploy stubs
+    await deployer.deploy(ChainlinkPriceFeedStub, 0.1 * 10 ** 8, 8);
+    await deployer.deploy(ERC20TokenStub, "ERC20 token", "ERC20");
+    await deployer.deploy(MonoStub);
+    await deployer.deploy(PawnStub);
+
+    // return // uncomment if you want only stubs deployed for test network
+  }
 
   // deploy ERC20 token contracts and price feeds and use these addresses in following deployment
 
@@ -218,27 +229,19 @@ module.exports = async function (deployer, network, accounts) {
       console.log(`Can't deploy contract on this network : ${network}.`);
   }
 
-  // Deploy stubs
-  if (network === "test") {
-    await deployer.deploy(ChainlinkPriceFeedStub, 0.1 * 10 ** 8, 8);
-    await deployer.deploy(ERC20TokenStub, "ERC20 token", "ERC20");
-    await deployer.deploy(MonoStub);
-    await deployer.deploy(PawnStub);
-  }
-
   if (network !== "polygon_infura_testnet") {
     // Setup roles
     const MINTER_ROLE = await PropInstance.MINTER_ROLE();
     await PropInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-      from: accounts[0],
+      from: admin,
     });
     await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-      from: accounts[0],
+      from: admin,
     });
 
     const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
     await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
-      from: accounts[0],
+      from: admin,
     });
 
     // initialize Paris board prices
@@ -257,17 +260,20 @@ module.exports = async function (deployer, network, accounts) {
       Paris.maxLandRarities,
       Paris.rarityMultiplier,
       commonLandPrices,
-      { from: accounts[0] }
+      { from: admin }
     );
 
     // Mint tokens for accounts
     const amount = ethers.utils.parseEther("1000");
-    await MonoInstance.mint(accounts[1], amount);
-    await LinkInstance.faucet(accounts[1], amount);
+    for (let index = 1; index < 10; index++) {
+      await MonoInstance.mint(accounts[index], amount);
+    }
+
+    await LinkInstance.faucet(player1, amount);
 
     // Give allowance to contract to spend all $MONO
     await MonoInstance.approve(BankInstance.address, amount, {
-      from: accounts[1],
+      from: player1,
     });
 
     // Allow Bank contract and OpenSea's ERC721 Proxy Address
@@ -278,12 +284,14 @@ module.exports = async function (deployer, network, accounts) {
     );
 
     // Mint pawn to players
-    await PawnInstance.mint(accounts[1]);
+    await PawnInstance.mint(player1);
 
     // Register pawns
-    const pawnID = await PawnInstance.tokenOfOwnerByIndex(accounts[1], 0);
+    const pawnID = await PawnInstance.tokenOfOwnerByIndex(player1, 0);
     await BoardInstance.register(Paris.id, pawnID, {
-      from: accounts[0], // BankInstance.address, Error: Returned error: sender account not recognized
+      from: admin,
     });
   }
+
+  console.log("...done.");
 };
