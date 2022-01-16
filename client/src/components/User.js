@@ -24,6 +24,7 @@ export default function User(props) {
 
   // functions
   const retrieveLandInfo = props.retrieve_land_info;
+  const setIsRoundCompleted = props.set_is_round_completed;
 
   const [Mono, setMono] = useState(null);
   const [Prop, setProp] = useState(null);
@@ -37,6 +38,7 @@ export default function User(props) {
   const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [areDicesDisplayed, setAreDicesDisplayed] = useState(false);
   const [isShakerDisplayed, setIsShakerDisplayed] = useState(false);
+  const [isDicesRolling, setIsDicesRolling] = useState(false);
   const [requestedID, setRequestedID] = useState(null);
   const [requestID, setRequestID] = useState(null);
 
@@ -218,6 +220,9 @@ export default function User(props) {
     setAreDicesDisplayed(true);
     setIsShakerDisplayed(false); // todo lancer l'animation 3D
     handleNewPosition(currentPosition, rollDice);
+    setIsRoundCompleted(false); // or updateValues()
+    setIsDicesRolling(false);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rollDice]);
 
@@ -253,7 +258,10 @@ export default function User(props) {
   function rollDices() {
     if (!Bank || !props.edition_id) return;
 
-    Bank.rollDices(props.edition_id);
+    setIsDicesRolling(true);
+    try {
+      Bank.rollDices(props.edition_id);
+    } catch (error) {}
   }
 
   /**
@@ -309,7 +317,7 @@ export default function User(props) {
         size="sm"
         className="btn btn-primary btn-lg btn-block"
         onClick={rollDices}
-        disabled={isRoundCompleted}
+        disabled={!isRoundCompleted && isDicesRolling}
       >
         Roll the dice!
       </Button>

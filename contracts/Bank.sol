@@ -37,7 +37,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	event RollingDices(address player, uint16 _edition, bytes32 requestID);
 	event DicesRollsPrepaid(address indexed player, uint8 quantity);
 	event MonoBought(address indexed player, uint256 amount);
-	event PropertyRentPayed(address indexed player, uint256 amount);
+	event PropertyRentPaid(address indexed player, uint256 amount);
 
 	constructor(
 		address PawnAddress,
@@ -140,8 +140,18 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit MonoBought(msg.sender, amountToBuy);
 	}
 
+	/**
+	 * @notice buy PROP
+	 * @notice requirements :
+	 * @notice - Round must be uncompleted
+	 * @notice - MONO transfer ok
+	 * @param _edition board edition
+	 * @dev requirements :
+	 * @dev - PROP is valid
+	 */
 	function buyProp(uint16 _edition) public {
 		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		require(!p.isRoundCompleted, "Round completed");
 		uint8 _rarity = retrievePropertyRarity(p.random);
 		require(Prop.isValidProp(_edition, p.position, _rarity), "PROP does not exist");
 		uint256 price = propPrices[_edition][p.position][_rarity];
@@ -157,19 +167,35 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit PropertyBought(msg.sender, prop_id);
 	}
 
+	/**
+	 * @notice pay property rent
+	 * @notice requirements :
+	 * @notice - Round must be uncompleted
+	 * @notice - MONO transfer ok
+	 * @param _edition board edition
+	 * @dev requirements :
+	 * @dev - PROP is valid
+	 */
 	function payRent(uint16 _edition) public {
 		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		require(!p.isRoundCompleted, "Round completed");
 		uint8 _rarity = retrievePropertyRarity(p.random);
 
 		require(Prop.isValidProp(_edition, p.position, _rarity), "PROP does not exist");
 
-		uint256 amount = retrievePropertyTax(_edition, p.position, _rarity);
+		uint256 amount = retrievePropertyRent(_edition, p.position, _rarity);
 		require(Mono.transferFrom(msg.sender, address(this), amount), "Tax payment failed");
 
-		emit PropertyRentPayed(msg.sender, amount);
+		p.isRentPaid = true;
+		p.isRoundCompleted = true;
+
+		uint256 _pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0); // todo player can have several pawns
+		Board.setPawnInfo(_edition, _pawnID, p);
+
+		emit PropertyRentPaid(msg.sender, amount);
 	}
 
-	function retrievePropertyTax(uint16 _edition, uint8 _land, uint8 _rarity) internal view returns(uint256){
+	function retrievePropertyRent(uint16 _edition, uint8 _land, uint8 _rarity) internal view returns(uint256){
 		return propPrices[_edition][_land][_rarity] / 100 > 10**18 ? propPrices[_edition][_land][_rarity] : 10**18;
 	}
 

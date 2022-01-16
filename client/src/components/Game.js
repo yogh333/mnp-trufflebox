@@ -119,6 +119,14 @@ function Game(props) {
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
+    Bank.on("PropertyRentPaid", (_player, _amout, event) => {
+      console.log(event);
+      if (event.blockNumber <= startBlockNumber) return;
+      if (address.toLowerCase() !== _player.toLowerCase()) return;
+
+      updateValues();
+      setToggleUpdateValues(!toggleUpdateValues);
+    });
   };
 
   const updateValues = () => {
@@ -233,6 +241,7 @@ function Game(props) {
             bank_contract={Bank}
             mono_symbol={monoSymbol}
             is_round_completed={isRoundCompleted}
+            set_is_round_completed={setIsRoundCompleted}
           />
         )}
       </div>

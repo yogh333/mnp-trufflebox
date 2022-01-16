@@ -15,6 +15,7 @@ export default function Visual(props) {
   const rarity = landInfo.rarity ? landInfo.rarity : null;
   const landID = landInfo.id;
   const prices = landInfo.prices;
+  const isRoundCompleted = props.is_round_completed;
 
   // functions
   const setIsModalShown = props.set_is_modal_shown;
@@ -60,7 +61,7 @@ export default function Visual(props) {
     return <>{spinner}</>;
   }
 
-  if (rarity !== null) {
+  if (rarity !== null && !isRoundCompleted) {
     return (
       <>
         <img

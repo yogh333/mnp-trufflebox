@@ -196,6 +196,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		require(boards[_edition].nb_pawns < boards[_edition].nb_pawns_max, "game is full");
 
 		boards[_edition].pawns[_pawnID].isOnBoard = true;
+		boards[_edition].pawns[_pawnID].isRoundCompleted = true; // require to throw dices at the beginning
 		boards[_edition].nb_pawns += 1;
 
 		emit ePawn(_edition, _pawnID);
@@ -219,7 +220,8 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @param _pawnID pawn ID
 	 */
 	function play(uint16 _edition, uint256 _pawnID) external onlyRole(MANAGER_ROLE) returns (bytes32 requestId) {
-		require(boards[_edition].pawns[_pawnID].isOnBoard == true, "Unregistered pawn");
+		require(boards[_edition].pawns[_pawnID].isOnBoard, "Unregistered pawn");
+		require(boards[_edition].pawns[_pawnID].isRoundCompleted, "Round not completed");
 
 		requestId = requestRandomNumber();
 
