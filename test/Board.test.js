@@ -6,7 +6,7 @@ const { BN } = require("@openzeppelin/test-helpers");
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 
 const Board = artifacts.require("BoardContract");
-const Pawn = artifacts.require("PawnContract");
+const Pawn = artifacts.require("PawnStubContract");
 const Link = artifacts.require("LinkForChainlinkVRF");
 const VRFCoordinator = artifacts.require("VRFCoordinatorContract");
 
@@ -79,9 +79,16 @@ contract("BoardContract", async (accounts) => {
   describe("#register() & #isRegistered()", () => {
     before("SETUP", async () => {
       PawnInstance = await Pawn.deployed();
+      // Mint pawn to players
+      await PawnInstance.mint(player1);
+      // Register player 1 pawn
+      const _pawnID = await PawnInstance.tokenOfOwnerByIndex(player1, 0);
+      await BoardInstance.register(0, _pawnID);
     });
     it("Player1 is registered", async () => {
       const _pawnID = await PawnInstance.tokenOfOwnerByIndex(player1, 0);
+      console.log("_pawnID.toString()", _pawnID.toString());
+      assert.strictEqual(_pawnID.toString(), "1000");
       const isRegistered = await BoardInstance.isRegistered(0, _pawnID);
       assert.isTrue(isRegistered);
     });

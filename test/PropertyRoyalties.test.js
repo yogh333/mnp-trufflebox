@@ -3,7 +3,7 @@
 Paris = require("../client/src/data/Paris.json");
 
 const Prop = artifacts.require("PropContract");
-const PawnStub = artifacts.require("PawnStub");
+const PawnStub = artifacts.require("PawnStubContract");
 const Board = artifacts.require("BoardContract");
 
 const truffleAssert = require("truffle-assertions");

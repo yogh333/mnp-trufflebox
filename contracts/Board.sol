@@ -250,7 +250,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		uint16 _edition,
 		uint256 _pawnID,
 		PawnInfo memory _pawnInfo
-	) internal {
+	)  external onlyRole(MANAGER_ROLE)  {
 		boards[_edition].pawns[_pawnID] = _pawnInfo;
 	}
 }

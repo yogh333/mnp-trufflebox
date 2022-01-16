@@ -24,7 +24,7 @@ const Staking = artifacts.require("StakingContract");
 const ChainlinkPriceFeedStub = artifacts.require("ChainLinkPriceFeedStub");
 const ERC20TokenStub = artifacts.require("ERC20TokenStub");
 const MonoStub = artifacts.require("MonoStub");
-const PawnStub = artifacts.require("PawnStub");
+const PawnStub = artifacts.require("PawnStubContract");
 
 let LinkInstance,
   VRFCoordinatorInstance,
@@ -36,7 +36,8 @@ let LinkInstance,
   EthUsdPriceFeedInstance,
   LinkUsdPriceFeedInstance,
   MaticUsdPriceFeedInstance,
-  MonoUsdPriceFeedInstance;
+  MonoUsdPriceFeedInstance,
+  PawnStubInstance;
 
 module.exports = async function (deployer, network, accounts) {
   console.log(`deploying for '${network}' network ...`);

@@ -47,7 +47,7 @@ contract BoardMock is BoardContract {
 
 		_pawnInfo.random = _random;
 
-		setPawnInfo(_edition, _pawnID, _pawnInfo);
+		this.setPawnInfo(_edition, _pawnID, _pawnInfo);
 	}
 
 	// Strict copy of Bank functions turned to public type

@@ -55,11 +55,13 @@ contract("BankContract", async (accounts) => {
       StakingInstance.address
     );
 
-    /* grant MINTER_ROLE to Bank smartcontract */
-    await PropInstance.grantRole(
-      await PropInstance.MINTER_ROLE(),
-      BankInstance.address
-    );
+    const MINTER_ROLE = await PropInstance.MINTER_ROLE();
+    await PropInstance.grantRole(MINTER_ROLE, BankInstance.address);
+    await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address);
+    const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
+    await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address);
+    // for test only
+    await BoardInstance.grantRole(MANAGER_ROLE, BoardInstance.address);
 
     user1 = accounts[1];
     user2 = accounts[2];
@@ -69,9 +71,7 @@ contract("BankContract", async (accounts) => {
 
     // Register pawns
     const pawnID = await PawnInstance.tokenOfOwnerByIndex(user1, 0);
-    await BoardInstance.register(0, pawnID, {
-      from: accounts[0],
-    });
+    await BoardInstance.register(0, pawnID);
 
     // set pawn info
     const _pawnInfo = {

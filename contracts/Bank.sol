@@ -148,7 +148,11 @@ contract BankContract is AccessControl, IERC721Receiver {
 		require(Mono.transferFrom(msg.sender, address(this), price), "$MONO transfer failed");
 		uint256 prop_id = Prop.mint(msg.sender, _edition, p.position, _rarity);
 
+		p.isPropertyBought = true;
+		p.isRoundCompleted = true;
 
+		uint256 _pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0); // todo player can have several pawns
+		Board.setPawnInfo(_edition, _pawnID, p);
 
 		emit PropertyBought(msg.sender, prop_id);
 	}
