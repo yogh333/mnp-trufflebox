@@ -87,7 +87,7 @@ contract("BankContract", async (accounts) => {
       console.log("locatePlayer", info);
     });
 
-    await BoardInstance.getPawn(0, pawnID).then((result) => {
+    await BoardInstance.getPawnInfo(0, pawnID).then((result) => {
       console.log("getPawn", result);
     });*/
   });

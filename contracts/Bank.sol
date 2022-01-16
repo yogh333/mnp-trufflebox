@@ -88,7 +88,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 		require(Board.isRegistered(_edition, pawnID), "player does not enroll");
 
-		p_ = Board.getPawn(_edition, pawnID);
+		p_ = Board.getPawnInfo(_edition, pawnID);
 	}
 
 	/**

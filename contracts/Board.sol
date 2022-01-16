@@ -29,6 +29,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		uint16 nb_pawns;
 	}
 
+	/// @dev structure used to store play attributes
 	struct PlayInfo {
 		uint256 pawnID;
 		uint16 edition;
@@ -44,7 +45,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 
 	/// @dev store all boards by edition number
 	mapping(uint16 => BoardInfo) private boards;
-
+	/// @dev store play information by requestID. Use for randomness
 	mapping(bytes32 => PlayInfo) private playInfoByRequestId;
 
 	/// @notice event emitted when a new board is created
@@ -94,7 +95,8 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	}
 
 	/**
-	 * @notice Requests randomness
+	 * @notice Request a random number
+	 * @return requestId the id of the request for the oracle
 	 */
 	function requestRandomNumber() internal returns (bytes32 requestId) {
 		require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
@@ -113,6 +115,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		boards[p.edition].pawns[p.pawnID].position += uint8(randomness % 11) + 2;
 		boards[p.edition].pawns[p.pawnID].position %= boards[p.edition].nbOfLands;
 		boards[p.edition].pawns[p.pawnID].random = randomness;
+
 		boards[p.edition].pawns[p.pawnID].isPropertyBought = false;
 		boards[p.edition].pawns[p.pawnID].isRentPaid = false;
 		boards[p.edition].pawns[p.pawnID].isRoundCompleted = false;
@@ -227,16 +230,22 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	}
 
 	/**
-	 * @notice get position of a Pawn on a board
+	 * @notice get Pawn information on a board
 	 * @param _edition board edition
 	 * @param _pawnID pawn ID
 	 * @return p Pawn information
 	 */
-	function getPawn(uint16 _edition, uint256 _pawnID) external view returns (PawnInfo memory p) {
+	function getPawnInfo(uint16 _edition, uint256 _pawnID) external view returns (PawnInfo memory p) {
 		require(isRegistered(_edition, _pawnID), "pawn has not been regsitered");
 		return boards[_edition].pawns[_pawnID];
 	}
 
+	/**
+	 * @notice set Pawn information on a board
+	 * @param _edition board edition
+	 * @param _pawnID pawn ID
+	 * @param _pawnInfo pawn information
+	 */
 	function setPawnInfo(
 		uint16 _edition,
 		uint256 _pawnID,
