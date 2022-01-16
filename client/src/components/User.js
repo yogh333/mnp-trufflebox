@@ -20,6 +20,7 @@ export default function User(props) {
   const toggleUpdateValues = props.toggle_update_user_values;
   const Bank = props.bank_contract;
   const monoSymbol = props.mono_symbol;
+  const isRoundCompleted = props.is_round_completed;
 
   // functions
   const retrieveLandInfo = props.retrieve_land_info;
@@ -308,6 +309,7 @@ export default function User(props) {
         size="sm"
         className="btn btn-primary btn-lg btn-block"
         onClick={rollDices}
+        disabled={isRoundCompleted}
       >
         Roll the dice!
       </Button>

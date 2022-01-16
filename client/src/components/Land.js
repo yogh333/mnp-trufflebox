@@ -50,7 +50,7 @@ export default function Land(props) {
   }, [Prop, landInfo.id]);
 
   const updateValues = () => {
-    if (!Prop || landInfo.type !== "property") return;
+    if (!Prop || !landInfo.isPurchasable) return;
 
     Prop.balanceOf(address).then((value) => {
       setPropBalance(value.toNumber());
@@ -113,7 +113,7 @@ export default function Land(props) {
     setPropertyInformationByRarity(_propertyInformationByRarity);
   }, [propertiesCountByRarity]);
 
-  if (landInfo.type !== "property") {
+  if (!landInfo.isPurchasable) {
     return <></>;
   }
 

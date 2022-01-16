@@ -50,6 +50,7 @@ function Game(props) {
   const [pawnID, setPawnID] = useState(false);
   const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [toggleUpdateValues, setToggleUpdateValues] = useState(null);
+  const [isRoundCompleted, setIsRoundCompleted] = useState(true);
 
   useEffect(() => {
     if (!(provider && address && networkId)) {
@@ -121,10 +122,17 @@ function Game(props) {
   };
 
   const updateValues = () => {
-    updatePlayerInfos();
+    updatePawnInfo();
+    updatePlayerInfo();
   };
 
-  const updatePlayerInfos = async () => {
+  const updatePawnInfo = async () => {
+    Bank.locatePlayer(editionID).then((_pawnInfo) => {
+      setIsRoundCompleted(_pawnInfo.isRoundCompleted);
+    });
+  };
+
+  const updatePlayerInfo = async () => {
     const _monoBalance = await Mono.balanceOf(address);
     const _pawnBalance = await Pawn.balanceOf(address);
 
@@ -168,10 +176,11 @@ function Game(props) {
       title: board.lands[cellID].name,
       type: board.lands[cellID].type,
       rarity: null,
+      isPurchasable: false,
       prices: [0, 0, 0],
     };
 
-    if (Bank != null && board.lands[cellID].type === "property") {
+    if (Bank != null && board.lands[cellID].isPurchasable) {
       _prices = await retrieveCellPrices(board.id, cellID);
       _landInfo.prices = [
         ethers.utils.formatUnits(_prices.properties[0]),
@@ -179,6 +188,7 @@ function Game(props) {
         ethers.utils.formatUnits(_prices.properties[2]),
       ];
       _landInfo.rarity = rarity;
+      _landInfo.isPurchasable = true;
     }
 
     setLandInfo(_landInfo);
@@ -222,6 +232,7 @@ function Game(props) {
             toggle_update_user_values={toggleUpdateValues}
             bank_contract={Bank}
             mono_symbol={monoSymbol}
+            is_round_completed={isRoundCompleted}
           />
         )}
       </div>
@@ -237,6 +248,7 @@ function Game(props) {
           do_modal_action={doModalAction}
           set_is_doing_modal_action={setIsDoingModalAction}
           parent_update_values_function={updateValues}
+          is_round_completed={isRoundCompleted}
         />
       </div>
       <div className="info-area-3">
