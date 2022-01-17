@@ -239,7 +239,7 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @return p Pawn information
 	 */
 	function getPawnInfo(uint16 _edition, uint256 _pawnID) external view returns (PawnInfo memory p) {
-		require(isRegistered(_edition, _pawnID), "pawn has not been regsitered");
+		require(isRegistered(_edition, _pawnID), "pawn has not been registered");
 		return boards[_edition].pawns[_pawnID];
 	}
 
