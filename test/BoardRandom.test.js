@@ -4,10 +4,7 @@ ethers = require("ethers");
 
 const Board = artifacts.require("BoardContract");
 const Pawn = artifacts.require("PawnContract");
-
-const VRFConsumerBase = artifacts.require("VRFConsumerBase");
 const VRFCoordinator = artifacts.require("VRFCoordinatorContract");
-const LinkForChainlinkVRF = artifacts.require("LinkForChainlinkVRF");
 
 const truffleAssert = require("truffle-assertions");
 const { assert, expect } = require("chai");
@@ -20,7 +17,7 @@ contract("Board", async (accounts) => {
   const _contractOwner = accounts[0];
   const requestId = 0x6161;
 
-  let BoardInstance, PawnInstance, VRFConsumerBaseInstance, LinkInstance;
+  let BoardInstance, PawnInstance;
 
   tokenTransfers.setWeb3(web3);
 
@@ -39,31 +36,9 @@ contract("Board", async (accounts) => {
         );
     };
 
-  describe("A. Test of the getRandomKeccak256() function", () => {
-        before("SETUP", async () => {
-            await initialSetUp();
-        });
 
-        it("1. Keccak return", async () => {
 
-            const emptyArray = Array.from(Array(5));
-            const results = [];
-
-            for (const item of emptyArray) {
-
-                const number = await BoardInstance.getRandomKeccak256();
-                const latest = await time.latestBlock();
-                await time.advanceBlockTo(parseInt(latest) + 20);
-
-                results.push(Number(number.toString()));
-            }
-
-            assert(results.every(num => [1,2,3,4,5,6].includes(num)));
-     });
-
-  });
-
-  describe("B. Test of the requestRandomNumber function", () => {
+  describe("A. Test of the requestRandomNumber function", () => {
 
         beforeEach("SETUP", async () => {
             await initialSetUp();
@@ -78,34 +53,33 @@ contract("Board", async (accounts) => {
 
         it("3. Pass if the LINK balance of the contract has enough fees", async function () {
 
-            await BoardInstance.getFaucet(BoardInstance.address,web3.utils.toBN(new BN(30).mul(new BN(10).pow(new BN(28)))));
+            await BoardInstance.getFaucet(BoardInstance.address,web3.utils.toBN(new BN(30).mul(new BN(10).pow(new BN(48)))));
 
             await BoardInstance.register(new BN(0), new BN(1));
             await BoardInstance.play(new BN(0), new BN(1));
         });
     });
 
-    describe("C. Test of the fulfillRandomness function", () => {
+    describe("B. Test of the fulfillRandomness function", () => {
 
         before("SETUP", async () => {
             await initialSetUp();
 
         });
 
-        it("7. Test if the random of PawnInfo is equal to the randomness generated in the test", async function() {
+        xit("7. Test if the random of PawnInfo is equal to the randomness generated in the test", async function() {
 
             await BoardInstance.register(new BN(0), new BN(1));
 
             const p = await BoardInstance.getPawnInfo(0,1);
             console.log(p.random);
 
-            const VRFCoordinatorInstance = await VRFCoordinator.deployed();
-            const requestID = await VRFCoordinatorInstance.getLastRequestID();
-            const expectedRandomness = await VRFCoordinatorInstance.getLastRandomness();
+            const requestID = await BoardInstance.requestRandomness();
+            const expectedRandomness = await BoardInstance.getLastRandomness();
 
             console.log(expectedRandomness);
 
-            await VRFCoordinatorInstance.sendRandomness(requestID);
+            await BoardInstance.sendRandomness(requestID);
 
             assert.strictEqual(p.random.toString(),expectedRandomness.toString());
         });
@@ -120,30 +94,30 @@ contract("Board", async (accounts) => {
         });
     });
 
-    describe.only("D. Test of the function play", () =>  {
+    describe("C. Test of the function play", () =>  {
 
         beforeEach("SETUP", async () => {
             await initialSetUp();
-            await BoardInstance.getFaucet(BoardInstance.address,web3.utils.toBN(new BN(30).mul(new BN(10).pow(new BN(28)))));
+            await BoardInstance.getFaucet(BoardInstance.address,web3.utils.toBN(new BN(60).mul(new BN(10).pow(new BN(28)))));
 
         });
 
-        //TODO
+
         xit("9. Reverts if the player isn't a manager", async function() {
 
-            //bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-            let hasRole = await BankInstance.hasRole(ADMIN_ROLE, _contractOwner);
-            await expectRevert(BoardInstance.play(new BN(0), new BN(1)),
-                "XXXXX");
+            //const ADMIN_ROLE = "a49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775";
+            let hasRole = await BankInstance.hasRole("ADMIN_ROLE", _contractOwner);
+            await expectRevert(BoardInstance.play(new BN(0), new BN(1) ));
         });
 
-        xit("10. Reverts playing if the paw is not registered", async function() {
+        it("10. Reverts playing if the paw is not registered", async function() {
 
             await expectRevert(BoardInstance.play(new BN(0), new BN(1)),
                 "Unregistered pawn");
         });
 
-        xit("11. Test random number related to the movement of the pawn", async () => {
+        it("11. Test random number related to the movement of the pawn", async () => {
+
             //Registering new pawn
             await BoardInstance.register(new BN(0), new BN(1));
 
@@ -153,8 +127,6 @@ contract("Board", async (accounts) => {
             await BoardInstance.setRandom(random);
 
             const oldPositionPawn = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
-
-            //We must deposit LINK tokens on the contract before
 
             //Call of the play method
             await BoardInstance.play(new BN(0), new BN(1));
@@ -169,64 +141,421 @@ contract("Board", async (accounts) => {
 
         });
 
-        it("12. We test the modulos, the bounds related to the movement of the pawn", async() => {
+        it("12.a. We test the modulos and the movement of the pawn -- random = 0", async() => {
 
             await BoardInstance.register(new BN(0), new BN(1));
 
-            const random = 11;
-
-            //Set the random number
+            const random = 0;
             await BoardInstance.setRandom(random);
 
-            const newPositionP = 2;
+            const newPositionPawnProcessed = 2;
 
-            //Call of the play method
             await BoardInstance.play(new BN(0), new BN(1));
 
-            //Call of callback from ChainLink Oracle
             await BoardInstance.callbackRandom();
 
             let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
 
-            //Verification that the pawn has advanced according to the random number set + 2
-            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionP));
-            });
-
-        it("13. We test the modulos, the bounds related to the movement of the pawn", async() => {
-
-            await BoardInstance.register(new BN(0), new BN(1));
-
-            const random = 5;
-
-            //Set the random number
-            await BoardInstance.setRandom(random);
-
-            const newPositionP = 7;
-
-            //Call of the play method
-            await BoardInstance.play(new BN(0), new BN(1));
-
-            //Call of callback from ChainLink Oracle
-            await BoardInstance.callbackRandom();
-
-            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
-
-            //Verification that the pawn has advanced according to the random number set + 2
-            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionP));
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
         });
 
+        it("12.b. We test the modulos and the movement of the pawn -- random = 1", async() => {
 
+            await BoardInstance.register(new BN(0), new BN(1));
 
+            const random = 1;
+            await BoardInstance.setRandom(random);
 
+            const newPositionPawnProcessed = 3;
 
+            //Call of the play method
+            await BoardInstance.play(new BN(0), new BN(1));
+
+            //Call of callback from ChainLink Oracle
+            await BoardInstance.callbackRandom();
+
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            //Verification that the pawn has advanced according to the position processed
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("12.c. We test the modulos and the movement of the pawn -- random = 2", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+
+            //const random = 11;
+            const random = 2;
+            //Set the random number
+            await BoardInstance.setRandom(random);
+
+            //const newPositionP = 2;
+            const newPositionPawnProcessed = 4;
+
+            //Call of the play method
+            await BoardInstance.play(new BN(0), new BN(1));
+
+            //Call of callback from ChainLink Oracle
+            await BoardInstance.callbackRandom();
+
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            //Verification that the pawn has advanced according to the position processed
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("13. We test the modulos and the movement of the pawn -- random = 3", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+
+            const random = 3;
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 5;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("14. We test the modulos and the movement of the pawn -- random = 4", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 4;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 6;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("15. We test the modulos and the movement of the pawn -- random = 5", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 5;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 7;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("16. We test the modulos and the movement of the pawn -- random = 6", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 6;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 8;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("17. We test the modulos and the movement of the pawn -- random = 7", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 7;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 9;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("18. We test the modulos and the movement of the pawn -- random = 8", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 8;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 10;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("19. We test the modulos and the movement of the pawn -- random = 9", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 9;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 11;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("20. We test the modulos and the movement of the pawn -- random = 10", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 10;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 12;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("21. We test the modulos and the movement of the pawn -- random = 11", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 11;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 2;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("22. We test the modulos and the movement of the pawn -- random = 12", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 12;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 3;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("23. We test the modulos and the movement of the pawn -- random = 13", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 13;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 4;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("24. We test the modulos and the movement of the pawn -- random = 14", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 14;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 5;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("25. We test the modulos and the movement of the pawn -- random = 15", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 15;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 6;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("26. We test the modulos and the movement of the pawn -- random = 16", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 16;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 7;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("27. We test the modulos and the movement of the pawn -- random = 17", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 17;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 8;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("28. We test the modulos and the movement of the pawn -- random = 18", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 18;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 9;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("29. We test the modulos and the movement of the pawn -- random = 19", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 19;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 10;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("30. We test the modulos and the movement of the pawn -- random = 20", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 20;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 11;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("31. We test the modulos and the movement of the pawn -- random = 21", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 21;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 12;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("32. We test the modulos and the movement of the pawn -- random = 22", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 22;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 2;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("33. We test the modulos and the movement of the pawn -- random = 23", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 23;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 3;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
+
+        it("34. We test the modulos and the movement of the pawn -- random = 24", async() => {
+
+            await BoardInstance.register(new BN(0), new BN(1));
+            const random = 24;
+
+            await BoardInstance.setRandom(random);
+
+            const newPositionPawnProcessed = 4;
+
+            await BoardInstance.play(new BN(0), new BN(1));
+            await BoardInstance.callbackRandom();
+            let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
+
+            assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
+        });
 
     });
-
-    //TODO
-    describe("E. In Bank.sol : test of the function rolldices", () => {
-
-        xit("XXXXXX. Reverts if the player does not own a pawn")
-    });
-
 
 });
