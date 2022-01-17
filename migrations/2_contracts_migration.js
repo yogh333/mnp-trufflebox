@@ -371,8 +371,8 @@ module.exports = async function (deployer, network, accounts) {
   );
 
   // Mint tokens for accounts
-  //const amount = ethers.utils.parseEther("1000");
-  //await MonoInstance.mint(accounts[1], amount);
+  const amount = ethers.utils.parseEther("1000");
+  await MonoInstance.mint(accounts[1], amount);
   //await LinkInstance.faucet(accounts[1], amount);
 
   // Give allowance to contract to spend all $MONO
