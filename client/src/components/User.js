@@ -12,6 +12,7 @@ import Button from "react-bootstrap/Button";
 
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
+  const DISTANT_NETWORKS_IDS = ["42", "80001"]; //['kovan', 'mumbai']
 
   const provider = props.provider;
   const address = props.address;
@@ -71,10 +72,8 @@ export default function User(props) {
       )
     );
 
-    if (
-      window.location.hostname === "127.0.0.1" ||
-      window.location.hostname === "localhost"
-    ) {
+    // only with Ganache
+    if (!DISTANT_NETWORKS_IDS.includes(networkId)) {
       setVRFCoordinator(
         new ethers.Contract(
           VRFCoordinatorJson.networks[networkId].address,
@@ -186,11 +185,10 @@ export default function User(props) {
   };
 
   useEffect(() => {
+    // only with Ganache
     if (
-      !(
-        window.location.hostname === "127.0.0.1" ||
-        window.location.hostname === "localhost"
-      ) ||
+      !networkId ||
+      DISTANT_NETWORKS_IDS.includes(networkId) ||
       !requestedID ||
       !VRFCoordinator
     )
@@ -260,8 +258,14 @@ export default function User(props) {
 
     setIsDicesRolling(true);
     try {
+      console.log("rollDices");
+      //Bank.buyPawn()
+      //Bank.locatePlayer(props.edition_id).then((result) => console.log(result));
       Bank.rollDices(props.edition_id);
-    } catch (error) {}
+    } catch (error) {
+      console.log("error");
+      setIsDicesRolling(false);
+    }
   }
 
   /**
@@ -319,7 +323,7 @@ export default function User(props) {
         onClick={rollDices}
         disabled={!isRoundCompleted && isDicesRolling}
       >
-        Roll the dice!
+        Roll the dices!
       </Button>
 
       <div

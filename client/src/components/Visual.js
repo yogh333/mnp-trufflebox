@@ -107,7 +107,11 @@ export default function Visual(props) {
 
   return (
     <>
-      <img className="land m-3 text-center" src={board.lands[landID].visual} />
+      <img
+        className="land m-3 text-center"
+        style={{ border: "2px solid black" }}
+        src={board.lands[landID].visual}
+      />
     </>
   );
 }

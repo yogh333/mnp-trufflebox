@@ -260,8 +260,8 @@ function Game(props) {
           is_round_completed={isRoundCompleted}
         />
       </div>
-      <div className="info-area-3">
-        <h2>Misc</h2>
+      <div className="info-area-3 text-center">
+        <h2>Game info</h2>
       </div>
       <div className="info-area-4 text-center">
         <h2>NFT Info</h2>
