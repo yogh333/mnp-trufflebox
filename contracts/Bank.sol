@@ -10,7 +10,6 @@ import "./Pawn.sol";
 import "./Board.sol";
 import "./Mono.sol";
 import "./Prop.sol";
-import "./Build.sol";
 import "./Staking.sol";
 
 contract BankContract is AccessControl, IERC721Receiver {
@@ -20,7 +19,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 	PawnContract private immutable Pawn;
 	BoardContract private immutable Board;
 	PropContract private immutable Prop;
-	BuildContract private immutable Build;
 	MonoContract private immutable Mono;
 	IERC20 private immutable Link;
 	StakingContract private immutable Staking;
@@ -31,26 +29,20 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/// @dev price of PROP by rarity by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private propPrices;
 
-	/// @dev price of BUILD by type by land by edition
-	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private buildPrices;
-
 	event PropertyBought(address indexed to, uint256 indexed prop_id);
-	event eBuyBuild(address indexed to, uint256 indexed build_id, uint32 nb);
 	event PawnBought(address indexed to, uint256 indexed pawn_id);
-	event eSellProp(address indexed seller, uint256 indexed prop_id, uint256 price);
-	event eSellBuild(address indexed seller, uint256 indexed prop_id, uint256 price);
 	event eWithdraw(address indexed to, uint256 value);
 
 	event PlayerEnrolled(uint16 _edition, address indexed player);
 	event RollingDices(address player, uint16 _edition, bytes32 requestID);
 	event DicesRollsPrepaid(address indexed player, uint8 quantity);
 	event MonoBought(address indexed player, uint256 amount);
+	event PropertyRentPayed(address indexed player, uint256 amount);
 
 	constructor(
 		address PawnAddress,
 		address BoardAddress,
 		address PropAddress,
-		address BuildAddress,
 		address MonoAddress,
 		address LinkAddress,
 		address StakingAddress
@@ -58,7 +50,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 		require(PawnAddress != address(0), "PAWN token smart contract address must be provided");
 		require(BoardAddress != address(0), "BOARD smart contract address must be provided");
 		require(PropAddress != address(0), "PROP token smart contract address must be provided");
-		require(BuildAddress != address(0), "BUILD token smart contract address must be provided");
 		require(MonoAddress != address(0), "MONO token smart contract address must be provided");
 		require(LinkAddress != address(0), "LINK token smart contract address must be provided");
 		require(StakingAddress != address(0), "LINK token smart contract address must be provided");
@@ -66,7 +57,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 		Pawn = PawnContract(PawnAddress);
 		Board = BoardContract(BoardAddress);
 		Prop = PropContract(PropAddress);
-		Build = BuildContract(BuildAddress);
 		Mono = MonoContract(MonoAddress);
 		Link = IERC20(LinkAddress);
 		Staking = StakingContract(StakingAddress);
@@ -90,7 +80,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/// @notice locate pawn on game's board
 	/// @param _edition edition number
 	/// @return p_ Pawn information
-	function locatePlayer(uint16 _edition) external view returns (BoardContract.PawnInfo memory p_) {
+	function locatePlayer(uint16 _edition) public view returns (BoardContract.PawnInfo memory p_) {
 		require(_edition <= Board.getMaxEdition(), "unknown edition");
 		require(Pawn.balanceOf(msg.sender) == 1, "player does not own a pawn");
 
@@ -98,7 +88,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 
 		require(Board.isRegistered(_edition, pawnID), "player does not enroll");
 
-		p_ = Board.getPawn(_edition, pawnID);
+		p_ = Board.getPawnInfo(_edition, pawnID);
 	}
 
 	/**
@@ -126,7 +116,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		// Bank must be paid here for a roll
 		uint256 monoLastPrice = uint256(Staking.getLastPrice(address(Mono)));
 		uint256 linkLastPrice = uint256(Staking.getLastPrice(address(Link)));
-		Mono.transferFrom(msg.sender, address(this), (chainlinkFee * linkLastPrice) / monoLastPrice);
+		Mono.transferFrom(msg.sender, address(this), (chainlinkFee * linkLastPrice) / monoLastPrice + 10**18);
 
 		// Bank must provide LINK to Board
 		bytes32 rollDicesID = Board.play(_edition, pawnID);
@@ -150,68 +140,48 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit MonoBought(msg.sender, amountToBuy);
 	}
 
-	function buyProp(
-		uint16 _edition,
-		uint8 _land,
-		uint8 _rarity
-	) public {
-		require(Prop.isValidProp(_edition, _land, _rarity), "PROP does not exist");
-		uint256 price = propPrices[_edition][_land][_rarity];
-
+	function buyProp(uint16 _edition) public {
+		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		uint8 _rarity = retrievePropertyRarity(p.random);
+		require(Prop.isValidProp(_edition, p.position, _rarity), "PROP does not exist");
+		uint256 price = propPrices[_edition][p.position][_rarity];
 		require(Mono.transferFrom(msg.sender, address(this), price), "$MONO transfer failed");
+		uint256 prop_id = Prop.mint(msg.sender, _edition, p.position, _rarity);
 
-		uint256 prop_id = Prop.mint(msg.sender, _edition, _land, _rarity);
+
 
 		emit PropertyBought(msg.sender, prop_id);
 	}
 
-	function sellProp(uint256 _id) public {
-		require(Prop.ownerOf(_id) == msg.sender, "cannot sell a non owned property");
+	function payRent(uint16 _edition) public {
+		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		uint8 _rarity = retrievePropertyRarity(p.random);
 
-		//(version, cell, rarity, serial) = Prop.get(_id);
-		PropContract.Property memory prop = Prop.get(_id);
+		require(Prop.isValidProp(_edition, p.position, _rarity), "PROP does not exist");
 
-		/* Bank buys PROP at 30% of selling price */
-		uint256 price = (propPrices[prop.edition][prop.land][prop.rarity] * 30) / 100;
+		uint256 amount = retrievePropertyTax(_edition, p.position, _rarity);
+		require(Mono.transferFrom(msg.sender, address(this), amount), "Tax payment failed");
 
-		require(Mono.balanceOf(address(this)) >= price, "Bank does not own enough funds");
-
-		Prop.safeTransferFrom(msg.sender, address(this), _id);
-
-		Mono.transfer(msg.sender, price);
-
-		emit eSellProp(msg.sender, _id, price);
+		emit PropertyRentPayed(msg.sender, amount);
 	}
 
-	function buyBuild(
-		uint16 _edition,
-		uint8 _land,
-		uint8 _buildType,
-		uint32 _amount
-	) public payable {
-		require(Build.isValidBuild(_edition, _land, _buildType), "BUILD does not exist");
-		uint256 price = buildPrices[_edition][_land][_buildType];
-
-		require(Mono.transferFrom(msg.sender, address(this), _amount * price), "$MONO transfer failed");
-
-		uint256 build_id = Build.mint(msg.sender, _edition, _land, _buildType, _amount);
-
-		emit eBuyBuild(msg.sender, build_id, _amount);
+	function retrievePropertyTax(uint16 _edition, uint8 _land, uint8 _rarity) internal view returns(uint256){
+		return propPrices[_edition][_land][_rarity] / 100 > 10**18 ? propPrices[_edition][_land][_rarity] : 10**18;
 	}
 
-	function sellBuild(uint256 _id, uint32 _amount) public {
-		BuildContract.Building memory b = Build.get(_id);
+	function retrievePropertyRarity(uint256 randomness) internal pure returns(uint8){
+		uint256 number = calculateRandomInteger("rarity", 1, 111, randomness);
 
-		/* Bank buys BUILD at 30% of selling price */
-		uint256 price = (buildPrices[b.edition][b.land][b.buildType] * 30 * _amount) / 100;
+		if (number <= 100) return 2;
+		if (number <= 110) return 1;
+		return 0;
+	}
 
-		require(Mono.balanceOf(address(this)) >= price, "Bank does not own enough funds");
+	function calculateRandomInteger(string memory _type, uint256 min, uint256 max, uint256 randomness) internal pure returns(uint256) {
+		uint256 modulo = max - min + 1;
+		uint256 number = uint256(keccak256(abi.encode(randomness, _type)));
 
-		Build.burn(msg.sender, _id, _amount);
-
-		Mono.transfer(msg.sender, price);
-
-		emit eSellBuild(msg.sender, _id, price);
+		return number % modulo + min;
 	}
 
 	function getPriceOfProp(
@@ -223,15 +193,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 		price = propPrices[_edition][_land][_rarity];
 	}
 
-	function getPriceOfBuild(
-		uint16 _edition,
-		uint8 _land,
-		uint8 _buildType
-	) external view returns (uint256 price) {
-		require(Build.isValidBuild(_edition, _land, _buildType), "BUILD does not exist");
-		price = buildPrices[_edition][_land][_buildType];
-	}
-
 	function setPriceOfProp(
 		uint16 _edition,
 		uint8 _land,
@@ -240,16 +201,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 	) public onlyRole(BANKER_ROLE) {
 		require(Prop.isValidProp(_edition, _land, _rarity), "PROP does not exist");
 		propPrices[_edition][_land][_rarity] = _price;
-	}
-
-	function setPriceOfBuild(
-		uint16 _edition,
-		uint8 _land,
-		uint8 _buildType,
-		uint256 _price
-	) public onlyRole(BANKER_ROLE) {
-		require(Build.isValidBuild(_edition, _land, _buildType), "BUILD does not exist");
-		buildPrices[_edition][_land][_buildType] = _price;
 	}
 
 	function withdraw(address _to, uint256 _value) external onlyRole(BANKER_ROLE) {
@@ -277,9 +228,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		uint8 _maxLands,
 		uint8 _maxLandRarities,
 		uint16 _rarityMultiplier,
-		uint16 _buildingMultiplier,
-		uint256[] calldata _commonLandPrices,
-		uint256[] calldata _buildPrices
+		uint256[] calldata _commonLandPrices
 	) external onlyRole(ADMIN_ROLE) {
 		for (uint8 landId = 0; landId < _maxLands; landId++) {
 			if (_commonLandPrices[landId] == 0) {
@@ -292,13 +241,6 @@ contract BankContract is AccessControl, IERC721Receiver {
 					_rarityMultiplier**(_maxLandRarities - rarity - 1) *
 					(1 ether);
 			}
-
-			if (_buildPrices[landId] == 0) {
-				continue;
-			}
-
-			buildPrices[_editionId][landId][0] = _buildPrices[landId] * (1 ether);
-			buildPrices[_editionId][landId][1] = _buildPrices[landId] * _buildingMultiplier * (1 ether);
 		}
 	}
 

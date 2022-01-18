@@ -6,6 +6,7 @@ Paris = require("../client/src/data/Paris.json");
 
 const Link = artifacts.require("Link");
 const LinkForChainlinkVRF = artifacts.require("LinkForChainlinkVRF");
+const CoordinatorVRF = artifacts.require("VRFCoordinatorContract");
 const Mono = artifacts.require("MonoContract");
 
 const EthUsdPriceFeed = artifacts.require("EthUsdPriceFeed");
@@ -15,24 +16,21 @@ const MonoUsdPriceFeed = artifacts.require("MonoUsdPriceFeed");
 
 const Bank = artifacts.require("BankContract");
 const Board = artifacts.require("BoardContract");
-const Build = artifacts.require("BuildContract");
 const Pawn = artifacts.require("PawnContract");
 const Prop = artifacts.require("PropContract");
 const Staking = artifacts.require("StakingContract");
 
 // Stubs
-const BoardStub = artifacts.require("BoardStub");
-const BuildStub = artifacts.require("BuildStub");
-const ChainlinkPriceFeedStub = artifacts.require("ChainlinkPriceFeedStub");
+const ChainlinkPriceFeedStub = artifacts.require("ChainLinkPriceFeedStub");
 const ERC20TokenStub = artifacts.require("ERC20TokenStub");
 const MonoStub = artifacts.require("MonoStub");
 const PawnStub = artifacts.require("PawnStub");
 
 let LinkInstance,
+  VRFCoordinatorInstance,
   MonoInstance,
   PawnInstance,
   PropInstance,
-  BuildInstance,
   BankInstance,
   StakingInstance,
   EthUsdPriceFeedInstance,
@@ -42,8 +40,19 @@ let LinkInstance,
 
 module.exports = async function (deployer, network, accounts) {
   console.log(`deploying for '${network}' network ...`);
+  const admin = accounts[0];
+  const player1 = accounts[1];
+  const player2 = accounts[2];
 
-  if (network === "test") return; // todo Deploy contracts instances for test here
+  if (network === "test") {
+    // Deploy stubs
+    await deployer.deploy(ChainlinkPriceFeedStub, 0.1 * 10 ** 8, 8);
+    await deployer.deploy(ERC20TokenStub, "ERC20 token", "ERC20");
+    await deployer.deploy(MonoStub);
+    await deployer.deploy(PawnStub);
+
+    // return // uncomment if you want only stubs deployed for test network
+  }
 
   // deploy ERC20 token contracts and price feeds and use these addresses in following deployment
 
@@ -68,8 +77,14 @@ module.exports = async function (deployer, network, accounts) {
       //await deployer.deploy(Link);
       //LinkInstance = await Link.deployed();
 
+      // Deploy the VRF Coordinator
+      await deployer.deploy(CoordinatorVRF);
+      VRFCoordinatorInstance = await CoordinatorVRF.deployed();
       // Deploy this Link contract to simulate Chainlink VRF
-      await deployer.deploy(LinkForChainlinkVRF);
+      await deployer.deploy(
+        LinkForChainlinkVRF,
+        VRFCoordinatorInstance.address
+      );
       LinkInstance = await LinkForChainlinkVRF.deployed();
 
       /*await deployer.deploy(Matic);
@@ -102,7 +117,7 @@ module.exports = async function (deployer, network, accounts) {
 
       await deployer.deploy(
         Board,
-        LinkInstance.address, // VRF Coordinator is Link contract
+        VRFCoordinatorInstance.address,
         LinkInstance.address,
         "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
         0.0001 * 10 ** 18
@@ -137,14 +152,6 @@ module.exports = async function (deployer, network, accounts) {
       "http://token-cdn-uri/"
     );
     PropInstance = await Prop.deployed();
-
-    // Deploy BUILD
-    await deployer.deploy(
-      Build,
-      BoardInstance.address,
-      "http://token-cdn-uri/"
-    );
-    BuildInstance = await Build.deployed();
   }
 
   // Deploy BANK
@@ -157,7 +164,6 @@ module.exports = async function (deployer, network, accounts) {
         PawnInstance.address,
         BoardInstance.address,
         PropInstance.address,
-        BuildInstance.address,
         MonoInstance.address,
         LinkInstance.address,
         StakingInstance.address
@@ -223,31 +229,19 @@ module.exports = async function (deployer, network, accounts) {
       console.log(`Can't deploy contract on this network : ${network}.`);
   }
 
-  // Deploy stubs
-  if (network === "test") {
-    await deployer.deploy(BoardStub, PawnInstance.address);
-    await deployer.deploy(BuildStub);
-    await deployer.deploy(ChainlinkPriceFeedStub, 0.1 * 10 ** 8, 8);
-    await deployer.deploy(ERC20TokenStub, "ERC20 token", "ERC20");
-    await deployer.deploy(MonoStub);
-    await deployer.deploy(PawnStub);
-  }
-
   if (network !== "polygon_infura_testnet") {
     // Setup roles
     const MINTER_ROLE = await PropInstance.MINTER_ROLE();
     await PropInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-      from: accounts[0],
-    });
-    await BuildInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-      from: accounts[0],
-    });
-    const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
-    await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
-      from: accounts[0],
+      from: admin,
     });
     await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-      from: accounts[0],
+      from: admin,
+    });
+
+    const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
+    await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
+      from: admin,
     });
 
     // initialize Paris board prices
@@ -258,11 +252,6 @@ module.exports = async function (deployer, network, accounts) {
       if (land.hasOwnProperty("commonPrice")) {
         commonLandPrices[index] = land.commonPrice;
       }
-
-      housePrices[index] = 0;
-      if (land.hasOwnProperty("housePrice")) {
-        housePrices[index] = land.housePrice;
-      }
     });
 
     await BankInstance.setPrices(
@@ -270,20 +259,21 @@ module.exports = async function (deployer, network, accounts) {
       Paris.maxLands,
       Paris.maxLandRarities,
       Paris.rarityMultiplier,
-      Paris.buildingMultiplier,
       commonLandPrices,
-      housePrices,
-      { from: accounts[0] }
+      { from: admin }
     );
 
     // Mint tokens for accounts
     const amount = ethers.utils.parseEther("1000");
-    await MonoInstance.mint(accounts[1], amount);
-    await LinkInstance.faucet(accounts[1], amount);
+    for (let index = 1; index < 10; index++) {
+      await MonoInstance.mint(accounts[index], amount);
+    }
+
+    await LinkInstance.faucet(player1, amount);
 
     // Give allowance to contract to spend all $MONO
     await MonoInstance.approve(BankInstance.address, amount, {
-      from: accounts[1],
+      from: player1,
     });
 
     // Allow Bank contract and OpenSea's ERC721 Proxy Address
@@ -294,6 +284,14 @@ module.exports = async function (deployer, network, accounts) {
     );
 
     // Mint pawn to players
-    await PawnInstance.mint(accounts[1]);
+    await PawnInstance.mint(player1);
+
+    // Register pawns
+    const pawnID = await PawnInstance.tokenOfOwnerByIndex(player1, 0);
+    await BoardInstance.register(Paris.id, pawnID, {
+      from: admin,
+    });
   }
+
+  console.log("...done.");
 };

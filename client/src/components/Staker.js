@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 
-import StakingJson from "../contracts/StakingContract.json";
 import ERC20Json from "../contracts/ERC20.json";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -16,13 +15,15 @@ function Staker(props) {
   const provider = props.provider;
   const networkId = props.network_id;
   const address = props.address;
+
+  const Staking = props.staking_contract;
+  const startBlockNumber = props.start_block_number;
+
   const rewardTokenName = props.reward_token_name;
   const rewardTokenSymbol = props.reward_token_symbol;
   const rewardTokenIcon = props.reward_token_icon;
   const rewardTokenAddress = props.reward_token_address;
   const rewardTokenPriceFeed = props.reward_token_price_feed;
-
-  const [Staking, setStaking] = useState(null);
 
   const [rewardTokenPrice, setRewardTokenPrice] = useState(
     props.reward_token_price
@@ -30,37 +31,12 @@ function Staker(props) {
   const [RewardTokenPriceFeedInstance, setRewardTokenPriceFeedInstance] =
     useState(null);
   const [RewardTokenInstance, setRewardTokenInstance] = useState(null);
-  const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [poolsAddresses, setPoolsAddresses] = useState([]);
   const [rewardTokenBalance, setRewardTokenBalance] = useState(0);
 
   const [poolToUpdateToken, setPoolToUpdateToken] = useState(null);
 
   const aggregatorV3InterfaceABI = AggregatorV3InterfaceJson.abi;
-
-  useEffect(() => {
-    if (!(provider && address && networkId)) {
-      return;
-    }
-
-    setStaking(
-      new ethers.Contract(
-        StakingJson.networks[networkId].address,
-        StakingJson.abi,
-        provider.getSigner(address)
-      )
-    );
-  }, [provider, address, networkId]);
-
-  useEffect(() => {
-    if (!Staking) {
-      return;
-    }
-
-    provider
-      .getBlockNumber()
-      .then((_blockNumber) => setStartBlockNumber(_blockNumber));
-  }, [Staking]);
 
   useEffect(() => {
     if (

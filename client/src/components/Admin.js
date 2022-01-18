@@ -7,9 +7,7 @@ import "../css/Admin.css";
 import Paris from "../data/Paris.json";
 
 import BankJson from "../contracts/BankContract.json";
-import MonoJson from "../contracts/MonoContract.json";
 import PropJson from "../contracts/PropContract.json";
-import BuildJson from "../contracts/BuildContract.json";
 import StakingJson from "../contracts/StakingContract.json";
 
 import {
@@ -23,8 +21,6 @@ import {
 } from "react-bootstrap";
 
 function Admin(props) {
-  const spinner = <Spinner as="span" animation="border" size="sm" />;
-
   const provider = props.provider;
   const networkId = props.network_id;
   const address = props.address;
@@ -82,7 +78,7 @@ function Admin(props) {
 
       setIsReadyToRender(true);
     });
-  }, [adminRole, address]);
+  }, [adminRole, address, Bank]);
 
   async function sendPricesToBank() {
     let commonLandPrices = [];
@@ -104,36 +100,20 @@ function Admin(props) {
       Paris.maxLands,
       Paris.maxLandRarities,
       Paris.rarityMultiplier,
-      Paris.buildingMultiplier,
-      commonLandPrices,
-      housePrices
+      commonLandPrices
     );
   }
 
   async function setRoles() {
-    const Mono = new ethers.Contract(
-      MonoJson.networks[networkId].address,
-      MonoJson.abi,
-      provider.getSigner(address)
-    );
     const Prop = new ethers.Contract(
       PropJson.networks[networkId].address,
       PropJson.abi,
       provider.getSigner(address)
     );
-    const Build = new ethers.Contract(
-      BuildJson.networks[networkId].address,
-      BuildJson.abi,
-      provider.getSigner(address)
-    );
 
-    const ADMIN_ROLE = await Prop.ADMIN_ROLE();
     const MINTER_ROLE = await Prop.MINTER_ROLE();
 
     Prop.grantRole(MINTER_ROLE, BankJson.networks[networkId].address).then(
-      (result) => console.log("minter role granted")
-    );
-    Build.grantRole(MINTER_ROLE, BankJson.networks[networkId].address).then(
       (result) => console.log("minter role granted")
     );
   }

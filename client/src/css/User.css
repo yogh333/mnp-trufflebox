@@ -4,9 +4,9 @@
 }
 
 .dice-display{
-    height: 5rem;
+    height: 4rem;
     aspect-ratio: 1;
-    display: block;
+    display: inline-block;
 }
 
 .ml-150{

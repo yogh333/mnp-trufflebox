@@ -4,16 +4,21 @@
 pragma solidity 0.8.10;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import "@openzeppelin/contracts/interfaces/IERC1363.sol";
 import "../Board.sol";
+import "./VRFCoordinator.sol";
 
 // @dev only used for local development with Ganache
-// @dev /!\ Vrf Coordinator address must be this one /!\
 contract LinkForChainlinkVRF is ERC20 { // https://github.com/rsksmart/erc677/blob/master/contracts/ERC677.sol
+    VRFCoordinatorContract VRFCoordinator;
+
     /* keyHash */ /* nonce */
     mapping(bytes32 => uint256) private nonces;
 
-    constructor() ERC20('Chainlink Token', 'LINK') {}
+
+    constructor(address VRFCoordinatorAddress) ERC20('Chainlink Token', 'LINK') {
+        VRFCoordinator = VRFCoordinatorContract(VRFCoordinatorAddress);
+    }
+
 
     // to create LINK
     function faucet(address recipient, uint amount) external {
@@ -25,6 +30,11 @@ contract LinkForChainlinkVRF is ERC20 { // https://github.com/rsksmart/erc677/bl
         uint256 value,
         bytes memory data
     ) external returns (bool) {
+        bool result = super.transfer(to, value);
+        if (!result) return false;
+
+        emit Transfer(msg.sender, to, value);
+
         (bytes32 _keyHash,uint256 _userSeed) = abi.decode(data, (bytes32, uint256));
         uint256 vRFSeed = uint256(keccak256(abi.encode(_keyHash, _userSeed, msg.sender, nonces[_keyHash])));
         nonces[_keyHash] = nonces[_keyHash] + 1;
@@ -32,9 +42,9 @@ contract LinkForChainlinkVRF is ERC20 { // https://github.com/rsksmart/erc677/bl
 
         uint256 randomness = uint256(keccak256(abi.encodePacked(_keyHash, vRFSeed, value, to)));
 
-        // /!\ Vrf Coordinator address in Board contract must be this one /!\
-        BoardContract Board = BoardContract(msg.sender);
-        Board.rawFulfillRandomness(requestId, randomness);
+        // Randomness is calculated here, by simplicity, but is not important.
+        // msg.sender is Board contract
+        VRFCoordinator.saveData(requestId, randomness, msg.sender);
 
         return true;
     }
