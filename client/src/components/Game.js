@@ -10,6 +10,7 @@ import User from "./User";
 import Land from "./Land";
 import Visual from "./Visual";
 import InGame from "./InGame";
+import DiceBoard from "./DiceBoard/DiceBoard";
 
 import BankJson from "../contracts/BankContract.json";
 import BoardJson from "../contracts/BoardContract.json";
@@ -208,6 +209,7 @@ function Game(props) {
 
   return (
     <div className="Game">
+      <DiceBoard />
       <div className="info-area-1 text-center">
         <h2>User info</h2>
         {provider && (
