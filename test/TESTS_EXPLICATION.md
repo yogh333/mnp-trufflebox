@@ -33,7 +33,7 @@ Dans ce fichier, nous allons trouver les différents tests relatifs à la géné
 **C. Test of the function play**
 
 
-- **Description :** nous interdisons de jouer si le pion n'est pas enregistré
+- **Description :** nous interdisons de jouer si le pion n'est pas enregistré.
   [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
 - **Raison :** vérifier que nous ne pouvons pas commencer la partie si le pion n'a pas été enregistré.
