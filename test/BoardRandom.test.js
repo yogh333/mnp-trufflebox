@@ -4,13 +4,10 @@ ethers = require("ethers");
 
 const Board = artifacts.require("BoardContract");
 const Pawn = artifacts.require("PawnContract");
-const VRFCoordinator = artifacts.require("VRFCoordinatorContract");
 
-const truffleAssert = require("truffle-assertions");
 const { assert, expect } = require("chai");
 const { BN, time, expectEvent, expectRevert} = require("@openzeppelin/test-helpers");
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
-const tokenTransfers = require("truffle-token-test-utils");
 
 contract("Board", async (accounts) => {
 
@@ -18,8 +15,6 @@ contract("Board", async (accounts) => {
   const requestId = 0x6161;
 
   let BoardInstance, PawnInstance;
-
-  tokenTransfers.setWeb3(web3);
 
     const initialSetUp = async () => {
         PawnInstance = await Pawn.new("pawn", "PAWN", "https://server.com/pawn/", {
@@ -35,8 +30,6 @@ contract("Board", async (accounts) => {
             {from: _contractOwner}
         );
     };
-
-
 
   describe("A. Test of the requestRandomNumber function", () => {
 
@@ -168,15 +161,12 @@ contract("Board", async (accounts) => {
 
             const newPositionPawnProcessed = 3;
 
-            //Call of the play method
             await BoardInstance.play(new BN(0), new BN(1));
 
-            //Call of callback from ChainLink Oracle
             await BoardInstance.callbackRandom();
 
             let newPositionPawn2 = await BoardInstance.getPawnInfo(new BN(0), new BN(1));
 
-            //Verification that the pawn has advanced according to the position processed
             assert.strictEqual(parseInt(newPositionPawn2[1]), parseInt(newPositionPawnProcessed));
         });
 
