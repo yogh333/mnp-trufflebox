@@ -3,11 +3,11 @@
 Ce dossier contient tous les tests unitaires Truffle pour tester les contrats intelligents dans le dossier /contracts.
 
 ## Fichier de test : BoardRandom.test.js
-<br/>
+
 Dans ce fichier, nous allons trouver les différents tests relatifs à la génération de l'aléatoire pour le lancer de dé.
-<br/>
+
 **A. Test of the requestRandomNumber function**
-<br/>
+
 - **Description :** tentative d'appel de la fonction play() si le contrat n'a pas assez de fonds.
   [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
@@ -33,7 +33,7 @@ Dans ce fichier, nous allons trouver les différents tests relatifs à la géné
 **C. Test of the function play**
 
 
-- **Description :** nous interdisons de jouer si le pion n'est pas enregistré.
+- **Description :** nous interdisons de jouer si le pion n'est pas enregistré
   [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
 - **Raison :** vérifier que nous ne pouvons pas commencer la partie si le pion n'a pas été enregistré.
@@ -85,3 +85,11 @@ Dans ce fichier, nous allons trouver les différents tests relatifs à la géné
       ✓ 33. We test the modulos and the movement of the pawn -- random = 23 
       ✓ 34. We test the modulos and the movement of the pawn -- random = 24 
 ```
+
+
+
+
+
+
+
+
