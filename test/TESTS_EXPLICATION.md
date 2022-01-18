@@ -3,11 +3,11 @@
 Ce dossier contient tous les tests unitaires Truffle pour tester les contrats intelligents dans le dossier /contracts.
 
 ## Fichier de test : BoardRandom.test.js
-
+<br/>
 Dans ce fichier, nous allons trouver les différents tests relatifs à la génération de l'aléatoire pour le lancer de dé.
-
+<br/>
 **A. Test of the requestRandomNumber function**
-
+<br/>
 - **Description :** tentative d'appel de la fonction play() si le contrat n'a pas assez de fonds.
   [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
