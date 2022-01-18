@@ -20,8 +20,8 @@
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const path = require("path");
 require("dotenv").config();
-const mnemonic = process.env["MNEMONIC"];
-const infuraProjectId = process.env["INFURA_PROJECT_ID"];
+const MNEMONIC = process.env.MNEMONIC;
+const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID;
 
 module.exports = {
   /**
@@ -48,12 +48,12 @@ module.exports = {
     },
 
     test: {
-      host: "127.0.0.1", // Localhost (default: none)
-      port: 8545, // Standard Ethereum port (default: none)
-      network_id: "*", // Any network (default: none)
+      host: "127.0.0.1",
+      port: 7111,
+      network_id: "*",
     },
 
-    kovan: {
+    /*kovan: {
       provider: () =>
         new HDWalletProvider({
           mnemonic: {
@@ -64,22 +64,43 @@ module.exports = {
       network_id: 42,
       gas: 8500000,
       gasprice: 25000000000,
+    },*/
+    kovan: {
+      provider: () =>
+        new HDWalletProvider({
+          mnemonic: {
+            phrase: MNEMONIC,
+          },
+          providerOrUrl: `https://kovan.infura.io/v3/${INFURA_PROJECT_ID}`,
+          //numberOfAddresses: 1,
+          //shareNonce: true,
+          //derivationPath: "m/44'/1'/0'/0/",
+        }),
+      network_id: 42,
+      gas: 5500000,
+      confirmations: 2, // # of confs to wait between deployments. (default: 0)
+      timeoutBlocks: 200, // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true, // Skip dry run before migrations? (default: false for public nets )
     },
     //polygon Infura testnet
     polygon_infura_testnet: {
       provider: () =>
         new HDWalletProvider({
           mnemonic: {
-            phrase: mnemonic,
+            phrase: MNEMONIC,
           },
-          providerOrUrl:
-            "https://polygon-mumbai.infura.io/v3/" + infuraProjectId,
+          providerOrUrl: `https://polygon-mumbai.infura.io/v3/${INFURA_PROJECT_ID}`,
+          //numberOfAddresses: 1,
+          //shareNonce: true,
+          //derivationPath: "m/44'/1'/0'/0/",
         }),
       network_id: 80001,
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true,
-      chainId: 80001,
+      //chainId: 80001,
+      gas: 6000000, // Gas sent with each transaction (default: ~6700000)
+      gasPrice: 3000000000, // 3 gwei (in wei) (default: 100 gwei)
     },
 
     // Another network with more advanced options...

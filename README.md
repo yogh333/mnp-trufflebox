@@ -56,9 +56,20 @@ truffle test
 
 ## Migration
 
+Don't forget, deployer account must have ETH on local or Kovan network or MATIC on Mumbai network
+
+ETH on kovan
+https://faucets.chain.link/kovan
+
+MATIC faucet
+https://faucet.polygon.technology/
+
 ```
 truffle migrate
 ```
+
+After deployment, give some LINK to Board and Bank contracts.<br/>
+LINK faucet https://faucets.chain.link
 
 ## Front-end
 
@@ -68,3 +79,16 @@ To launch React front-end
 cd client
 npm start
 ```
+
+## Online demo
+https://mnp-app.herokuapp.com/
+
+Available for kovan and mumbai testnet
+
+Players must have ETH or MATIC to pay transactions.
+
+ETH on kovan
+https://faucets.chain.link/kovan
+
+MATIC faucet
+https://faucet.polygon.technology/

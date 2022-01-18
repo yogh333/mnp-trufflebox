@@ -3,34 +3,41 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { ethers } from "ethers";
 
 import "../css/Game.css";
-
 import boards from "../data/boards.json";
+
 import Grid from "./Grid";
 import User from "./User";
 import Land from "./Land";
+import Visual from "./Visual";
 import InGame from "./InGame";
 
 import BankJson from "../contracts/BankContract.json";
 import BoardJson from "../contracts/BoardContract.json";
 import MonoJson from "../contracts/MonoContract.json";
 import PawnJson from "../contracts/PawnContract.json";
-import Spinner from "react-bootstrap/Spinner";
 
 function Game(props) {
-  const spinner = <Spinner as="span" animation="border" size="sm" />;
-  const editionID = parseInt(props.edition_id);
+  const spinner = props.spinner;
+  const editionID = "0";
 
-  const board = require(`../data/${boards[editionID]}.json`);
+  const board = require(`../data/${boards[parseInt(editionID)]}.json`);
 
   const provider = props.provider;
   const networkId = props.network_id;
   const address = props.address;
 
+  const monoSymbol = props.mono_symbol;
+  const doModalAction = props.do_modal_action;
+
+  // functions
+  const setIsModalShown = props.set_is_modal_shown;
+  const setModalHTML = props.set_modal_html;
+  const setIsDoingModalAction = props.set_is_doing_modal_action;
+
   const [Bank, setBank] = useState(null);
   const [Mono, setMono] = useState(null);
   const [Board, setBoard] = useState(null);
   const [Pawn, setPawn] = useState(null);
-  const [visual, setVisual] = useState(<div>Property visual</div>);
   const [landInfo, setLandInfo] = useState({
     id: null,
     title: "undefined",
@@ -43,6 +50,7 @@ function Game(props) {
   const [pawnID, setPawnID] = useState(false);
   const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [toggleUpdateValues, setToggleUpdateValues] = useState(null);
+  const [isRoundCompleted, setIsRoundCompleted] = useState(true);
 
   useEffect(() => {
     if (!(provider && address && networkId)) {
@@ -92,7 +100,6 @@ function Game(props) {
     }
 
     updateValues();
-    setIsReadyToRender(true);
   }, [Bank]);
 
   useEffect(() => {
@@ -105,46 +112,54 @@ function Game(props) {
 
   const subscribeContractsEvents = () => {
     Bank.on("PropertyBought", (_player, _propID, event) => {
-      console.log(event);
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
+      console.log(event);
+      updateValues();
+      setToggleUpdateValues(!toggleUpdateValues);
+    });
+    Bank.on("PropertyRentPaid", (_player, _amout, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+      if (address.toLowerCase() !== _player.toLowerCase()) return;
+
+      console.log(event);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
   };
 
   const updateValues = () => {
-    updatePlayerInfos();
+    updatePawnInfo();
+    updatePlayerInfo();
   };
 
-  const updatePlayerInfos = async () => {
+  const updatePawnInfo = async () => {
+    Bank.locatePlayer(editionID).then((_pawnInfo) => {
+      setIsRoundCompleted(_pawnInfo.isRoundCompleted);
+    });
+  };
+
+  const updatePlayerInfo = async () => {
     const _monoBalance = await Mono.balanceOf(address);
     const _pawnBalance = await Pawn.balanceOf(address);
 
-    let _isRegistered, _pawnID;
+    let _isRegistered = false,
+      _pawnID;
     if (_pawnBalance.toNumber() > 0) {
       _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
-      _isRegistered = await Board.isRegistered(props.edition_id, _pawnID);
+      _isRegistered = await Board.isRegistered(editionID, _pawnID);
     }
 
-    if (
+    setCanPlay(
       _isRegistered &&
-      ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1"))
-    ) {
-      setPawnID(_pawnID);
-      setCanPlay(true);
-
-      return;
-    }
-
-    setCanPlay(false);
+        ethers.BigNumber.from(_monoBalance).gte(ethers.utils.parseEther("1"))
+    );
     setPawnID(_pawnID);
+    setIsReadyToRender(true);
   };
 
   const retrieveCellPrices = async (_editionId, _cellID) => {
-    console.log("get prices !");
-
     let propertiesPrices = [];
     for (let rarity = 0; rarity < board.maxLandRarities; rarity++) {
       propertiesPrices[rarity] = await Bank.getPriceOfProp(
@@ -154,53 +169,36 @@ function Game(props) {
       );
     }
 
-    const HOUSE = 0;
-    const HOTEL = 1;
-    let buildingsPrices = [];
-    buildingsPrices[HOUSE] = await Bank.getPriceOfBuild(
-      _editionId,
-      _cellID,
-      HOUSE
-    );
-    buildingsPrices[HOTEL] = await Bank.getPriceOfBuild(
-      _editionId,
-      _cellID,
-      HOTEL
-    );
-
     return {
       properties: propertiesPrices,
-      buildings: buildingsPrices,
     };
   };
 
-  async function displayInfo(cellID) {
-    setVisual(<img className="land" src={board.lands[cellID].visual} />);
-    if (Bank != null) {
-      if (board.lands[cellID].type !== "property") {
-        return;
-      }
+  async function retrieveLandInfo(cellID, rarity) {
+    setIsRetrievingInfo(true);
+    let _prices;
+    let _landInfo = {
+      id: cellID,
+      title: board.lands[cellID].name,
+      type: board.lands[cellID].type,
+      rarity: null,
+      isPurchasable: false,
+      prices: [0, 0, 0],
+    };
 
-      setIsRetrievingInfo(true);
-      const prices = await retrieveCellPrices(board.id, cellID);
-      const land = {
-        id: cellID,
-        title: board.lands[cellID].name,
-        type: board.lands[cellID].type,
-        prices: {
-          rare: ethers.utils.formatUnits(prices.properties[0]),
-          uncommon: ethers.utils.formatUnits(prices.properties[1]),
-          common: ethers.utils.formatUnits(prices.properties[2]),
-        },
-        bprices: {
-          house: ethers.utils.formatUnits(prices.buildings[0]),
-          hotel: ethers.utils.formatUnits(prices.buildings[1]),
-        },
-      };
-
-      setLandInfo(land);
-      setIsRetrievingInfo(false);
+    if (Bank != null && board.lands[cellID].isPurchasable) {
+      _prices = await retrieveCellPrices(board.id, cellID);
+      _landInfo.prices = [
+        ethers.utils.formatUnits(_prices.properties[0]),
+        ethers.utils.formatUnits(_prices.properties[1]),
+        ethers.utils.formatUnits(_prices.properties[2]),
+      ];
+      _landInfo.rarity = rarity;
+      _landInfo.isPurchasable = true;
     }
+
+    setLandInfo(_landInfo);
+    setIsRetrievingInfo(false);
   }
 
   if (!isReadyToRender) {
@@ -218,7 +216,7 @@ function Game(props) {
         board_contract={Board}
         pawn_contract={Pawn}
         pawn_id={pawnID}
-        edition_id={props.edition_id}
+        edition_id={editionID}
         parent_update_values_function={updateValues}
       />
     );
@@ -226,30 +224,47 @@ function Game(props) {
 
   return (
     <div className="Game">
-      <div className="info-area-1">
+      <div className="info-area-1 text-center">
         <h2>User info</h2>
         {provider && (
           <User
             provider={provider}
             address={address}
             network_id={networkId}
-            edition_id={props.edition_id}
+            edition_id={editionID}
             max_lands={board.maxLands}
+            land_info={landInfo}
             pawn_id={pawnID}
-            display_info={displayInfo}
+            retrieve_land_info={retrieveLandInfo}
+            parent_update_values_function={updateValues}
             toggle_update_user_values={toggleUpdateValues}
+            bank_contract={Bank}
+            mono_symbol={monoSymbol}
+            is_round_completed={isRoundCompleted}
+            set_is_round_completed={setIsRoundCompleted}
           />
         )}
       </div>
-      <div className="info-area-2">
-        <h2>Property Visual</h2>
-        {visual}
+      <div className="info-area-2 text-center">
+        <Visual
+          spinner={spinner}
+          land_info={landInfo}
+          bank_contract={Bank}
+          edition_id={editionID}
+          mono_symbol={monoSymbol}
+          set_is_modal_shown={setIsModalShown}
+          set_modal_html={setModalHTML}
+          do_modal_action={doModalAction}
+          set_is_doing_modal_action={setIsDoingModalAction}
+          parent_update_values_function={updateValues}
+          is_round_completed={isRoundCompleted}
+        />
       </div>
-      <div className="info-area-3">
-        <h2>Misc</h2>
+      <div className="info-area-3 text-center">
+        <h2>Game info</h2>
       </div>
-      <div className="info-area-4">
-        <h2>Property Info</h2>
+      <div className="info-area-4 text-center">
+        <h2>NFT Info</h2>
         {isRetrievingInfo ? (
           spinner
         ) : (
@@ -259,16 +274,21 @@ function Game(props) {
             provider={provider}
             land_info={landInfo}
             bank_contract={Bank}
-            edition_id={props.edition_id}
+            edition_id={editionID}
             max_rarity={board.maxLandRarities}
             rarity_multiplier={board.rarityMultiplier}
             rarity_names={board.rarityNames}
             toggle_update_values={toggleUpdateValues}
+            mono_symbol={monoSymbol}
           />
         )}
       </div>
       <div className="main-area">
-        <Grid board={board} displayInfo={displayInfo} />
+        <Grid
+          board={board}
+          retrieve_land_info={retrieveLandInfo}
+          mono_symbol={monoSymbol}
+        />
       </div>
     </div>
   );

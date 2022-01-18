@@ -1,7 +1,6 @@
 const Pawn = artifacts.require("PawnContract");
-const Board = artifacts.require("BoardContract");
+const Board = artifacts.require("BoardMock");
 const Prop = artifacts.require("PropContract");
-const Build = artifacts.require("BuildContract");
 const Bank = artifacts.require("BankContract");
 const Mono = artifacts.require("MonoContract");
 const Staking = artifacts.require("StakingContract");
@@ -9,6 +8,7 @@ const ERC20TokenStub = artifacts.require("ERC20TokenStub");
 const MonoUsdPriceFeed = artifacts.require("MonoUsdPriceFeed");
 
 const utils = require("./utils.js");
+ethers = require("ethers");
 
 contract("BankContract", async (accounts) => {
   beforeEach(async function () {
@@ -24,24 +24,13 @@ contract("BankContract", async (accounts) => {
     PawnInstance = await Pawn.new("NAME", "SYMBOL", "URI");
 
     /* Deploy Board */
-    BoardInstance = await Board.new(
-      "0x514910771af9ca656af840dff83e8264ecf986ca",
-      "0x514910771af9ca656af840dff83e8264ecf986ca",
-      "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4",
-      0.0001 * 10 ** 18
-    );
+    BoardInstance = await Board.new();
 
     /* Deploy Prop */
     PropInstance = await Prop.new(
       BoardInstance.address,
       "TMWPROP",
       "PROP",
-      "https://token-cdn/"
-    );
-
-    /* Deploy Build */
-    BuildInstance = await Build.new(
-      BoardInstance.address,
       "https://token-cdn/"
     );
 
@@ -61,24 +50,46 @@ contract("BankContract", async (accounts) => {
       PawnInstance.address,
       BoardInstance.address,
       PropInstance.address,
-      BuildInstance.address,
       MonoInstance.address,
       LinkInstance.address,
       StakingInstance.address
     );
 
-    /* grant MINTER_ROLE to Bank smartcontract */
-    await PropInstance.grantRole(
-      await PropInstance.MINTER_ROLE(),
-      BankInstance.address
-    );
-    await BuildInstance.grantRole(
-      await BuildInstance.MINTER_ROLE(),
-      BankInstance.address
-    );
+    const MINTER_ROLE = await PropInstance.MINTER_ROLE();
+    await PropInstance.grantRole(MINTER_ROLE, BankInstance.address);
+    await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address);
+    const MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
+    await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address);
+    // for test only
+    await BoardInstance.grantRole(MANAGER_ROLE, BoardInstance.address);
 
     user1 = accounts[1];
     user2 = accounts[2];
+
+    // Mint pawn to players
+    await PawnInstance.mint(user1);
+
+    // Register pawns
+    const pawnID = await PawnInstance.tokenOfOwnerByIndex(user1, 0);
+    await BoardInstance.register(0, pawnID);
+
+    // set pawn info
+    const _pawnInfo = {
+      random: ethers.utils.parseEther("0"),
+      position: "1",
+      isOnBoard: true,
+      isPropertyBought: false,
+      isRentPaid: false,
+      isRoundCompleted: false,
+    };
+    await BoardInstance.updatePawnInfo(0, pawnID, 2, _pawnInfo);
+    /*await BankInstance.locatePlayer(0, { from: user1 }).then((info) => {
+      console.log("locatePlayer", info);
+    });
+
+    await BoardInstance.getPawnInfo(0, pawnID).then((result) => {
+      console.log("getPawn", result);
+    });*/
   });
 
   it("should GET price of Prop(0,1,2)", async function () {
@@ -133,67 +144,6 @@ contract("BankContract", async (accounts) => {
     let price = web3.utils.toWei("6000", "ether");
     try {
       await BankInstance.setPriceOfProp(p.edition, p.land, p.rarity, price);
-    } catch (err) {
-      assert(utils.isEVMException(err), err.toString());
-      return;
-    }
-    assert(false, "test did not revert");
-  });
-
-  it("should GET price of Build(0, 1, 1)", async function () {
-    let b = {
-      edition: 0,
-      land: 1,
-      type: 1,
-    };
-    let price = await BankInstance.getPriceOfBuild(b.edition, b.land, b.type);
-    expect(price.toString()).to.equal(web3.utils.toWei("0", "ether"));
-  });
-
-  it("should SET price of Build(0,1,1)", async function () {
-    let b = {
-      edition: 0,
-      land: 1,
-      type: 1,
-    };
-
-    let price = web3.utils.toWei("4", "ether");
-
-    await BankInstance.setPriceOfBuild(b.edition, b.land, b.type, price);
-    let price_out = await BankInstance.getPriceOfBuild(
-      b.edition,
-      b.land,
-      b.type
-    );
-    expect(price_out.toString()).to.equal(price);
-  });
-
-  it("should REVERT when trying to get non allowed build's price", async function () {
-    let b = {
-      edition: 0,
-      land: 2,
-      type: 1,
-    };
-    try {
-      await BankInstance.getPriceOfBuild(b.edition, b.land, b.type);
-    } catch (err) {
-      assert(utils.isEVMException(err), err.toString());
-      return;
-    }
-    assert(false, "test did not revert");
-  });
-
-  it("should REVERT when trying to set non allowed build's price", async function () {
-    let b = {
-      edition: 0,
-      land: 2,
-      type: 1,
-    };
-
-    let price = web3.utils.toWei("4", "ether");
-
-    try {
-      await BankInstance.setPriceOfBuild(b.edition, b.land, b.type, price);
     } catch (err) {
       assert(utils.isEVMException(err), err.toString());
       return;
@@ -256,35 +206,36 @@ contract("BankContract", async (accounts) => {
 
     p.edition = 99;
     try {
-      await BankInstance.buyProp(p.edition, p.land, p.rarity, { from: user1 });
+      await BankInstance.buyProp(p.edition, { from: user1 });
+      assert(false, "test must revert");
     } catch (err) {
       assert(utils.isEVMException(err), err.toString());
-      p.edition = 0;
-      p.land = 99;
-      try {
-        await BankInstance.buyProp(p.edition, p.land, p.rarity, {
-          from: user1,
-        });
-      } catch (err) {
-        assert(utils.isEVMException(err), err.toString());
-        p.land = 1;
-        p.rarity = 5;
-        try {
-          await BankInstance.buyProp(p.edition, p.land, p.rarity, {
-            from: user1,
-          });
-        } catch (err) {
-          assert(utils.isEVMException(err), err.toString());
-          return;
-        }
-        assert(false, "test did not revert");
-      }
-      assert(false, "test did not revert");
     }
-    assert(false, "test did not revert");
+
+    p.edition = 0;
+    p.land = 99;
+    try {
+      await BankInstance.buyProp(p.edition, {
+        from: user1,
+      });
+      assert(false, "test must revert");
+    } catch (err) {
+      assert(utils.isEVMException(err), err.toString());
+    }
+
+    p.land = 1;
+    p.rarity = 5;
+    try {
+      await BankInstance.buyProp(p.edition, {
+        from: user1,
+      });
+      assert(false, "test must revert");
+    } catch (err) {
+      assert(utils.isEVMException(err), err.toString());
+    }
   });
 
-  it("user 1 to BUY PROP(0,1,2)", async function () {
+  it("user 1 to BUY PROP(0)", async function () {
     let p = {
       edition: 0,
       land: 1,
@@ -303,7 +254,7 @@ contract("BankContract", async (accounts) => {
     });
 
     await MonoInstance.approve(BankInstance.address, price, { from: user1 });
-    let result = await BankInstance.buyProp(p.edition, p.land, p.rarity, {
+    let result = await BankInstance.buyProp(p.edition, {
       from: user1,
     });
 
@@ -324,69 +275,11 @@ contract("BankContract", async (accounts) => {
     await MonoInstance.approve(BankInstance.address, price, { from: user1 });
 
     try {
-      await BankInstance.buyProp(p.edition, p.land, p.rarity, { from: user1 });
+      await BankInstance.buyProp(p.edition, { from: user1 });
+      assert(false, "test must revert");
     } catch (err) {
       assert(utils.isEVMException(err), err.toString());
       return;
     }
-    assert(false, "test did not revert");
   });
-
-  it("should mint 10 Builds (0, 1, 0) to user 1", async function () {
-    let b = {
-      edition: 0,
-      land: 1,
-      type: 0,
-    };
-
-    let price = web3.utils.toWei("10", "ether");
-    await BankInstance.setPriceOfBuild(b.edition, b.land, b.type, price);
-
-    let value = (
-      await BankInstance.getPriceOfBuild(b.edition, b.land, b.type, {
-        from: user1,
-      })
-    ).mul(web3.utils.toBN(10));
-
-    await MonoInstance.approve(BankInstance.address, value, { from: user1 });
-
-    let result = await BankInstance.buyBuild(b.edition, b.land, b.type, 10, {
-      from: user1,
-    });
-
-    let id = result.logs[0].args["build_id"];
-    expect((await BuildInstance.balanceOf(user1, id)).toNumber()).to.equal(10);
-  });
-
-  /*it("user shall be able to resell to the bank an owned PROP", async function () {
-    let p = {
-      edition: 0,
-      land: 1,
-      rarity: 2,
-    };
-
-    let user1mono = mono.connect(user1);
-    let user1bank = bank.connect(user1);
-    let user1prop = prop.connect(user1);
-
-    let price = await user1bank.getPriceOfProp(p.edition, p.land, p.rarity);
-    await user1mono.approve(bank.address, price);
-    let tx = await user1bank.buyProp(p.edition, p.land, p.rarity);
-    let tr = await tx.wait();
-    let events = tr.events;
-    if (events && events[3] && events[3].args) {
-      let prop_id = events[3].args.prop_id;
-      await user1prop.approve(bank.address, prop_id);
-      tx = await user1bank.sellProp(prop_id);
-      tr = await tx.wait();
-      events = tr.events;
-      if (events && events[3] && events[3].args) {
-        expect(events[3].args.prop_id).to.equal(prop_id);
-      } else {
-        assert(false, "test fails");
-      }
-    } else {
-      assert(false, "test fails");
-    }
-  });*/
 });

@@ -5,10 +5,9 @@ Paris = require("../client/src/data/Paris.json");
 const Bank = artifacts.require("BankContract");
 const Prop = artifacts.require("PropContract");
 const Staking = artifacts.require("StakingContract"); // Create Staking Stub
-const PawnStub = artifacts.require("PawnStub");
+const PawnStub = artifacts.require("PawnStubContract");
 const Board = artifacts.require("BoardContract");
 const MonoStub = artifacts.require("MonoStub");
-const BuildStub = artifacts.require("BuildStub");
 const MonoUsdPriceFeed = artifacts.require("MonoUsdPriceFeed");
 const ERC20TokenStub = artifacts.require("ERC20TokenStub");
 
@@ -17,14 +16,13 @@ const { assert } = require("chai");
 const { BN } = require("@openzeppelin/test-helpers");
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 
-contract("Bank royalties", async (accounts) => {
+contract("Bank#propertyTransfer(royalties)", async (accounts) => {
   const _contractOwner = accounts[0];
   const _seller = accounts[1];
   const _buyer = accounts[2];
 
   let BankInstance;
   let BoardInstance;
-  let BuildInstance;
   let MonoInstance;
   let PawnInstance;
   let PropInstance;
@@ -40,9 +38,8 @@ contract("Bank royalties", async (accounts) => {
   };
 
   const initialSetUp = async () => {
-    /* with 'test' network, contracts are deployed in migration.
+    /* except for 'test' network, contracts are deployed in migration.
     PawnInstance = await PawnStub.deployed();
-    BuildInstance = await BuildStub.deployed();
     MonoInstance = await MonoStub.deployed();
     LinkInstance = await ERC20TokenStub.deployed();
     MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.deployed();
@@ -52,7 +49,6 @@ contract("Bank royalties", async (accounts) => {
     BankInstance = await Bank.deployed();*/
     PawnInstance = await PawnStub.new({ from: _contractOwner });
 
-    BuildInstance = await BuildStub.new({ from: _contractOwner });
     MonoInstance = await MonoStub.new({ from: _contractOwner });
     LinkInstance = await ERC20TokenStub.new("Chainlink token", "LINK", {
       from: _contractOwner,
@@ -89,7 +85,6 @@ contract("Bank royalties", async (accounts) => {
       PawnInstance.address,
       BoardInstance.address,
       PropInstance.address,
-      BuildInstance.address,
       MonoInstance.address,
       LinkInstance.address,
       StakingInstance.address,

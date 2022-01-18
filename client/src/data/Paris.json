@@ -14,6 +14,7 @@
     {
         "name": "Depart",
         "type": "go",
+        "isPurchasable": false,
         "position": "bottom",
         "corner": true,
         "visual": "./images/cell0.png"
@@ -21,6 +22,7 @@
     {
         "name": "Boulevard de Belleville",
         "type": "property",
+        "isPurchasable": true,
         "position": "bottom",
         "commonPrice": 6,
         "cost": 60,
@@ -35,12 +37,14 @@
     {
         "name": "Caisse de Communauté",
         "type": "community-chest",
+        "isPurchasable": false,
         "position": "bottom",
         "visual": "./images/cell2.png"
     },
     {
         "name": "Rue Lecourbe",
         "type": "property",
+        "isPurchasable": true,
         "position": "bottom",
         "commonPrice": 6,
         "cost": 60,
@@ -55,6 +59,7 @@
     {
         "name": "Impôts sur le revenu",
         "type": "tax",
+        "isPurchasable": true,
         "position": "bottom",
         "commonPrice": 20,
         "cost": 200,
@@ -63,6 +68,7 @@
     {
         "name": "Gare Montparnasse",
         "type": "railroad",
+        "isPurchasable": true,
         "position": "bottom",
         "commonPrice": 20,
         "cost": 200,
@@ -72,6 +78,7 @@
     {
         "name": "Rue de Vaugirard",
         "type": "property",
+        "isPurchasable": true,
         "position": "bottom",
         "commonPrice": 10,
         "cost": 100,
@@ -86,12 +93,14 @@
     {
         "name": "Chance",
         "type": "chance",
+        "isPurchasable": false,
         "position": "bottom",
         "visual": "./images/cell7.png"
     },
     {
         "name": "Rue de Courcelles",
         "type": "property",
+        "isPurchasable": true,
         "position": "bottom",
         "commonPrice": 10,
         "cost": 100,
@@ -106,6 +115,7 @@
     {
         "name": "Avenue de la République",
         "type": "property",
+        "isPurchasable": true,
         "position": "bottom",
         "commonPrice": 12,
         "cost": 120,
@@ -120,6 +130,7 @@
     {
         "name": "Jail",
         "type": "jail",
+        "isPurchasable": false,
         "position": "bottom",
         "corner": true,
         "visual": "./images/cell10.png"
@@ -127,6 +138,7 @@
     {
         "name": "Boulevard de la Villette",
         "type": "property",
+        "isPurchasable": true,
         "position": "left",
         "commonPrice": 14,
         "cost": 140,
@@ -141,6 +153,7 @@
     {
         "name": "Compagnie de distributon de l'électricité",
         "type": "utility",
+        "isPurchasable": true,
         "position": "left",
         "commonPrice": 15,
         "cost": 150,
@@ -150,6 +163,7 @@
     {
         "name": "Avenue de Neuilly",
         "type": "property",
+        "isPurchasable": true,
         "position": "left",
         "commonPrice": 14,
         "cost": 140,
@@ -164,6 +178,7 @@
     {
         "name": "Rue de Paradis",
         "type": "property",
+        "isPurchasable": true,
         "position": "left",
         "commonPrice": 16,
         "cost": 160,
@@ -178,6 +193,7 @@
     {
         "name": "Gare de Lyon",
         "type": "railroad",
+        "isPurchasable": true,
         "position": "left",
         "commonPrice": 20,
         "cost": 200,
@@ -187,6 +203,7 @@
     {
         "name": "Avenue Mozart",
         "type": "property",
+        "isPurchasable": true,
         "position": "left",
         "commonPrice": 18,
         "cost": 180,
@@ -201,12 +218,14 @@
     {
         "name": "Caisse de Communauté",
         "type": "community-chest",
+        "isPurchasable": false,
         "position": "left",
         "visual": "./images/cell17.png"
     },
     {
         "name": "Boulevard Saint Michel",
         "type": "property",
+        "isPurchasable": true,
         "position": "left",
         "commonPrice": 18,
         "cost": 180,
@@ -221,6 +240,7 @@
     {
         "name": "Place Pigalle",
         "type": "property",
+        "isPurchasable": true,
         "position": "left",
         "commonPrice": 20,
         "cost": 200,
@@ -235,6 +255,7 @@
     {
         "name": "Parking Gratuit",
         "type": "free-parking",
+        "isPurchasable": false,
         "position": "left",
         "corner": true,
         "visual": "./images/cell20.png"
@@ -242,6 +263,7 @@
     {
         "name": "Avenue Matignon",
         "type": "property",
+        "isPurchasable": true,
         "position": "top",
         "commonPrice": 22,
         "cost": 220,
@@ -256,12 +278,14 @@
     {
         "name": "Chance",
         "type": "chance",
+        "isPurchasable": false,
         "position": "top",
         "visual": "./images/cell22.png"
     },
     {
         "name": "Boulevard Malesherbes",
         "type": "property",
+        "isPurchasable": true,
         "position": "top",
         "commonPrice": 22,
         "cost": 220,
@@ -276,6 +300,7 @@
     {
         "name": "Avenue Henri-Martin",
         "type": "property",
+        "isPurchasable": true,
         "position": "top",
         "commonPrice": 24,
         "cost": 240,
@@ -290,6 +315,7 @@
     {
         "name": "Gare du Nord",
         "type": "railroad",
+        "isPurchasable": true,
         "position": "top",
         "commonPrice": 20,
         "cost": 200,
@@ -299,6 +325,7 @@
     {
         "name": "Faubourg Saint Honoré",
         "type": "property",
+        "isPurchasable": true,
         "position": "top",
         "commonPrice": 26,
         "cost": 260,
@@ -313,6 +340,7 @@
     {
         "name": "Place de La Bourse",
         "type": "property",
+        "isPurchasable": true,
         "position": "top",
         "commonPrice": 26,
         "cost": 260,
@@ -327,6 +355,7 @@
     {
         "name": "Compagnie de distribution des eaux",
         "type": "utility",
+        "isPurchasable": true,
         "position": "top",
         "commonPrice": 15,
         "cost": 150,
@@ -336,6 +365,7 @@
     {
         "name": "Rue Lafayette",
         "type": "property",
+        "isPurchasable": true,
         "position": "top",
         "commonPrice": 28,
         "cost": 280,
@@ -350,6 +380,7 @@
     {
         "name": "Allez en Prison",
         "type": "go-to-jail",
+        "isPurchasable": false,
         "position": "top",
         "corner": true,
         "visual": "./images/cell30.png"
@@ -357,6 +388,7 @@
     {
         "name": "Avenue de Breteuil",
         "type": "property",
+        "isPurchasable": true,
         "position": "right",
         "commonPrice": 30,
         "cost": 300,
@@ -371,6 +403,7 @@
     {
         "name": "Avenue Foch",
         "type": "property",
+        "isPurchasable": true,
         "position": "right",
         "commonPrice": 30,
         "cost": 300,
@@ -385,12 +418,14 @@
     {
         "name": "Caisse de Communauté",
         "type": "community-chest",
+        "isPurchasable": false,
         "position": "right",
         "visual": "./images/cell33.png"
     },
     {
         "name": "Boulevard des Capucines",
         "type": "property",
+        "isPurchasable": true,
         "position": "right",
         "commonPrice": 32,
         "cost": 320,
@@ -405,6 +440,7 @@
     {
         "name": "Gare Saint Lazare",
         "type": "railroad",
+        "isPurchasable": true,
         "position": "right",
         "commonPrice": 20,
         "cost": 200,
@@ -414,12 +450,14 @@
     {
         "name": "Chance",
         "type": "chance",
+        "isPurchasable": false,
         "position": "right",
         "visual": "./images/cell36.png"
     },
     {
         "name": "Avenue des Champs Elysées",
         "type": "property",
+        "isPurchasable": true,
         "position": "right",
         "commonPrice": 35,
         "cost": 350,
@@ -434,13 +472,16 @@
     {
         "name": "Taxe de Luxe",
         "type": "tax",
+        "isPurchasable": true,
         "position": "right",
+        "commonPrice": 10,
         "cost": 100,
         "visual": "./images/cell38.png"
     },
     {
         "name": "Rue de la Paix",
         "type": "property",
+        "isPurchasable": true,
         "position": "right",
         "commonPrice": 40,
         "cost": 400,

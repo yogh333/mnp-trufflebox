@@ -80,7 +80,7 @@ contract PropContract is ERC721Enumerable, AccessControl, Ownable, IERC2981 {
 		return
 			(edition <= Board.getMaxEdition()) &&
 			(land <= Board.getNbLands(edition)) &&
-			(Board.isBuildingLand(edition, land)) &&
+			(Board.isPurchasable(edition, land)) &&
 			(rarity <= Board.getRarityLevel(edition));
 	}
 
