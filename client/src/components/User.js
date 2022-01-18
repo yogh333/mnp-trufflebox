@@ -22,10 +22,13 @@ export default function User(props) {
   const Bank = props.bank_contract;
   const monoSymbol = props.mono_symbol;
   const isRoundCompleted = props.is_round_completed;
+  const landInfo = props.land_info;
+  const isLandPurchasable = landInfo.isPurchasable;
 
   // functions
   const retrieveLandInfo = props.retrieve_land_info;
   const setIsRoundCompleted = props.set_is_round_completed;
+  const parentUpdateValues = props.parent_update_values_function;
 
   const [Mono, setMono] = useState(null);
   const [Prop, setProp] = useState(null);
@@ -119,6 +122,7 @@ export default function User(props) {
 
     Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
       setCurrentPosition(_pawnInfo.position);
+
       highlightCurrentCell(_pawnInfo.position);
       const rarity = getRandomRarity(_pawnInfo.random);
       retrieveLandInfo(_pawnInfo.position, rarity);
@@ -206,6 +210,7 @@ export default function User(props) {
 
     Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
       setRollDice(calculateDicesNumbers(_pawnInfo)); // to throw dices 3D animation and display dices results
+      setCurrentPosition(_pawnInfo.position);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestID]);
@@ -218,7 +223,7 @@ export default function User(props) {
     setAreDicesDisplayed(true);
     setIsShakerDisplayed(false); // todo lancer l'animation 3D
     handleNewPosition(currentPosition, rollDice);
-    setIsRoundCompleted(false); // or updateValues()
+    setIsRoundCompleted(false); // or parentUpdateValues()
     setIsDicesRolling(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -256,14 +261,12 @@ export default function User(props) {
   function rollDices() {
     if (!Bank || !props.edition_id) return;
 
+    setAreDicesDisplayed(false);
     setIsDicesRolling(true);
     try {
-      console.log("rollDices");
-      //Bank.buyPawn()
-      //Bank.locatePlayer(props.edition_id).then((result) => console.log(result));
       Bank.rollDices(props.edition_id);
     } catch (error) {
-      console.log("error");
+      setAreDicesDisplayed(true);
       setIsDicesRolling(false);
     }
   }
@@ -321,7 +324,10 @@ export default function User(props) {
         size="sm"
         className="btn btn-primary btn-lg btn-block"
         onClick={rollDices}
-        disabled={!isRoundCompleted && isDicesRolling}
+        // todo
+        // For not purchasable lands (i.e. price is nul) nothing is implemented.
+        // The player can ONLY roll de dices even if round is not completed.
+        disabled={(isLandPurchasable && !isRoundCompleted) || isDicesRolling}
       >
         Roll the dices!
       </Button>

@@ -107,6 +107,12 @@ contract BankContract is AccessControl, IERC721Receiver {
 	}
 
 	function rollDices(uint16 _edition) external {
+		// todo
+		// For not purchasable lands (i.e. price is nul) nothing is implemented.
+		// The player can ONLY roll de dices even if round is not completed.
+		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		require(propPrices[_edition][p.position][0] == 0 || p.isRoundCompleted, "Uncompleted round");
+
 		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 		uint256 pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0);
 		require(Board.isRegistered(_edition, pawnID), "player does not enroll");

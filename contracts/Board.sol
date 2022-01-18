@@ -120,7 +120,20 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		boards[p.edition].pawns[p.pawnID].isRentPaid = false;
 		boards[p.edition].pawns[p.pawnID].isRoundCompleted = false;
 
+		//todo gameStrategist(boards[p.edition].pawns[p.pawnID].position)
+
 		emit RandomReady(requestId);
+	}
+
+	/**
+	 * @dev Game strategist
+	 */
+	function gameStrategist(uint16 _edition, uint256 _pawnID, uint8 _position) internal {
+		if (boards[_edition].isPurchasable[_position]) {
+			boards[_edition].pawns[_pawnID].isRoundCompleted = false;
+		}
+
+		boards[_edition].pawns[_pawnID].isRoundCompleted = true;
 	}
 
 	/**
@@ -221,7 +234,15 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 */
 	function play(uint16 _edition, uint256 _pawnID) external onlyRole(MANAGER_ROLE) returns (bytes32 requestId) {
 		require(boards[_edition].pawns[_pawnID].isOnBoard, "Unregistered pawn");
-		require(boards[_edition].pawns[_pawnID].isRoundCompleted, "Round not completed");
+
+		// todo
+		// For not purchasable lands (i.e. price is nul) nothing is implemented.
+		// The player can ONLY roll de dices even if round is not completed.
+		require(
+			!boards[_edition].isPurchasable[boards[_edition].pawns[_pawnID].position] ||
+				boards[_edition].pawns[_pawnID].isRoundCompleted,
+			"Round not completed"
+		);
 
 		requestId = requestRandomNumber();
 

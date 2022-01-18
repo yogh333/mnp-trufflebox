@@ -16,11 +16,11 @@ export default function Visual(props) {
   const landID = landInfo.id;
   const prices = landInfo.prices;
   const isRoundCompleted = props.is_round_completed;
+  const doModalAction = props.do_modal_action;
 
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
-  const doModalAction = props.do_modal_action;
   const setIsDoingModalAction = props.set_is_doing_modal_action;
   const updateValues = props.parent_update_values_function;
 
@@ -39,6 +39,13 @@ export default function Visual(props) {
       console.log("rent payed");
       setIsDoingModalAction(false);
       setIsModalShown(false);
+      // reset modal data
+      setModalHTML({
+        title: "",
+        body: "",
+        button: "",
+        action: "",
+      });
       updateValues();
     });
   };

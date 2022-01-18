@@ -13,14 +13,14 @@ https://kovan.etherscan.io/
 
 | Name             | Address                               | gas used |
 |------------------|--------------------------------------------|----------|
-| Migrations       | 0xd299E1909608eC779a12109DC148c406e20AEa7E | 250154   |
-| Mono             | 0x69d8Cd691B46F7764805845F40Db12ea8e887E56 | 2788158  |
-| MonoUsdPriceFeed | 0x69fA08fe867C2913E48AC72f6D39cb1181853300 | 753495 |
-| Staking          | 0xDE9ED5DC4337c324f876cc7Ee36d9C1F56349518 | 2699359 |
-| Board            | 0x5a143a67F4E73392c038688725c4b61E2B34d417 | 3685410 |
-| Prop             | 0x80502B8187108e98248ADb7af0482B235B4AfED1 | 5021442 |
-| Pawn             | 0xf2D61766624261D665B9763c253D05944351eD22 | 3973323 |
-| Bank             | 0x4689318c45B5B14eA286CABc384d054ad2D9BA00 | 4702855 |
+| Migrations       | 0x7deAaAdF22A8E415417DAE75c9A0F17E202fe1D8 | 250154   |
+| Mono             | 0x6064E05307F17f7aA7EDB6A67db53DbA9D1c2E2B | 2788158  |
+| MonoUsdPriceFeed | 0x25d37C5DD4849621D67E28f61c6d494367Ec9Cf6 | 753495 |
+| Staking          | 0x4D0c582ACCd8c1b700B68FFE810476c23B1cf0cE | 2699359 |
+| Board            | 0x95e3E67B1a0bb90E37507cE81643F52ABA827Cd2 | 3685410 |
+| Prop             | 0x20a4aB5BA63d8Ba6d48787d8b8cBd24d17EDB08a | 5021442 |
+| Pawn             | 0x9bFf875f6198f397e6d3989e0A9E0FC8ce76832F | 3973323 |
+| Bank             | 0x6D6035c06eD3864670107eCF4dAc00Cab374d29E | 4702855 |
 
 ### Useful addresses
 | Name                          | Address                                         |
@@ -42,14 +42,14 @@ https://kovan.etherscan.io/
 | Name             | Address                               | gas used |
 |------------------|--------------------------------------------|----------|
 | Migrations       | 0x045DA15c5daC23DEF1F6FEDa63dD92766a4c3eC0 | 250154   |
-| Mono             | 0x9745172E647cda25082fB1c7e50C1bF5D0869E23 | 2788158  |
-| LinkUsdPriceFeed | 0xCdfa847495250bCB9794e1A6C5bC41D93413e4c5 | 753615 |
-| MonoUsdPriceFeed | 0xC0C5Dbb4105b20C8B6e7Ca4a0CceeB81cA2EEe0C | 753495 |
-| Staking          | 0x8019f4136abeeEf7D073408d3138305EEbf8f4f2 | 2699359 |
-| Board            | 0xaCE31cDbe1053b850933390A80614c77472cB8B8 | 3685410 |
-| Prop             | 0xD1D9E7Db1b5983AA75bba6A8C1238FFa7CC7cc40 | 5021442 |
-| Pawn             | 0x19116f257418f3B5c972c93F12E65144b96F179b | 3973323 |
-| Bank             | 0xDEC0353b24d23dE82d2aA77a1602C85B917b4786 | 4702855 |
+| Mono             | 0x0B3641B78FF2319117D409DCC6181C7b415F9BC2 | 2788158  |
+| LinkUsdPriceFeed | 0x322d788e966d3d08911052bf3118Dc2c00854C95 | 753615 |
+| MonoUsdPriceFeed | 0xaEA06845D080924AA13BC707507Cc2Ba5F900936 | 753495 |
+| Staking          | 0xbB3e15833e2a1C2a0CaAFf13fEe0102bc6467bcE | 2699359 |
+| Board            | 0xD24827D8AD38e9bE8a036a22Afe4aADF1d2c9CbA | 3685410 |
+| Prop             | 0xE5Dc85850a893643148603Fe8c97F860D17Eb48F | 5021442 |
+| Pawn             | 0x3E39232e4A798D85f1C34709Bb01dBf7774e0c87 | 3973323 |
+| Bank             | 0x092B1Eb4dD08f86Cf8cB79e5ee002eCA6Eed8284 | 4702855 |
 
 ### Useful addresses
 | Name                           | Address                                         |

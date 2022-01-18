@@ -203,7 +203,7 @@ module.exports = async function (deployer, network, accounts) {
         );
       }
       // Transfer Links to ganache account 1
-      await LinkInstance.faucet(player1, ethers.utils.parseEther("1000"));
+      //await LinkInstance.faucet(player1, ethers.utils.parseEther("1000"));
 
       // ***************
       // Add ERC20 tokens to stake
@@ -296,6 +296,14 @@ module.exports = async function (deployer, network, accounts) {
       break;
 
     case "kovan":
+      console.warn(
+        "/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\"
+      );
+      console.warn(`/!\\ Deployer account (${accounts[0]}) must have ETH.`);
+      console.warn(
+        "/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\"
+      );
+
       // deploy ERC20 token contracts and price feeds and use these addresses in following deployment
       // Deploy MONO
       await deployer.deploy(Mono, ethers.utils.parseEther("3000000"));
@@ -389,7 +397,6 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       // Transfer LINK to Board and Bank contracts
       //
-      // Todo* with faucet
       // Testnet LINK are available from https://faucets.chain.link/kovan
       // ***************
 
@@ -411,8 +418,6 @@ module.exports = async function (deployer, network, accounts) {
           ethers.utils.parseEther("1000")
         );
       }
-      // Transfer Links to account 1
-      // Todo* with faucet
 
       // ***************
       // Add ERC20 tokens to stake
@@ -498,9 +503,27 @@ module.exports = async function (deployer, network, accounts) {
         from: admin,
       });
 
+      console.warn("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
+      console.warn(
+        `/!\\ You must fill Board contract (${BoardInstance.address})`
+      );
+      console.warn(`/!\\ and Bank contract (${BankInstance.address})`);
+      console.warn(`/!\\ with LINK (${LINK}).`);
+      console.warn("/!\\ LINK faucet https://faucets.chain.link/kovan");
+      console.warn("/!\\ Players must have some ETH");
+      console.warn("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
+
       break;
 
     case "polygon_infura_testnet":
+      console.warn(
+        "/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\"
+      );
+      console.warn(`/!\\ Deployer account (${accounts[0]}) must have MATIC.`);
+      console.warn(
+        "/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\"
+      );
+
       // deploy ERC20 token contracts and price feeds and use these addresses in following deployment
       // Deploy MONO
       await deployer.deploy(Mono, ethers.utils.parseEther("3000000"));
@@ -592,7 +615,6 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       // Transfer LINK to Board and Bank contracts
       //
-      // Todo* with faucet
       // Testnet LINK are available from https://faucets.chain.link/kovan
       // ***************
 
@@ -614,8 +636,6 @@ module.exports = async function (deployer, network, accounts) {
           ethers.utils.parseEther("1000")
         );
       }
-      // Transfer Links to account 1
-      // Todo* with faucet
 
       // ***************
       // Add ERC20 tokens to stake
@@ -704,6 +724,16 @@ module.exports = async function (deployer, network, accounts) {
       await BoardInstance.register(Paris.id, pawnID, {
         from: admin,
       });
+
+      console.warn("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
+      console.warn(
+        `/!\\ You must fill Board contract (${BoardInstance.address})`
+      );
+      console.warn(`/!\\ and Bank contract (${BankInstance.address})`);
+      console.warn(`/!\\ with LINK (${LINK}).`);
+      console.warn("/!\\ LINK faucet https://faucets.chain.link/mumbai");
+      console.warn("/!\\ Players must have some MATIC");
+      console.warn("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
 
       break;
 

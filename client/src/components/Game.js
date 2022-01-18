@@ -27,12 +27,12 @@ function Game(props) {
   const address = props.address;
 
   const monoSymbol = props.mono_symbol;
+  const doModalAction = props.do_modal_action;
 
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
   const setIsDoingModalAction = props.set_is_doing_modal_action;
-  const doModalAction = props.do_modal_action;
 
   const [Bank, setBank] = useState(null);
   const [Mono, setMono] = useState(null);
@@ -112,18 +112,18 @@ function Game(props) {
 
   const subscribeContractsEvents = () => {
     Bank.on("PropertyBought", (_player, _propID, event) => {
-      console.log(event);
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
+      console.log(event);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
     Bank.on("PropertyRentPaid", (_player, _amout, event) => {
-      console.log(event);
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
+      console.log(event);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -160,8 +160,6 @@ function Game(props) {
   };
 
   const retrieveCellPrices = async (_editionId, _cellID) => {
-    console.log("get prices !");
-
     let propertiesPrices = [];
     for (let rarity = 0; rarity < board.maxLandRarities; rarity++) {
       propertiesPrices[rarity] = await Bank.getPriceOfProp(
@@ -235,8 +233,10 @@ function Game(props) {
             network_id={networkId}
             edition_id={editionID}
             max_lands={board.maxLands}
+            land_info={landInfo}
             pawn_id={pawnID}
             retrieve_land_info={retrieveLandInfo}
+            parent_update_values_function={updateValues}
             toggle_update_user_values={toggleUpdateValues}
             bank_contract={Bank}
             mono_symbol={monoSymbol}

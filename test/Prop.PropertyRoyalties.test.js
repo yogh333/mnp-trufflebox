@@ -11,7 +11,7 @@ const { assert } = require("chai");
 const { BN } = require("@openzeppelin/test-helpers");
 const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 
-contract("Property royalties", async (accounts) => {
+contract("Prop (Property royalties)", async (accounts) => {
   const _contractOwner = accounts[0];
   const _seller = accounts[1];
   const _buyer = accounts[2];

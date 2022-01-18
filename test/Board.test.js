@@ -87,7 +87,6 @@ contract("BoardContract", async (accounts) => {
     });
     it("Player1 is registered", async () => {
       const _pawnID = await PawnInstance.tokenOfOwnerByIndex(player1, 0);
-      console.log("_pawnID.toString()", _pawnID.toString());
       assert.strictEqual(_pawnID.toString(), "1000");
       const isRegistered = await BoardInstance.isRegistered(0, _pawnID);
       assert.isTrue(isRegistered);

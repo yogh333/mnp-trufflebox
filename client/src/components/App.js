@@ -52,6 +52,8 @@ function App() {
   const [modalHTML, setModalHTML] = useState({
     title: "",
     body: "",
+    button: "",
+    action: "",
   });
   const [doModalAction, setDoModalAction] = useState(null);
 
@@ -228,6 +230,15 @@ function App() {
     rewardTokenIcon,
     startBlockNumber,
   ]);
+
+  // reset modal data and diffuse to children
+  useEffect(() => {
+    if (!modalHTML) return;
+
+    if (modalHTML.action === "") {
+      setDoModalAction("");
+    }
+  }, [modalHTML]);
 
   function renderOthersLinks() {
     if (!address) {
