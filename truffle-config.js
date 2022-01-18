@@ -65,7 +65,7 @@ module.exports = {
       gas: 8500000,
       gasprice: 25000000000,
     },
-    //polygon Infura testnet
+    //polygon Infura testnet (Mumbai)
     polygon_infura_testnet: {
       provider: () =>
         new HDWalletProvider({
