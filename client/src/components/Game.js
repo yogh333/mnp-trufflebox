@@ -64,6 +64,7 @@ function Game(props) {
         provider.getSigner(address)
       )
     );
+    console.log({Bank});
 
     setMono(
       new ethers.Contract(
@@ -209,7 +210,6 @@ function Game(props) {
 
   return (
     <div className="Game">
-      <DiceBoard />
       <div className="info-area-1 text-center">
         <h2>User info</h2>
         {provider && (
@@ -271,6 +271,7 @@ function Game(props) {
           mono_symbol={monoSymbol}
         />
       </div>
+      <DiceBoard />
     </div>
   );
 }

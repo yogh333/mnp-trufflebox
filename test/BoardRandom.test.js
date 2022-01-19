@@ -30,7 +30,7 @@ contract("Board", async (accounts) => {
             {from: _contractOwner}
         );
     };
-
+/*
   describe("A. Test of the requestRandomNumber function", () => {
 
         beforeEach("SETUP", async () => {
@@ -547,5 +547,7 @@ contract("Board", async (accounts) => {
         });
 
     });
+
+ */
 
 });

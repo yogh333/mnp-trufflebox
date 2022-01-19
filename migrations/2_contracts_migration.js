@@ -1,8 +1,8 @@
 require("dotenv").config();
 
-ethers = require("ethers");
+const ethers = require("ethers");
 
-Paris = require("../client/src/data/Paris.json");
+const Paris = require("../client/src/data/Paris.json");
 
 const Link = artifacts.require("Link");
 const LinkForChainlinkVRF = artifacts.require("LinkForChainlinkVRF");

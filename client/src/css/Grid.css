@@ -10,6 +10,12 @@
   /*background: #dae9d4;*/
   background-image: url("../images/board.jpg");
   background-size: contain;
+  z-index: 2;
+}
+
+.board > * {
+  position: relative;
+  z-index: 2;
 }
 
 .cell {

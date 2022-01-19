@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import CANNON from "cannon";
 import { DiceManager, DiceD6 } from "./Dice";
-import Stats from "stats.js";
 import {useEffect} from "react";
 import OrbitControls from './OrbitControls'
 
@@ -11,7 +10,6 @@ var container,
     camera,
     renderer,
     controls,
-    stats,
     world,
     dice = [];
 
@@ -20,8 +18,8 @@ function init() {
     // SCENE
     scene = new THREE.Scene();
     // CAMERA
-    var SCREEN_WIDTH = window.innerWidth,
-        SCREEN_HEIGHT = window.innerHeight;
+    var SCREEN_WIDTH = 780,
+        SCREEN_HEIGHT = 706;
     var VIEW_ANGLE = 20,
         ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT,
         NEAR = 1,
@@ -31,7 +29,8 @@ function init() {
     camera.position.set(0, 100, 0);
     // camera.position.z = SCREEN_HEIGHT
     // RENDERER
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setClearColor( 0x000000, 0 );
     renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -42,12 +41,6 @@ function init() {
     // CONTROLS
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enabled = false;
-    // STATS
-    stats = new Stats();
-    stats.domElement.style.position = "absolute";
-    stats.domElement.style.bottom = "0px";
-    stats.domElement.style.zIndex = 100;
-    container.appendChild(stats.domElement);
 
     let ambient = new THREE.AmbientLight("#ffffff", 0.3);
     scene.add(ambient);
@@ -70,7 +63,9 @@ function init() {
 
     // FLOOR
     var floorMaterial = new THREE.MeshPhongMaterial({
-        color: "#00aa00",
+        //color: "#00aa00",
+        opacity: 0,
+        depthWrite: false,
         side: THREE.DoubleSide,
         transparent: true
     });
@@ -126,8 +121,7 @@ function init() {
     requestAnimationFrame(animate);
 }
 
-function randomDiceThrow() {
-    var  diceValues = [];
+export function randomDiceThrow(value0,value1) {
 
     for (var i = 0; i < dice.length; i++) {
         let yRand = Math.random() * 20;
@@ -153,8 +147,8 @@ function randomDiceThrow() {
     }
 
     DiceManager.prepareValues([
-        { dice: dice[0], value: 2 },
-        { dice: dice[1], value: 5 }
+        { dice: dice[0], value: value0 },
+        { dice: dice[1], value: value1 }
     ]);
 }
 
@@ -176,20 +170,13 @@ function updatePhysics() {
 
 function update() {
     //controls.update();
-    stats.update();
 }
 
 function render() {
     renderer.render(scene, camera);
 }
 
-
 export default function DiceBoard(){
-    useEffect(init,[]);
-    return <>
-    <h1>Dice Board</h1>
-
-    <button onClick={randomDiceThrow}>Throw dice</button>
-        </>
-
+    useEffect(init, [])
+    return <></>
 }

@@ -9,6 +9,7 @@ import VRFCoordinatorJson from "../contracts/VRFCoordinatorContract.json";
 
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
+import {randomDiceThrow} from "./DiceBoard/DiceBoard";
 
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -249,10 +250,16 @@ export default function User(props) {
    * description: simulates the roll of dice to move the game forward and to move on the pawn
    * random is retrieved with RandomReady(requestId) event
    */
-  function rollDices() {
+  async function rollDices() {
     if (!Bank || !props.edition_id) return;
 
     Bank.rollDices(props.edition_id);
+
+    //TODO: Manage the connection with th blockchain
+    //const receipt = await Bank.rollDices(props.edition_id)
+    //console.log(receipt);
+    const [value1, value2] = [1,3]
+    randomDiceThrow(value1, value2)
   }
 
   /**
