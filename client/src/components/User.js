@@ -295,9 +295,13 @@ export default function User(props) {
    * @param previousPosition
    */
   function forgetPreviousPosition(previousPosition) {
-    document
+    /*document
       .getElementById(`cell-${previousPosition}`)
-      .classList.remove("active");
+      .classList.remove("active");*/
+    const pawn = document.getElementById("pawn");
+    if (pawn.parentNode) {
+      pawn.parentNode.removeChild(pawn);
+    }
   }
 
   /**
@@ -307,7 +311,26 @@ export default function User(props) {
    */
   function highlightCurrentCell(total) {
     const activeCell = document.getElementById(`cell-${total}`);
-    activeCell.classList.add("active");
+    const image = document.createElement("img");
+    image.src = "images/pawns/pawn.png";
+    image.class = "pawn";
+    image.id = "pawn";
+    image.style.width = "50px";
+    image.style.position = "relative";
+
+    switch (activeCell.dataset.position) {
+      case "bottom":
+        image.style.top = "20px";
+      case "left":
+        image.style.top = "5px";
+      case "top":
+        image.style.top = "15px";
+      case "right":
+        image.style.top = "7px";
+    }
+
+    activeCell.appendChild(image);
+    //activeCell.classList.add("active");
   }
 
   return (
