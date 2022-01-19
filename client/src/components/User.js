@@ -131,6 +131,7 @@ export default function User(props) {
   }, [Bank, props.edition_id]);
 
   const getRandomRarity = (randomness) => {
+    // Logical is the same in Bank contract
     const number = getRandomInteger("rarity", 1, 111, randomness);
     // return rarity
     if (number <= 100) return 2;
@@ -140,6 +141,7 @@ export default function User(props) {
 
   const getRandomInteger = (type, min, max, randomNumber) => {
     // Simulate another random number from Chainlink VRF random number
+    // Logical is the same in Bank contract
     const modulo = max - min + 1;
     const value = ethers.utils.defaultAbiCoder.encode(
       ["uint256", "string"],
@@ -216,18 +218,18 @@ export default function User(props) {
   }, [requestID]);
 
   useEffect(() => {
-    if (!rollDice) {
+    if (!rollDice || !currentPosition) {
       return;
     }
 
     setAreDicesDisplayed(true);
     setIsShakerDisplayed(false); // todo lancer l'animation 3D
     handleNewPosition(currentPosition, rollDice);
-    setIsRoundCompleted(false); // or parentUpdateValues()
+    setIsRoundCompleted(false); // or parentUpdateValues();
     setIsDicesRolling(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rollDice]);
+  }, [rollDice, currentPosition]);
 
   /**
    * Calculate dices values [1;6]
@@ -345,12 +347,9 @@ export default function User(props) {
         type="submit"
         variant="danger"
         size="sm"
-        className="btn btn-primary btn-lg btn-block"
+        className="btn btn-primary btn-lg btn-block m-2"
         onClick={rollDices}
-        // todo
-        // For not purchasable lands (i.e. price is nul) nothing is implemented.
-        // The player can ONLY roll de dices even if round is not completed.
-        disabled={(isLandPurchasable && !isRoundCompleted) || isDicesRolling}
+        disabled={!isRoundCompleted || isDicesRolling}
       >
         Roll the dices!
       </Button>

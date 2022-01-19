@@ -107,11 +107,8 @@ contract BankContract is AccessControl, IERC721Receiver {
 	}
 
 	function rollDices(uint16 _edition) external {
-		// todo
-		// For not purchasable lands (i.e. price is nul) nothing is implemented.
-		// The player can ONLY roll de dices even if round is not completed.
 		BoardContract.PawnInfo memory p = locatePlayer(_edition);
-		require(propPrices[_edition][p.position][0] == 0 || p.isRoundCompleted, "Uncompleted round");
+		require(p.isRoundCompleted, "Uncompleted round");
 
 		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 		uint256 pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0);
@@ -136,13 +133,15 @@ contract BankContract is AccessControl, IERC721Receiver {
 	function buyMono() public payable {
 		uint256 MonoBalance = Mono.balanceOf(address(this));
 		uint256 MonoUsdLastPrice = uint256(Staking.getLastPrice(address(Mono)));
-		//address _address = Staking.poolAddressBySymbol("MATIC");
 		address _address = Staking.NETWORK_TOKEN_VIRTUAL_ADDRESS();
 		uint256 TokenNetworkUsdLastPrice = uint256(Staking.getLastPrice(_address));
 		uint256 amountToBuy = (msg.value * TokenNetworkUsdLastPrice) / MonoUsdLastPrice;
+
 		require(amountToBuy > 0, "You need to send some network token");
 		require(amountToBuy <= MonoBalance, "Not enough tokens in the reserve");
+
 		Mono.transfer(msg.sender, amountToBuy);
+
 		emit MonoBought(msg.sender, amountToBuy);
 	}
 
