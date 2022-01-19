@@ -12,6 +12,10 @@ import "./Mono.sol";
 import "./Prop.sol";
 import "./Staking.sol";
 
+/** @title Bank contract
+ * @notice Is the contract handler
+ * @author Jerome Caporossi, Stéphane Chaunard, Alexandre Gautier
+ */
 contract BankContract is AccessControl, IERC721Receiver {
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 	bytes32 public constant BANKER_ROLE = keccak256("BANKER_ROLE");
@@ -29,16 +33,54 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/// @dev price of PROP by rarity by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private propPrices;
 
+	/**
+     * @notice Event emitted when a property is bought
+	 * @param to address
+	 * @param prop_id Prop id*/
 	event PropertyBought(address indexed to, uint256 indexed prop_id);
+	/**
+     * @notice Event emitted when a pawn is bought
+	 * @param to address
+	 * @param pawn_id pawn ID*/
 	event PawnBought(address indexed to, uint256 indexed pawn_id);
+	/**
+     * @notice Event emitted after a withdraw
+	 * @param to address
+	 * @param value amount*/
 	event eWithdraw(address indexed to, uint256 value);
-
+	/**
+     * @notice Event emitted when a player is enrolled in the game
+	 * @param _edition edition ID
+	 * @param player address*/
 	event PlayerEnrolled(uint16 _edition, address indexed player);
+	/**
+     * @notice Event emitted when player throw dices and random number is requested.
+	 * @param player address
+	 * @param _edition edition ID
+	 * @param requestID random request ID*/
 	event RollingDices(address player, uint16 _edition, bytes32 requestID);
-	event DicesRollsPrepaid(address indexed player, uint8 quantity);
+	/**
+     * @notice Event emitted when a player buy MONO
+	 * @param player address
+	 * @param amount amount*/
 	event MonoBought(address indexed player, uint256 amount);
+	/**
+     * @notice Event emitted when a property rent is paid by player
+	 * @param player address
+	 * @param amount amount*/
 	event PropertyRentPaid(address indexed player, uint256 amount);
 
+	/**
+     * @dev Constructor
+	 * @param PawnAddress address
+	 * @param BoardAddress address
+	 * @param PropAddress address
+	 * @param MonoAddress address
+	 * @param LinkAddress address
+	 * @param StakingAddress address
+	 * @dev ADMIN_ROLE, BANKER_ROLE are given to deployer
+	 * @dev #### requirements :<br />
+	 * @dev - all parameters addresses must not be address(0)*/
 	constructor(
 		address PawnAddress,
 		address BoardAddress,
@@ -68,7 +110,10 @@ contract BankContract is AccessControl, IERC721Receiver {
 		_setRoleAdmin(BANKER_ROLE, ADMIN_ROLE);
 	}
 
-	/// @notice buy a pawn (mandatory to play)
+	/**
+     * @notice buy a pawn (mandatory to play)
+	 * @dev #### requirements :<br />
+	 * @dev - MONO transfer*/
 	function buyPawn() external {
 		require(Mono.transferFrom(msg.sender, address(this), 1 ether), "$MONO transfer failed");
 
@@ -77,12 +122,16 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit PawnBought(msg.sender, pawn_id);
 	}
 
-	/// @notice locate pawn on game's board
-	/// @param _edition edition number
-	/// @return p_ Pawn information
+	/** locate pawn on game's board
+	 * @notice #### requirements :<br />
+	 * @notice - edition is valid
+	 * @notice - player has a pawn
+	 * @notice - pawn is registered at this edition
+	 * @param _edition edition number
+	 * @return p_ Board contract pawn information struct*/
 	function locatePlayer(uint16 _edition) public view returns (BoardContract.PawnInfo memory p_) {
 		require(_edition <= Board.getMaxEdition(), "unknown edition");
-		require(Pawn.balanceOf(msg.sender) == 1, "player does not own a pawn");
+		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 
 		uint256 pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0);
 
@@ -91,10 +140,12 @@ contract BankContract is AccessControl, IERC721Receiver {
 		p_ = Board.getPawnInfo(_edition, pawnID);
 	}
 
-	/**
-	 * @notice To enroll a player, this player must have a pawn and register it in Board contract and give allowance to this contract to spent 50 $MONO
-	 * @param _edition board edition
-	 */
+	/** To enroll a player to a board, required to play.
+	 * @notice #### requirements :<br />
+	 * @notice - contract has allowance to spend enroll fee
+	 * @notice - player has a pawn
+	 * @notice - pawn is registered at this edition
+	 * @param _edition board edition*/
 	function enrollPlayer(uint16 _edition) public {
 		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
 		require(Mono.allowance(msg.sender, address(this)) >= enroll_fee, "player has to approve Bank for 50 $MONO");
@@ -106,6 +157,13 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit PlayerEnrolled(_edition, msg.sender);
 	}
 
+	/** To throw the dices and request a random number.
+	 * @notice #### requirements :<br />
+	 * @notice - round is completed
+	 * @notice - player has a pawn
+	 * @notice - pawn is registered at this edition
+	 * @notice - Board contract has enough LINK to pay ChainLink fee to request VRF
+	 * @param _edition board edition*/
 	function rollDices(uint16 _edition) external {
 		BoardContract.PawnInfo memory p = locatePlayer(_edition);
 		require(p.isRoundCompleted, "Uncompleted round");
@@ -127,9 +185,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit RollingDices(msg.sender, _edition, rollDicesID);
 	}
 
-	/**
-	 * @notice To buy Mono from Token network
-	 */
+	/** To buy Mono with the Token network.*/
 	function buyMono() public payable {
 		uint256 MonoBalance = Mono.balanceOf(address(this));
 		uint256 MonoUsdLastPrice = uint256(Staking.getLastPrice(address(Mono)));
@@ -145,15 +201,12 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit MonoBought(msg.sender, amountToBuy);
 	}
 
-	/**
-	 * @notice buy PROP
-	 * @notice requirements :
+	/** buy PROP
+	 * @notice #### requirements :<br />
 	 * @notice - Round must be uncompleted
 	 * @notice - MONO transfer ok
-	 * @param _edition board edition
-	 * @dev requirements :
 	 * @dev - PROP is valid
-	 */
+	 * @param _edition board edition*/
 	function buyProp(uint16 _edition) public {
 		BoardContract.PawnInfo memory p = locatePlayer(_edition);
 		require(!p.isRoundCompleted, "Round completed");
@@ -172,15 +225,12 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit PropertyBought(msg.sender, prop_id);
 	}
 
-	/**
-	 * @notice pay property rent
-	 * @notice requirements :
+	/** pay property rent
+	 * @notice #### requirements :<br />
 	 * @notice - Round must be uncompleted
 	 * @notice - MONO transfer ok
-	 * @param _edition board edition
-	 * @dev requirements :
 	 * @dev - PROP is valid
-	 */
+	 * @param _edition board edition*/
 	function payRent(uint16 _edition) public {
 		BoardContract.PawnInfo memory p = locatePlayer(_edition);
 		require(!p.isRoundCompleted, "Round completed");
@@ -200,10 +250,19 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit PropertyRentPaid(msg.sender, amount);
 	}
 
+	/** @dev Retrieve property rent
+	 * @param _edition edition ID
+	 * @param _land land ID
+	 * @param _rarity rarity
+	 * @return amount*/
 	function retrievePropertyRent(uint16 _edition, uint8 _land, uint8 _rarity) internal view returns(uint256){
 		return propPrices[_edition][_land][_rarity] / 100 > 10**18 ? propPrices[_edition][_land][_rarity] : 10**18;
 	}
 
+	/** @dev Retrieve property rarity from randomness
+	 * @dev use calculateRandomInteger() with type = 'rarity'
+	 * @param randomness ChainLink VRF random number
+	 * @return number*/
 	function retrievePropertyRarity(uint256 randomness) internal pure returns(uint8){
 		uint256 number = calculateRandomInteger("rarity", 1, 111, randomness);
 
@@ -212,6 +271,12 @@ contract BankContract is AccessControl, IERC721Receiver {
 		return 0;
 	}
 
+	/** @dev Calculate a new random integer in [min, max] from random ChainLink VRF.
+	 * @param _type used to calculate new number
+	 * @param min minimum integer
+	 * @param max maximum integer
+	 * @param randomness ChainLink VRF random number
+	 * @return number*/
 	function calculateRandomInteger(string memory _type, uint256 min, uint256 max, uint256 randomness) internal pure returns(uint256) {
 		uint256 modulo = max - min + 1;
 		uint256 number = uint256(keccak256(abi.encode(randomness, _type)));
@@ -219,6 +284,13 @@ contract BankContract is AccessControl, IERC721Receiver {
 		return number % modulo + min;
 	}
 
+	/** get a property price
+	 * @notice #### requirements :<br />
+	 * @notice - property mus be valid
+	 * @param _edition edition ID
+	 * @param _land land ID
+	 * @param _rarity rarity
+	 * @return price*/
 	function getPriceOfProp(
 		uint16 _edition,
 		uint8 _land,
@@ -228,6 +300,14 @@ contract BankContract is AccessControl, IERC721Receiver {
 		price = propPrices[_edition][_land][_rarity];
 	}
 
+	/** set a property price
+	 * @notice #### requirements :<br />
+	 * @notice - must have BANKER role
+	 * @notice - property mus be valid
+	 * @param _edition edition ID
+	 * @param _land land ID
+	 * @param _rarity rarity
+	 * @param _price amount*/
 	function setPriceOfProp(
 		uint16 _edition,
 		uint8 _land,
@@ -238,6 +318,12 @@ contract BankContract is AccessControl, IERC721Receiver {
 		propPrices[_edition][_land][_rarity] = _price;
 	}
 
+	/** withdraw
+	 * @notice #### requirements :<br />
+	 * @notice - must have BANKER role
+	 * @notice - MONO transfer
+	 * @param _to address
+	 * @param _value amount*/
 	function withdraw(address _to, uint256 _value) external onlyRole(BANKER_ROLE) {
 		require(Mono.transfer(_to, _value), "withdraw failure");
 
@@ -258,6 +344,12 @@ contract BankContract is AccessControl, IERC721Receiver {
 		return this.onERC721Received.selector;
 	}
 
+	/** set properties prices, useful to add an edition from admin
+	 * @param _editionId edition ID
+	 * @param _maxLands max lands
+	 * @param _maxLandRarities max land rarity
+	 * @param _rarityMultiplier rarity multiplier
+	 * @param _commonLandPrices common land rarity price*/
 	function setPrices(
 		uint16 _editionId,
 		uint8 _maxLands,
@@ -279,14 +371,16 @@ contract BankContract is AccessControl, IERC721Receiver {
 		}
 	}
 
-	/**
-	 * @notice Transfer property ERC721 and royalties to receiver. Useful for our Marketplace
-	 * @dev
+	/** Transfer property ERC721 and royalties to receiver. Useful for our Marketplace<br />
+	 * @notice #### requirements :<br />
+	 * @notice - only BANKER role
+	 * @notice - buyer MONO balance must be greater than sell price
+	 * @dev - This contract must be allowed contract for transfer
+	 * @dev - MONO transfer sell price
 	 * @param _from the seller
 	 * @param _to the buyer
 	 * @param _tokenId the Property token id
-	 * @param _salePrice the sale price
-	 */
+	 * @param _salePrice the sale price */
 	function propertyTransfer(
 		address _from,
 		address _to,

@@ -6,7 +6,11 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol';
 
 
-// @dev For local development only
+/**
+ * @title MONO/USD price feed
+ * @notice Is a fake price feed base on ChainLink price feed contracts. see AggregatorV3Interface
+ * @author Jerome Caporossi, Stéphane Chaunard, Alexandre Gautier
+ */
 contract MonoUsdPriceFeed is AggregatorV3Interface, Ownable {
     
     int256 value;
@@ -16,10 +20,12 @@ contract MonoUsdPriceFeed is AggregatorV3Interface, Ownable {
     uint80 answeredInRound;
     uint8 private _decimals = 8;
 
-    // @param _value: précision à 6 chiffres
+    /** @dev Constructor
+	 * @param _value 6 digits precision*/
     constructor(int256 _value) {
         setRoundData(_value);
     }
+
 
     function decimals() override external view returns (uint8) {
         return _decimals;
