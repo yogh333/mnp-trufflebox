@@ -136,6 +136,7 @@ function Game(props) {
 
   const updatePawnInfo = async () => {
     Bank.locatePlayer(editionID).then((_pawnInfo) => {
+      console.log(_pawnInfo);
       setIsRoundCompleted(_pawnInfo.isRoundCompleted);
     });
   };

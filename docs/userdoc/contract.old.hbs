@@ -1,0 +1,12 @@
+## `{{name}}`
+
+{{{natspec.userdoc}}}
+
+{{#each ownFunctions}}
+{{#unless (eq visibility "internal")}}
+### `{{name}}({{args}}){{#if outputs}} → {{outputs}}{{/if}}` ({{visibility}})
+
+{{{natspec.userdoc}}}
+
+{{/unless}}
+{{/each}}

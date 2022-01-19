@@ -92,3 +92,9 @@ https://faucets.chain.link/kovan
 
 MATIC faucet
 https://faucet.polygon.technology/
+
+## developer documents
+`docs/devdocs/`
+
+## user documents
+`docs/userdocs/`

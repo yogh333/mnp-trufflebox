@@ -8,17 +8,19 @@ import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol';
 
 /**
+ * @title Staking contract
  * @notice This contract is made for staking ERC20 tokens to earn an ERC20 token.
+ * @author Jerome Caporossi, Stéphane Chaunard, Alexandre Gautier
  */
 contract StakingContract is Ownable {
 
-    // User informations for each pool.
+    // User information for each pool.
     struct UserInfo {
         uint256 amount;         // Amount of staked token provided
         uint256 depositDate;    // Deposit date for interest calculation
     }
 
-    // Pool informations.
+    // Pool information
     struct PoolInfo {
         ERC20 token; // Address of the staked token
         bool isTokenNetwork; // ex. MATIC for Polygon networks
@@ -42,8 +44,22 @@ contract StakingContract is Ownable {
     mapping(string => address) public poolAddressBySymbol;
     uint256 public networkTokenPoolBalance;
 
+    /**
+     * @notice Event emitted when a pool is added
+	 * @param tokenPoolAddress address
+	 * @param priceFeed address*/
     event PoolAdded(address tokenPoolAddress, address priceFeed);
+    /**
+     * @notice Event emitted when token is staked
+	 * @param user address
+	 * @param tokenPoolAddress address
+	 * @param amount amount*/
     event Staked(address user, address tokenPoolAddress, uint256 amount);
+    /**
+     * @notice Event emitted when token is unstaked
+	 * @param user address
+	 * @param tokenPoolAddress address
+	 * @param amount amount*/
     event Unstaked(address user, address tokenPoolAddress, uint256 amount);
 
     /**
@@ -117,6 +133,8 @@ contract StakingContract is Ownable {
 
     /**
      * @notice method to add a pool. Can only performed by contract's owner
+     * @notice #### requirements :<br />
+     * @notice - pool not exists yet
      * @param _token: pool token address
      * @param _priceFeed: pool token feed
      * @param _yield: Percentage token yield.
@@ -131,6 +149,10 @@ contract StakingContract is Ownable {
 
     /**
      * @notice Stake your token in this pool
+     * @notice #### requirements :<br />
+     * @notice - amount must be > 0
+	 * @notice - user must have nothing staked
+	 * @notice - user must have sufficient balance
      * @param _token: pool token address
      * @param _amount: staked amount
      * @dev Approval is needed before calling this method.
@@ -164,6 +186,8 @@ contract StakingContract is Ownable {
      * @param _pool: pool informations
      * @param _user: user informations
      * @dev calculate rewards by staked time in seconds
+     * @dev #### requirements :<br />
+	 * @dev - block timestamp >= deposit date
      */
     function _calculateReward(
         address _token,
@@ -181,6 +205,9 @@ contract StakingContract is Ownable {
 
     /**
      * @notice Unstake all in this pool
+     * @notice #### requirements :<br />
+	 * @notice - user amount staked is positive
+	 * @notice - transfer ok
      * @param _token: pool token address
      */
     function unstake(address _token) external {

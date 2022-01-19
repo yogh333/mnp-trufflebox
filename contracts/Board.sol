@@ -5,9 +5,11 @@ pragma solidity 0.8.10;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBase.sol";
 
-/// @title Board
-/// @author Jerome Caporossi, Stéphane Chaunard, Alexandre Gautier
-/// @notice Implements game logic and board's features
+/**
+ * @title Board contract
+ * @notice Implements game logic and board's features
+ * @author Jerome Caporossi, Stéphane Chaunard, Alexandre Gautier
+ */
 contract BoardContract is AccessControl, VRFConsumerBase {
 	/// @dev structure used to store pawn's attribute
 	struct PawnInfo {
@@ -48,18 +50,25 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	/// @dev store play information by requestID. Use for randomness
 	mapping(bytes32 => PlayInfo) private playInfoByRequestId;
 
-	/// @notice event emitted when a new board is created
-	/// @param new_edition_nb new board edition number
+	/** Event emitted when a new board is created
+	 * @param new_edition_nb new board edition number*/
 	event BoardCreated(uint16 indexed new_edition_nb);
-
-	/// @notice event emitted when a new pawn is registered on a board
-	/// @param _edition board edition number
-	/// @param _pawnID pawn's ID
+	/** Event emitted when a new pawn is registered on a board
+	 * @param _edition board edition number
+	 * @param _pawnID pawn's ID*/
 	event ePawn(uint16 indexed _edition, uint256 indexed _pawnID);
-
+	/**
+     * @notice Event emitted when a random number is received by contract
+	 * @param requestId request id
+	 * @dev see fulfillRandomness()*/
 	event RandomReady(bytes32 requestId);
 
-	/// @notice constructor
+	/**
+     * @dev Constructor
+	 * @param _VRFCoordinator ChainLink VRFCoordinator contract address
+	 * @param _LinkToken LINK token address
+	 * @param _keyHash ChainLink keyHash parameter for VRF
+	 * @param _Chainlinkfee ChainLink fee for VRF*/
 	constructor(
 		address _VRFCoordinator,
 		address _LinkToken,
@@ -94,21 +103,18 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		}
 	}
 
-	/**
-	 * @notice Request a random number
-	 * @return requestId the id of the request for the oracle
-	 */
+	/** @dev Request a random number
+	 * @return requestId the id of the request for the oracle*/
 	function requestRandomNumber() internal returns (bytes32 requestId) {
 		require(LINK.balanceOf(address(this)) >= fee, "Not enough LINK - fill contract with faucet");
 		requestId = requestRandomness(keyHash, fee);
 	}
 
 	/**
-	 * @notice Callback function used by VRF Coordinator
 	 * @param requestId the id of the request for the oracle
 	 * @param randomness randomness must be requested from an oracle, which generates a number and a cryptographic proof
-	 * @dev /!\ Maximum Gas for Callback : If your fulfillRandomness function uses more than 200k gas, the transaction will fail.
-	 */
+	 * @dev Callback function used by ChainLink VRF Coordinator
+	 * @dev /!\ Maximum Gas for Callback : If your fulfillRandomness function uses more than 200k gas, the transaction will fail.*/
 	function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
 		PlayInfo storage p = playInfoByRequestId[requestId];
 
@@ -118,66 +124,58 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 
 		boards[p.edition].pawns[p.pawnID].isPropertyBought = false;
 		boards[p.edition].pawns[p.pawnID].isRentPaid = false;
-		boards[p.edition].pawns[p.pawnID].isRoundCompleted = false;
 
-		//todo gameStrategist(boards[p.edition].pawns[p.pawnID].position)
+		gameStrategist(p.edition, p.pawnID, boards[p.edition].pawns[p.pawnID].position);
 
 		emit RandomReady(requestId);
 	}
 
-	/**
-	 * @dev Game strategist
-	 */
+	/** @dev Game strategist
+	 * @param _edition board edition
+	 * @param _pawnID pawn ID*/
 	function gameStrategist(uint16 _edition, uint256 _pawnID, uint8 _position) internal {
 		if (boards[_edition].isPurchasable[_position]) {
 			boards[_edition].pawns[_pawnID].isRoundCompleted = false;
+
+			return;
 		}
 
+		// Actually, not purchasable lands don't have strategies, except to throw the dices.
 		boards[_edition].pawns[_pawnID].isRoundCompleted = true;
 	}
 
-	/**
-	 * @notice check if a land can be bought (PROP tokens available)
+	/** check if a land can be bought (PROP tokens available)
 	 * @param edition board edition
 	 * @param land cell number
-	 * @return true or false
-	 */
+	 * @return true or false*/
 	function isPurchasable(uint16 edition, uint8 land) external view returns (bool) {
 		return boards[edition].isPurchasable[land];
 	}
 
-	/**
-	 * @notice get the number of board editions
-	 * @return number of board editions
-	 */
+	/** get the number of board editions
+	 * @return number of board editions*/
 	function getMaxEdition() external view returns (uint16) {
 		return editionMax;
 	}
 
-	/**
-	 * @notice get the number of lands for a board edition
+	/** get the number of lands for a board edition
 	 * @param edition board edition
-	 * @return number of lands
-	 */
+	 * @return number of lands*/
 	function getNbLands(uint16 edition) external view returns (uint8) {
 		return boards[edition].nbOfLands;
 	}
 
-	/**
-	 * @notice get the number of rarity level for a board edition
+	/** get the number of rarity level for a board edition
 	 * @param edition board edition
-	 * @return number of rarity levels
-	 */
+	 * @return number of rarity levels*/
 	function getRarityLevel(uint16 edition) external view returns (uint8) {
 		return boards[edition].rarityLevel;
 	}
 
-	/**
-	 * @notice create a new board
+	/** create a new board
 	 * @param _nbOfLands number of lands
 	 * @param _rarityLevel number of rarity levels
-	 * @param _maxPawns max number of pawns allowed
-	 */
+	 * @param _maxPawns max number of pawns allowed*/
 	function newBoard(
 		uint8 _nbOfLands,
 		uint8 _rarityLevel,
@@ -198,11 +196,9 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		emit BoardCreated(editionMax);
 	}
 
-	/**
-	 * @notice register a pawn on a board
+	/** register a pawn on a board
 	 * @param _edition board edition
-	 * @param _pawnID pawn ID
-	 */
+	 * @param _pawnID pawn ID*/
 	function register(uint16 _edition, uint256 _pawnID) external onlyRole(MANAGER_ROLE) returns (bool isOnBoarded) {
 		require(_edition <= editionMax, "Unknown edition");
 		require(boards[_edition].pawns[_pawnID].isOnBoard == false, "pawn already registered");
@@ -217,32 +213,20 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		return true;
 	}
 
-	/**
-	 * @notice check if a pawn is registered
+	/** check if a pawn is registered
 	 * @param _edition board edition
 	 * @param _pawnID pawn ID
-	 * @return true or false
-	 */
+	 * @return true or false*/
 	function isRegistered(uint16 _edition, uint256 _pawnID) public view returns (bool) {
 		return boards[_edition].pawns[_pawnID].isOnBoard;
 	}
 
-	/**
-	 * @notice play with a pawn
+	/** play with a pawn
 	 * @param _edition board edition
-	 * @param _pawnID pawn ID
-	 */
+	 * @param _pawnID pawn ID*/
 	function play(uint16 _edition, uint256 _pawnID) external onlyRole(MANAGER_ROLE) returns (bytes32 requestId) {
 		require(boards[_edition].pawns[_pawnID].isOnBoard, "Unregistered pawn");
-
-		// todo
-		// For not purchasable lands (i.e. price is nul) nothing is implemented.
-		// The player can ONLY roll de dices even if round is not completed.
-		require(
-			!boards[_edition].isPurchasable[boards[_edition].pawns[_pawnID].position] ||
-				boards[_edition].pawns[_pawnID].isRoundCompleted,
-			"Round not completed"
-		);
+		require(boards[_edition].pawns[_pawnID].isRoundCompleted, "Round not completed");
 
 		requestId = requestRandomNumber();
 
@@ -252,23 +236,19 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		p.pawnID = _pawnID;
 	}
 
-	/**
-	 * @notice get Pawn information on a board
+	/** get Pawn information on a board
 	 * @param _edition board edition
 	 * @param _pawnID pawn ID
-	 * @return p Pawn information
-	 */
+	 * @return p Pawn information*/
 	function getPawnInfo(uint16 _edition, uint256 _pawnID) external view returns (PawnInfo memory p) {
 		require(isRegistered(_edition, _pawnID), "pawn has not been regsitered");
 		return boards[_edition].pawns[_pawnID];
 	}
 
-	/**
-	 * @notice set Pawn information on a board
+	/** set Pawn information on a board
 	 * @param _edition board edition
 	 * @param _pawnID pawn ID
-	 * @param _pawnInfo pawn information
-	 */
+	 * @param _pawnInfo pawn information*/
 	function setPawnInfo(
 		uint16 _edition,
 		uint256 _pawnID,
