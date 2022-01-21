@@ -33,45 +33,41 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/// @dev price of PROP by rarity by land by edition
 	mapping(uint16 => mapping(uint8 => mapping(uint8 => uint256))) private propPrices;
 
-	/**
-     * @notice Event emitted when a property is bought
+	/** Event emitted when a property is bought
 	 * @param to address
-	 * @param prop_id Prop id*/
+	 * @param prop_id Prop id */
 	event PropertyBought(address indexed to, uint256 indexed prop_id);
-	/**
-     * @notice Event emitted when a pawn is bought
+	/** Event emitted when a pawn is bought
 	 * @param to address
-	 * @param pawn_id pawn ID*/
+	 * @param pawn_id pawn ID */
 	event PawnBought(address indexed to, uint256 indexed pawn_id);
-	/**
-     * @notice Event emitted after a withdraw
+	/** Event emitted after a withdraw
 	 * @param to address
-	 * @param value amount*/
+	 * @param value amount */
 	event eWithdraw(address indexed to, uint256 value);
-	/**
-     * @notice Event emitted when a player is enrolled in the game
+	/** Event emitted when a player is enrolled in the game
 	 * @param _edition edition ID
-	 * @param player address*/
+	 * @param player address */
 	event PlayerEnrolled(uint16 _edition, address indexed player);
-	/**
-     * @notice Event emitted when player throw dices and random number is requested.
+	/** Event emitted when player throw dices and random number is requested.
 	 * @param player address
 	 * @param _edition edition ID
-	 * @param requestID random request ID*/
+	 * @param requestID random request ID */
 	event RollingDices(address player, uint16 _edition, bytes32 requestID);
-	/**
-     * @notice Event emitted when a player buy MONO
+	/** Event emitted when player prepaid MONO amount in 'inGame'
 	 * @param player address
-	 * @param amount amount*/
+	 * @param quantity MONO amount */
+	event DicesRollsPrepaid(address indexed player, uint8 quantity);
+	/** Event emitted when a player buy MONO
+	 * @param player address
+	 * @param amount amount */
 	event MonoBought(address indexed player, uint256 amount);
-	/**
-     * @notice Event emitted when a property rent is paid by player
+	/** Event emitted when a property rent is paid by player
 	 * @param player address
-	 * @param amount amount*/
+	 * @param amount amount */
 	event PropertyRentPaid(address indexed player, uint256 amount);
 
-	/**
-     * @dev Constructor
+	/** @dev Constructor
 	 * @param PawnAddress address
 	 * @param BoardAddress address
 	 * @param PropAddress address
@@ -110,8 +106,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		_setRoleAdmin(BANKER_ROLE, ADMIN_ROLE);
 	}
 
-	/**
-     * @notice buy a pawn (mandatory to play)
+	/** Buy a pawn (mandatory to play)
 	 * @dev #### requirements :<br />
 	 * @dev - MONO transfer*/
 	function buyPawn() external {
@@ -122,13 +117,13 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit PawnBought(msg.sender, pawn_id);
 	}
 
-	/** locate pawn on game's board
+	/** Locate pawn on game's board
 	 * @notice #### requirements :<br />
 	 * @notice - edition is valid
 	 * @notice - player has a pawn
 	 * @notice - pawn is registered at this edition
 	 * @param _edition edition number
-	 * @return p_ Board contract pawn information struct*/
+	 * @return p_ Board contract pawn information struct */
 	function locatePlayer(uint16 _edition) public view returns (BoardContract.PawnInfo memory p_) {
 		require(_edition <= Board.getMaxEdition(), "unknown edition");
 		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
@@ -148,7 +143,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	 * @param _edition board edition*/
 	function enrollPlayer(uint16 _edition) public {
 		require(Pawn.balanceOf(msg.sender) != 0, "player does not own a pawn");
-		require(Mono.allowance(msg.sender, address(this)) >= enroll_fee, "player has to approve Bank for 50 $MONO");
+		require(Mono.allowance(msg.sender, address(this)) >= enroll_fee, "player hasn't approve Bank to spend $MONO");
 
 		uint256 pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0);
 
