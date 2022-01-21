@@ -80,7 +80,9 @@ export default function Land(props) {
       for (let index = 0; index < propBalance; index++) {
         const idx = await Prop.tokenOfOwnerByIndex(address, index);
         properties[index] = await Prop.get(idx); // can be used
-        _propertiesCountByRarity[properties[index].rarity]++;
+        if (properties[index].land === landInfo.id) {
+          _propertiesCountByRarity[properties[index].rarity]++;
+        }
       }
 
       setPropertiesCountByRarity(_propertiesCountByRarity);
@@ -95,7 +97,7 @@ export default function Land(props) {
     let _propertyInformationByRarity = [];
     for (let rarity = 0; rarity < maxRarity; rarity++) {
       _propertyInformationByRarity[rarity] = {
-        owned: nbOfPropsByRarity[rarity],
+        owned: propertiesCountByRarity[rarity],
         left: rarityMultiplier ** rarity - nbOfPropsByRarity[rarity],
       };
     }
