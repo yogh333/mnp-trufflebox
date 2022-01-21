@@ -15,6 +15,7 @@ import BankJson from "../contracts/BankContract.json";
 import BoardJson from "../contracts/BoardContract.json";
 import MonoJson from "../contracts/MonoContract.json";
 import PawnJson from "../contracts/PawnContract.json";
+import PropJson from "../contracts/PropContract.json";
 
 function Game(props) {
   const spinner = props.spinner;
@@ -25,10 +26,12 @@ function Game(props) {
   const provider = props.provider;
   const networkId = props.network_id;
   const address = props.address;
-
+  // Contracts
+  const Staking = props.staking_contract;
+  // vars
   const monoSymbol = props.mono_symbol;
   const doModalAction = props.do_modal_action;
-
+  const startBlockNumber = props.start_block_number;
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
@@ -36,6 +39,7 @@ function Game(props) {
 
   const [Bank, setBank] = useState(null);
   const [Mono, setMono] = useState(null);
+  const [Prop, setProp] = useState(null);
   const [Board, setBoard] = useState(null);
   const [Pawn, setPawn] = useState(null);
   const [landInfo, setLandInfo] = useState({
@@ -48,9 +52,11 @@ function Game(props) {
   const [isRetrievingInfo, setIsRetrievingInfo] = useState(false);
   const [canPlay, setCanPlay] = useState(false);
   const [pawnID, setPawnID] = useState(false);
-  const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [toggleUpdateValues, setToggleUpdateValues] = useState(null);
   const [isRoundCompleted, setIsRoundCompleted] = useState(true);
+  const [pawnInfo, setPawnInfo] = useState(true);
+  const [pawnPosition, setPawnPosition] = useState(0);
+  const [globalVars, setGlobalVars] = useState({});
 
   useEffect(() => {
     if (!(provider && address && networkId)) {
@@ -73,6 +79,14 @@ function Game(props) {
       )
     );
 
+    setProp(
+      new ethers.Contract(
+        PropJson.networks[networkId].address,
+        PropJson.abi,
+        provider
+      )
+    );
+
     setBoard(
       new ethers.Contract(
         BoardJson.networks[networkId].address,
@@ -88,10 +102,6 @@ function Game(props) {
         provider.getSigner(address)
       )
     );
-
-    provider
-      .getBlockNumber()
-      .then((_blockNumber) => setStartBlockNumber(_blockNumber));
   }, [provider, address, networkId]);
 
   useEffect(() => {
@@ -135,9 +145,16 @@ function Game(props) {
   };
 
   const updatePawnInfo = async () => {
+    const _pawnBalance = await Pawn.balanceOf(address);
+
+    if (_pawnBalance.toNumber() === 0) {
+      return;
+    }
+
     Bank.locatePlayer(editionID).then((_pawnInfo) => {
-      console.log(_pawnInfo);
       setIsRoundCompleted(_pawnInfo.isRoundCompleted);
+      setPawnInfo(_pawnInfo);
+      setPawnPosition(_pawnInfo.position);
     });
   };
 
@@ -202,6 +219,8 @@ function Game(props) {
     setIsRetrievingInfo(false);
   }
 
+  console.log("Game");
+
   if (!isReadyToRender) {
     return <>{spinner}</>;
   }
@@ -212,6 +231,7 @@ function Game(props) {
         provider={provider}
         address={address}
         network_id={networkId}
+        staking_contract={Staking}
         bank_contract={Bank}
         mono_contract={Mono}
         board_contract={Board}
@@ -219,6 +239,7 @@ function Game(props) {
         pawn_id={pawnID}
         edition_id={editionID}
         parent_update_values_function={updateValues}
+        start_block_number={startBlockNumber}
       />
     );
   }
@@ -233,6 +254,9 @@ function Game(props) {
             address={address}
             network_id={networkId}
             edition_id={editionID}
+            mono_contract={Mono}
+            board_contract={Board}
+            prop_contract={Prop}
             max_lands={board.maxLands}
             land_info={landInfo}
             pawn_id={pawnID}
@@ -243,6 +267,11 @@ function Game(props) {
             mono_symbol={monoSymbol}
             is_round_completed={isRoundCompleted}
             set_is_round_completed={setIsRoundCompleted}
+            pawn_info={pawnInfo}
+            pawn_position={pawnPosition}
+            set_global_vars={setGlobalVars}
+            global_vars={globalVars}
+            start_block_number={startBlockNumber}
           />
         )}
       </div>
@@ -273,9 +302,10 @@ function Game(props) {
             address={address}
             network_id={networkId}
             provider={provider}
-            land_info={landInfo}
             bank_contract={Bank}
+            prop_contract={Prop}
             edition_id={editionID}
+            land_info={landInfo}
             max_rarity={board.maxLandRarities}
             rarity_multiplier={board.rarityMultiplier}
             rarity_names={board.rarityNames}

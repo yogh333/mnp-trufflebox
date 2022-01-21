@@ -17,63 +17,34 @@ export default function User(props) {
   const provider = props.provider;
   const address = props.address;
   const networkId = props.network_id;
-  const maxCells = props.max_lands;
-  const toggleUpdateValues = props.toggle_update_user_values;
+  // Contracts
   const Bank = props.bank_contract;
+  const Mono = props.mono_contract;
+  const Board = props.board_contract;
+  const Prop = props.prop_contract;
+  // vars
   const monoSymbol = props.mono_symbol;
   const isRoundCompleted = props.is_round_completed;
-  const landInfo = props.land_info;
-  const isLandPurchasable = landInfo.isPurchasable;
-
+  const pawnInfo = props.pawn_info;
+  const pawnPosition = pawnInfo.position;
+  const globalVars = props.global_vars;
+  const startBlockNumber = props.start_block_number;
+  const toggleUpdateValues = props.toggle_update_user_values;
   // functions
   const retrieveLandInfo = props.retrieve_land_info;
-  const setIsRoundCompleted = props.set_is_round_completed;
   const parentUpdateValues = props.parent_update_values_function;
+  const setGlobalVars = props.set_global_vars;
 
-  const [Mono, setMono] = useState(null);
-  const [Prop, setProp] = useState(null);
-  const [Board, setBoard] = useState(null);
   const [VRFCoordinator, setVRFCoordinator] = useState(null);
   const [balance, setBalance] = useState(spinner);
   const [propertyCount, setPropertyCount] = useState(spinner);
   const [rollDice, setRollDice] = useState(null);
-  const [dicesResults, setDicesResults] = useState(null);
-  const [currentPosition, setCurrentPosition] = useState(0);
-  const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [areDicesDisplayed, setAreDicesDisplayed] = useState(false);
   const [isShakerDisplayed, setIsShakerDisplayed] = useState(false);
   const [isDicesRolling, setIsDicesRolling] = useState(false);
-  const [requestedID, setRequestedID] = useState(null);
-  const [requestID, setRequestID] = useState(null);
 
   useEffect(() => {
-    if (!(provider && address && networkId)) {
-      return;
-    }
-
-    setMono(
-      new ethers.Contract(
-        MonoJson.networks[networkId].address,
-        MonoJson.abi,
-        provider
-      )
-    );
-
-    setProp(
-      new ethers.Contract(
-        PropJson.networks[networkId].address,
-        PropJson.abi,
-        provider
-      )
-    );
-
-    setBoard(
-      new ethers.Contract(
-        BoardJson.networks[networkId].address,
-        BoardJson.abi,
-        provider.getSigner()
-      )
-    );
+    if (!(provider && address && networkId)) return;
 
     // only with Ganache
     if (!DISTANT_NETWORKS_IDS.includes(networkId)) {
@@ -85,10 +56,6 @@ export default function User(props) {
         )
       );
     }
-
-    provider
-      .getBlockNumber()
-      .then((_blockNumber) => setStartBlockNumber(_blockNumber));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address, provider, networkId]);
 
@@ -116,19 +83,18 @@ export default function User(props) {
   }, [toggleUpdateValues]);
 
   useEffect(() => {
-    if (!Bank || !props.edition_id) {
-      return;
-    }
+    if (!pawnPosition || !pawnInfo || !pawnInfo.random) return;
 
-    Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
-      setCurrentPosition(_pawnInfo.position);
+    setRollDice(calculateDicesNumbers(pawnInfo));
 
-      highlightCurrentCell(_pawnInfo.position);
-      const rarity = getRandomRarity(_pawnInfo.random);
-      retrieveLandInfo(_pawnInfo.position, rarity);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [Bank, props.edition_id]);
+    displayPawn(pawnPosition);
+    const rarity = getRandomRarity(pawnInfo.random);
+    retrieveLandInfo(pawnPosition, rarity);
+  }, [pawnPosition]);
+
+  useEffect(() => {
+    setAreDicesDisplayed(!isRoundCompleted);
+  }, [isRoundCompleted]);
 
   const getRandomRarity = (randomness) => {
     // Logical is the same in Bank contract
@@ -153,24 +119,11 @@ export default function User(props) {
   };
 
   useEffect(() => {
-    if (!startBlockNumber || !Board || !Bank) {
-      return;
-    }
+    if (!startBlockNumber || !Board || !Bank || !VRFCoordinator) return;
 
     subscribeContractsEvents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startBlockNumber, Board, Bank]);
-
-  useEffect(() => {
-    if (!rollDice || !currentPosition) {
-      return;
-    }
-
-    setAreDicesDisplayed(true);
-    setIsShakerDisplayed(false); // todo lancer l'animation 3D
-    handleNewPosition(currentPosition, rollDice);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rollDice]);
+  }, [startBlockNumber, Board, Bank, VRFCoordinator]);
 
   const subscribeContractsEvents = () => {
     Bank.on("RollingDices", (_player, _edition, _requestID, event) => {
@@ -180,56 +133,36 @@ export default function User(props) {
       console.log("event", event);
       setIsShakerDisplayed(true);
       setAreDicesDisplayed(false);
-      setRequestedID(_requestID);
+      globalVars.requestedId = _requestID;
+      setGlobalVars(globalVars);
+
+      // begin - only with Ganache
+      if (
+        !networkId ||
+        DISTANT_NETWORKS_IDS.includes(networkId) ||
+        !_requestID ||
+        !VRFCoordinator
+      )
+        return;
+
+      VRFCoordinator.sendRandomness(_requestID).then(() => {
+        console.log("VRFCoordinator response asked");
+      });
+      // end - only with Ganache
     });
     Board.on("RandomReady", (_requestID, event) => {
       if (event.blockNumber <= startBlockNumber) return;
+      if (_requestID !== globalVars.requestedId) return;
 
       console.log("event", event);
-      setRequestID(_requestID);
+      forgetPreviousPawnPosition();
+
+      setIsShakerDisplayed(false); // todo lancer l'animation 3D
+      setIsDicesRolling(false);
+
+      parentUpdateValues();
     });
   };
-
-  useEffect(() => {
-    // only with Ganache
-    if (
-      !networkId ||
-      DISTANT_NETWORKS_IDS.includes(networkId) ||
-      !requestedID ||
-      !VRFCoordinator
-    )
-      return;
-
-    VRFCoordinator.sendRandomness(requestedID).then(() => {
-      console.log("VRFCoordinator response asked");
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestedID]);
-
-  useEffect(() => {
-    if (!requestID || !Bank || !requestedID || !props.edition_id) return;
-    if (requestID !== requestedID) return;
-
-    Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
-      setRollDice(calculateDicesNumbers(_pawnInfo)); // to throw dices 3D animation and display dices results
-      setCurrentPosition(_pawnInfo.position);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestID]);
-
-  useEffect(() => {
-    if (!rollDice || !currentPosition) {
-      return;
-    }
-
-    setAreDicesDisplayed(true);
-    setIsShakerDisplayed(false); // todo lancer l'animation 3D
-    handleNewPosition(currentPosition, rollDice);
-    setIsRoundCompleted(false); // or parentUpdateValues();
-    setIsDicesRolling(false);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rollDice, currentPosition]);
 
   /**
    * Calculate dices values [1;6]
@@ -274,66 +207,35 @@ export default function User(props) {
   }
 
   /**
-   * name: handleNewPosition
-   * description: make all the operations to determine and to display the new position of the future pawn
-   * @param previousPosition
-   * @param pawnInfo
-   */
-  function handleNewPosition(previousPosition, pawnInfo) {
-    const newCell = (previousPosition + pawnInfo.dicesSum) % maxCells;
-
-    // todo STOPPER animation roll dices sur le front et lancer l'animation 3D puis à la fin :
-
-    highlightCurrentCell(newCell);
-    const rarity = getRandomRarity(pawnInfo.random);
-    retrieveLandInfo(pawnInfo.position, rarity);
-    setCurrentPosition(newCell);
-    forgetPreviousPosition(previousPosition);
-  }
-
-  /**
-   * name: forgetPreviousPosition
+   * name: forgetPreviousPawnPosition
    * description: allows to remove the highlighting of the cell of the previous sum of the dice
    * @param previousPosition
    */
-  function forgetPreviousPosition(previousPosition) {
-    /*document
-      .getElementById(`cell-${previousPosition}`)
-      .classList.remove("active");*/
-    const pawn = document.getElementById("pawn");
-    if (pawn.parentNode) {
+  function forgetPreviousPawnPosition() {
+    const pawn = document.querySelector(`#cell-${pawnPosition} > #pawn`);
+    if (pawn && pawn.parentNode) {
       pawn.parentNode.removeChild(pawn);
     }
   }
 
   /**
-   * name: highlightCurrentCell
+   * name: displayPawn
    * description: highlight the cell which is the result of the sum of the dice
-   * @param total
    */
-  function highlightCurrentCell(total) {
-    const activeCell = document.getElementById(`cell-${total}`);
-    const image = document.createElement("img");
-    image.src = "images/pawns/pawn.png";
-    image.class = "pawn";
-    image.id = "pawn";
-    image.style.width = "50px";
-    image.style.position = "relative";
+  function displayPawn() {
+    let pawn = document.querySelector(`#cell-${pawnPosition} > #pawn`);
+    if (pawn) return;
 
-    switch (activeCell.dataset.position) {
-      case "bottom":
-        image.style.top = "20px";
-      case "left":
-        image.style.top = "5px";
-      case "top":
-        image.style.top = "15px";
-      case "right":
-        image.style.top = "7px";
-    }
+    const activeCell = document.getElementById(`cell-${pawnPosition}`);
+    pawn = document.createElement("img");
+    pawn.src = "images/pawns/pawn.png";
+    pawn.className = `pawn pawn-${activeCell.dataset.position}`;
+    pawn.id = "pawn";
 
-    activeCell.appendChild(image);
-    //activeCell.classList.add("active");
+    activeCell.appendChild(pawn);
   }
+
+  console.log("User");
 
   return (
     <div>

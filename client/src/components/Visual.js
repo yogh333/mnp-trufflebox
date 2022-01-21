@@ -68,8 +68,6 @@ export default function Visual(props) {
     return <>{spinner}</>;
   }
 
-  console.log(isRoundCompleted);
-
   if (rarity !== null && !isRoundCompleted) {
     return (
       <>

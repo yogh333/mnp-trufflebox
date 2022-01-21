@@ -16,3 +16,7 @@
 .mr-20{
   margin-right: 20px;
 }
+
+#random-switch {
+  margin-left: 0px !important;
+}

@@ -56,6 +56,7 @@ function App() {
     action: "",
   });
   const [doModalAction, setDoModalAction] = useState(null);
+  const [isReadyToRender, setIsReadyToRender] = useState(false);
 
   const aggregatorV3InterfaceABI = AggregatorV3InterfaceJson.abi;
 
@@ -114,13 +115,13 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!networkId || !address) return;
+
     setProvider(getProvider());
   }, [networkId, address]);
 
   function connectWallet() {
-    if (address) {
-      return;
-    }
+    if (address) return;
 
     if (typeof window.ethereum !== "undefined") {
       if (window.ethereum.isMetaMask) {
@@ -141,9 +142,7 @@ function App() {
   }
 
   useEffect(() => {
-    if (!(provider && address && networkId)) {
-      return;
-    }
+    if (!(provider && address && networkId)) return;
 
     setStaking(
       new ethers.Contract(
@@ -221,6 +220,7 @@ function App() {
     });
 
     setIsRewardTokenDisplay(true);
+    setIsReadyToRender(true);
   }, [
     Staking,
     rewardTokenAddress,
@@ -256,6 +256,10 @@ function App() {
   const ellipsis = (string) => {
     return string.substring(0, 5) + "..." + string.slice(-3);
   };
+
+  if (!isReadyToRender) {
+    return <>{spinner}</>;
+  }
 
   return (
     <div className="App">
@@ -358,12 +362,14 @@ function App() {
                 provider={provider}
                 network_id={networkId}
                 address={address}
+                staking_contract={Staking}
                 spinner={spinner}
                 mono_symbol={monoSymbol}
                 set_is_modal_shown={setIsModalShown}
                 set_modal_html={setModalHTML}
                 do_modal_action={doModalAction}
                 set_is_doing_modal_action={setIsDoingModalAction}
+                start_block_number={startBlockNumber}
               />
             }
           />
@@ -375,6 +381,7 @@ function App() {
                 provider={provider}
                 network_id={networkId}
                 address={address}
+                staking_contract={Staking}
                 reward_token_name={rewardTokenName}
                 reward_token_symbol={rewardTokenSymbol}
                 reward_token_icon={rewardTokenIcon}
@@ -382,7 +389,6 @@ function App() {
                 reward_token_price={rewardTokenPrice}
                 reward_token_price_feed={rewardTokenPriceFeed}
                 mono_symbol={monoSymbol}
-                staking_contract={Staking}
                 start_block_number={startBlockNumber}
               />
             }
