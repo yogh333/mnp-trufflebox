@@ -5,11 +5,13 @@ import Button from "react-bootstrap/Button";
 import boards from "../data/boards.json";
 
 export default function Visual(props) {
-  const spinner = props.spinner;
-  const editionID = props.edition_id;
   const board = require(`../data/${boards[parseInt(props.edition_id)]}.json`);
 
+  // Contracts
   const Bank = props.bank_contract;
+  // vars
+  const spinner = props.spinner;
+  const editionID = props.edition_id;
   const monoSymbol = props.mono_symbol;
   const landInfo = props.land_info;
   const rarity = landInfo.rarity ? landInfo.rarity : null;
@@ -17,7 +19,6 @@ export default function Visual(props) {
   const prices = landInfo.prices;
   const isRoundCompleted = props.is_round_completed;
   const doModalAction = props.do_modal_action;
-
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;

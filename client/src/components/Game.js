@@ -219,8 +219,6 @@ function Game(props) {
     setIsRetrievingInfo(false);
   }
 
-  console.log("Game");
-
   if (!isReadyToRender) {
     return <>{spinner}</>;
   }

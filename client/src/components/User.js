@@ -83,7 +83,7 @@ export default function User(props) {
   }, [toggleUpdateValues]);
 
   useEffect(() => {
-    if (!pawnPosition || !pawnInfo || !pawnInfo.random) return;
+    if (pawnPosition === null || !pawnInfo || !pawnInfo.random) return;
 
     setRollDice(calculateDicesNumbers(pawnInfo));
 
@@ -234,8 +234,6 @@ export default function User(props) {
 
     activeCell.appendChild(pawn);
   }
-
-  console.log("User");
 
   return (
     <div>

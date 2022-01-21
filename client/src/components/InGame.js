@@ -4,14 +4,10 @@ import { ethers } from "ethers";
 
 import "../css/Game.css";
 
-import boards from "../data/boards.json";
-
-import StakingJson from "../contracts/StakingContract.json";
-
 import { Button, Card, Container, Spinner } from "react-bootstrap";
 
 function InGame(props) {
-  const IN_GAME_MONO_AMOUNT = 50;
+  const IN_GAME_MONO_AMOUNT = 500;
 
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
