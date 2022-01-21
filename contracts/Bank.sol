@@ -66,6 +66,14 @@ contract BankContract is AccessControl, IERC721Receiver {
 	 * @param player address
 	 * @param amount amount */
 	event PropertyRentPaid(address indexed player, uint256 amount);
+	/** Event emitted when a community tax is paid by player
+	 * @param player address
+	 * @param amount amount */
+	event CommunityTaxPaid(address indexed player, uint256 amount);
+	/** Event emitted when a chance profit is received by player
+	 * @param player address
+	 * @param amount amount */
+	event ChanceProfitReceived(address indexed player, uint256 amount);
 
 	/** @dev Constructor
 	 * @param PawnAddress address
@@ -245,6 +253,50 @@ contract BankContract is AccessControl, IERC721Receiver {
 		emit PropertyRentPaid(msg.sender, amount);
 	}
 
+	/** pay community tax
+	 * @notice #### requirements :<br />
+	 * @notice - Round must be uncompleted
+	 * @notice - must be community card
+	 * @notice - MONO transfer ok
+	 * @param _edition board edition*/
+	function payCommunityTax(uint16 _edition) public {
+		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		require(p.isCommunityCard, "Not community card");
+		require(!p.isRoundCompleted, "Round completed");
+
+		uint256 amount = retrieveCommunityTax(p.random);
+		p.isRoundCompleted = true;
+
+		require(Mono.transferFrom(msg.sender, address(this), amount), "Tax payment failed");
+
+		uint256 _pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0); // todo player can have several pawns
+		Board.setPawnInfo(_edition, _pawnID, p);
+
+		emit CommunityTaxPaid(msg.sender, amount);
+	}
+
+	/** receive chance profit
+	 * @notice #### requirements :<br />
+	 * @notice - Round must be uncompleted
+	 * @notice - must be a chance card
+	 * @notice - MONO transfer ok
+	 * @param _edition board edition*/
+	function receiveChanceProfit(uint16 _edition) public {
+		BoardContract.PawnInfo memory p = locatePlayer(_edition);
+		require(p.isChanceCard, "Not chance card");
+		require(!p.isRoundCompleted, "Round completed");
+
+		uint256 amount = retrieveChanceProfit(p.random);
+		p.isRoundCompleted = true;
+
+		require(Mono.transferFrom(address(this), msg.sender, amount), "Tax payment failed");
+
+		uint256 _pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0); // todo player can have several pawns
+		Board.setPawnInfo(_edition, _pawnID, p);
+
+		emit ChanceProfitReceived(msg.sender, amount);
+	}
+
 	/** @dev Retrieve property rent
 	 * @param _edition edition ID
 	 * @param _land land ID
@@ -252,6 +304,20 @@ contract BankContract is AccessControl, IERC721Receiver {
 	 * @return amount*/
 	function retrievePropertyRent(uint16 _edition, uint8 _land, uint8 _rarity) internal view returns(uint256){
 		return propPrices[_edition][_land][_rarity] / 100 > 10**18 ? propPrices[_edition][_land][_rarity] : 10**18;
+	}
+
+	/** @dev Retrieve chance profit
+	 * @param randomness ChainLink VRF random number
+	 * @return amount*/
+	function retrieveChanceProfit(uint256 randomness) internal view returns(uint256){
+		return calculateRandomInteger("chance", 1, 50, randomness);
+	}
+
+	/** @dev Retrieve community tax
+	 * @param randomness ChainLink VRF random number
+	 * @return amount*/
+	function retrieveCommunityTax(uint256 randomness) internal view returns(uint256){
+		return calculateRandomInteger("community", 1, 50, randomness);
 	}
 
 	/** @dev Retrieve property rarity from randomness

@@ -149,33 +149,33 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		}
 
 		// Go to jail
-		if (boards[p.edition].pawns[p.pawnID].position == 30) {
-			boards[p.edition].pawns[p.pawnID].isInJail = true;
-			boards[p.edition].pawns[p.pawnID].position = 10;
+		if (_position == 30) {
+			boards[_edition].pawns[_pawnID].isInJail = true;
+			boards[_edition].pawns[_pawnID].position = 10;
 			return;
 		}
 
 		// Free park
-		if (boards[p.edition].pawns[p.pawnID].position == 20) {
+		if (_position == 20) {
 			return;
 		}
 
 		// Jail simple visit
-		if (boards[p.edition].pawns[p.pawnID].position == 10) {
+		if (_position == 10) {
 			return;
 		}
 
 		// Chance card
-		if (boards[p.edition].pawns[p.pawnID].position == 7 ||
-			boards[p.edition].pawns[p.pawnID].position == 22 ||
-			boards[p.edition].pawns[p.pawnID].position == 36
+		if (_position == 7 ||
+			_position == 22 ||
+			_position == 36
 		) {
-			boards[p.edition].pawns[p.pawnID].isChanceCard = true;
+			boards[_edition].pawns[_pawnID].isChanceCard = true;
 			return;
 		}
 
 		// Community card
-		boards[p.edition].pawns[p.pawnID].isCommunityCard = true;
+		boards[_edition].pawns[_pawnID].isCommunityCard = true;
 	}
 
 	/** check if a land can be bought (PROP tokens available)
