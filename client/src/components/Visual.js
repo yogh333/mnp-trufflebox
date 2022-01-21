@@ -19,11 +19,15 @@ export default function Visual(props) {
   const prices = landInfo.prices;
   const isRoundCompleted = props.is_round_completed;
   const doModalAction = props.do_modal_action;
+  const mustResetAlert = props.must_reset_alert;
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
   const setIsDoingModalAction = props.set_is_doing_modal_action;
   const updateValues = props.parent_update_values_function;
+  const setMustResetAlert = props.set_must_reset_alert;
+
+  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
     if (!doModalAction) return;
@@ -32,6 +36,13 @@ export default function Visual(props) {
       payRent();
     }
   }, [doModalAction]);
+
+  useEffect(() => {
+    if (!mustResetAlert) return;
+
+    setAlert(null);
+    setMustResetAlert(false);
+  }, [mustResetAlert]);
 
   const payRent = (event) => {
     if (!(Bank && editionID)) return;
@@ -47,6 +58,7 @@ export default function Visual(props) {
         button: "",
         action: "",
       });
+      setAlert("Rent payed");
       updateValues();
     });
   };
@@ -56,6 +68,7 @@ export default function Visual(props) {
 
     Bank.buyProp(editionID).then((value) => {
       console.log("Property bought");
+      setAlert("Property bought");
       updateValues();
     });
   };
@@ -120,6 +133,9 @@ export default function Visual(props) {
         style={{ border: "2px solid black" }}
         src={board.lands[landID].visual}
       />
+      <div className={alert ? "d-block" : "d-none"}>
+        <div className="alert alert-success m-3">{alert}</div>
+      </div>
     </>
   );
 }

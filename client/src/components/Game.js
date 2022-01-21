@@ -57,6 +57,7 @@ function Game(props) {
   const [pawnInfo, setPawnInfo] = useState(true);
   const [pawnPosition, setPawnPosition] = useState(0);
   const [globalVars, setGlobalVars] = useState({});
+  const [mustResetAlert, setMustResetAlert] = useState(false);
 
   useEffect(() => {
     if (!(provider && address && networkId)) {
@@ -215,6 +216,10 @@ function Game(props) {
       _landInfo.isPurchasable = true;
     }
 
+    if (rarity === null) {
+      setMustResetAlert(true);
+    }
+
     setLandInfo(_landInfo);
     setIsRetrievingInfo(false);
   }
@@ -270,6 +275,7 @@ function Game(props) {
             set_global_vars={setGlobalVars}
             global_vars={globalVars}
             start_block_number={startBlockNumber}
+            set_must_reset_alert={setMustResetAlert}
           />
         )}
       </div>
@@ -286,6 +292,8 @@ function Game(props) {
           set_is_doing_modal_action={setIsDoingModalAction}
           parent_update_values_function={updateValues}
           is_round_completed={isRoundCompleted}
+          must_reset_alert={mustResetAlert}
+          set_must_reset_alert={setMustResetAlert}
         />
       </div>
       <div className="info-area-3 text-center">

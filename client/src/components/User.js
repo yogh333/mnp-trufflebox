@@ -34,6 +34,7 @@ export default function User(props) {
   const retrieveLandInfo = props.retrieve_land_info;
   const parentUpdateValues = props.parent_update_values_function;
   const setGlobalVars = props.set_global_vars;
+  const setMustResetAlert = props.set_must_reset_alert;
 
   const [VRFCoordinator, setVRFCoordinator] = useState(null);
   const [balance, setBalance] = useState(spinner);
@@ -196,6 +197,7 @@ export default function User(props) {
   function rollDices() {
     if (!Bank || !props.edition_id) return;
 
+    setMustResetAlert(true);
     setAreDicesDisplayed(false);
     setIsDicesRolling(true);
     try {
