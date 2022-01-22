@@ -16,6 +16,7 @@ import BoardJson from "../contracts/BoardContract.json";
 import MonoJson from "../contracts/MonoContract.json";
 import PawnJson from "../contracts/PawnContract.json";
 import PropJson from "../contracts/PropContract.json";
+import Rules from "./Rules";
 
 function Game(props) {
   const spinner = props.spinner;
@@ -130,7 +131,23 @@ function Game(props) {
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
-    Bank.on("PropertyRentPaid", (_player, _amout, event) => {
+    Bank.on("PropertyRentPaid", (_player, _amount, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+      if (address.toLowerCase() !== _player.toLowerCase()) return;
+
+      console.log(event);
+      updateValues();
+      setToggleUpdateValues(!toggleUpdateValues);
+    });
+    Bank.on("CommunityTaxPaid", (_player, _amount, event) => {
+      if (event.blockNumber <= startBlockNumber) return;
+      if (address.toLowerCase() !== _player.toLowerCase()) return;
+
+      console.log(event);
+      updateValues();
+      setToggleUpdateValues(!toggleUpdateValues);
+    });
+    Bank.on("ChanceProfitReceived", (_player, _amount, event) => {
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
@@ -196,13 +213,15 @@ function Game(props) {
   async function retrieveLandInfo(cellID, rarity) {
     setIsRetrievingInfo(true);
     let _prices;
+    const _type = board.lands[cellID].type;
     let _landInfo = {
       id: cellID,
       title: board.lands[cellID].name,
-      type: board.lands[cellID].type,
+      type: _type,
       rarity: null,
       isPurchasable: false,
       prices: [0, 0, 0],
+      game_info: board.game_info_by_type[_type],
     };
 
     if (Bank != null && board.lands[cellID].isPurchasable) {
@@ -298,6 +317,11 @@ function Game(props) {
       </div>
       <div className="info-area-3 text-center">
         <h2>Game info</h2>
+        <Rules
+          game_info_by_type={board.game_info_by_type}
+          land_info={landInfo}
+          pawn_info={pawnInfo}
+        />
       </div>
       <div className="info-area-4 text-center">
         <h2>NFT Info</h2>

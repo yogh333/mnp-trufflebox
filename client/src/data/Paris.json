@@ -493,5 +493,19 @@
         "deFiMultiplier": 2,
         "visual": "./images/cell39.png"
     }
-    ]
+    ],
+    "game_info_by_type": {
+        "go": "Each time a player's pawn lands on or passes over 'Départ', whether by throwing the dice or drawing a card, the Banker pays that player a 200 $MONO salary. The 200 $MONO is paid only once each time around the board.",
+        "property":  "Whenever you land on an unowned property you may buy that property from the Bank at its printed price. You receive the NFT showing ownership. If you don't want to buy it, you must pay a rent. This rent will be shares between NFT owners of this land.",
+        "community-chest": "When you land on community chest, to continue to play, you may pay a tax to community of NFT owners.",
+        "tax": "Whenever you land on an unowned property NFT you may buy that NFT from the Bank.",
+        "railroad": "Whenever you land on an unowned property NFT you may buy that NFT from the Bank.",
+        "chance": "When you land on chance, to continue to play, you may receipt a tax to NFT owners community.",
+        "jail": "You are in Jail, you cannot collect your salary.<br />If you don't come from 'Go to jail', you are just visiting.",
+        "jail_in_jail": "You are in Jail, you cannot collect your salary.",
+        "jail-visit-only": "you are just visiting jail, you incur no penalty.",
+        "utility": "Whenever you land on an unowned property NFT you may buy that NFT from the Bank.",
+        "free-parking": "Enjoy, It's a free park !",
+        "go-to-jail": "Go to jail"
+    }
 }
