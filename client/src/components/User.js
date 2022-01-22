@@ -91,6 +91,7 @@ export default function User(props) {
     displayPawn(pawnPosition);
     const rarity = getRandomRarity(pawnInfo.random);
     retrieveLandInfo(pawnPosition, rarity);
+    forgetPreviousPawnPosition();
   }, [pawnPosition]);
 
   useEffect(() => {
@@ -156,11 +157,8 @@ export default function User(props) {
       if (_requestID !== globalVars.requestedId) return;
 
       console.log("event", event);
-      forgetPreviousPawnPosition();
-
       setIsShakerDisplayed(false); // todo lancer l'animation 3D
       setIsDicesRolling(false);
-
       parentUpdateValues();
     });
   };
@@ -211,11 +209,20 @@ export default function User(props) {
   /**
    * name: forgetPreviousPawnPosition
    * description: allows to remove the highlighting of the cell of the previous sum of the dice
-   * @param previousPosition
    */
   function forgetPreviousPawnPosition() {
-    const pawn = document.querySelector(`#cell-${pawnPosition} > #pawn`);
-    if (pawn && pawn.parentNode) {
+    console.log("forgetPreviousPawnPosition");
+    console.log("pawnInfo", pawnInfo);
+    const move = pawnInfo.random.mod(11).toNumber() + 2;
+    const pawn = document.querySelector(`#cell-${pawnPosition - move} > #pawn`);
+    console.log("pawnPosition", pawnPosition);
+    console.log("move", move);
+    console.log(
+      "pawn pawnPosition",
+      document.querySelector(`#cell-${pawnPosition} > #pawn`)
+    );
+    console.log("pawn pawnPosition - move", pawn);
+    if (pawn && pawn.parentNode && move !== 0) {
       pawn.parentNode.removeChild(pawn);
     }
   }
@@ -271,12 +278,12 @@ export default function User(props) {
       </div>
 
       <div id="dices" className={areDicesDisplayed ? "d-block" : "d-none"}>
-        <div className="mt-3 ml-150">
+        <div className="m-4 text-center">
           {/* first dice display */}
           <img
             className="dice-display d-inline-block m-2"
             src={
-              require(`../assets/dice_face_${
+              require(`../assets/dices/dice_face_${
                 rollDice ? rollDice.dices[0] : 1
               }.png`).default
             }
@@ -286,7 +293,7 @@ export default function User(props) {
           <img
             className="dice-display d-inline-block m-2"
             src={
-              require(`../assets/dice_face_${
+              require(`../assets/dices/dice_face_${
                 rollDice ? rollDice.dices[1] : 1
               }.png`).default
             }

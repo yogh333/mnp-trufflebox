@@ -289,7 +289,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 		uint256 amount = retrieveChanceProfit(p.random);
 		p.isRoundCompleted = true;
 
-		require(Mono.transferFrom(address(this), msg.sender, amount), "Tax payment failed");
+		require(Mono.transfer(msg.sender, amount), "Tax payment failed");
 
 		uint256 _pawnID = Pawn.tokenOfOwnerByIndex(msg.sender, 0); // todo player can have several pawns
 		Board.setPawnInfo(_edition, _pawnID, p);
@@ -310,14 +310,14 @@ contract BankContract is AccessControl, IERC721Receiver {
 	 * @param randomness ChainLink VRF random number
 	 * @return amount*/
 	function retrieveChanceProfit(uint256 randomness) internal view returns(uint256){
-		return calculateRandomInteger("chance", 1, 50, randomness);
+		return calculateRandomInteger("chance", 1, 50, randomness) * 10**18;
 	}
 
 	/** @dev Retrieve community tax
 	 * @param randomness ChainLink VRF random number
 	 * @return amount*/
 	function retrieveCommunityTax(uint256 randomness) internal view returns(uint256){
-		return calculateRandomInteger("community", 1, 50, randomness);
+		return calculateRandomInteger("community", 1, 50, randomness) * 10**18;
 	}
 
 	/** @dev Retrieve property rarity from randomness

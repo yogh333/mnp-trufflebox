@@ -15,6 +15,8 @@ export default function Visual(props) {
   const monoSymbol = props.mono_symbol;
   const landInfo = props.land_info;
   const rarity = landInfo.rarity ? landInfo.rarity : null;
+  const isChanceCard = landInfo.type === "chance";
+  const isCommunityCard = landInfo.type === "community-chest";
   const landID = landInfo.id;
   const prices = landInfo.prices;
   const isRoundCompleted = props.is_round_completed;
@@ -73,6 +75,26 @@ export default function Visual(props) {
     });
   };
 
+  const receiveChance = (event) => {
+    if (!(Bank && editionID)) return;
+
+    Bank.receiveChanceProfit(editionID).then((value) => {
+      console.log("Chance profit received");
+      setAlert("Chance profit received");
+      updateValues();
+    });
+  };
+
+  const payCommunityTax = (event) => {
+    if (!(Bank && editionID)) return;
+
+    Bank.payCommunityTax(editionID).then((value) => {
+      console.log("Community tax paid");
+      setAlert("Community tax paid");
+      updateValues();
+    });
+  };
+
   const borderColor = (rarity) => {
     const COLORS = ["yellow", "green", "blue"];
     return COLORS[rarity];
@@ -120,6 +142,52 @@ export default function Visual(props) {
             }}
           >
             Don't
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  if (isChanceCard && !isRoundCompleted) {
+    return (
+      <>
+        <img
+          className="land m-3 text-center"
+          style={{ border: "2px solid black" }}
+          src={board.lands[landID].visual}
+        />
+
+        <div>
+          <Button
+            className="m-1"
+            variant="success"
+            size="sm"
+            onClick={receiveChance}
+          >
+            Receive
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  if (isCommunityCard && !isRoundCompleted) {
+    return (
+      <>
+        <img
+          className="land m-3 text-center"
+          style={{ border: "2px solid black" }}
+          src={board.lands[landID].visual}
+        />
+
+        <div>
+          <Button
+            className="m-1"
+            variant="success"
+            size="sm"
+            onClick={payCommunityTax}
+          >
+            Pay
           </Button>
         </div>
       </>

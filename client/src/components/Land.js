@@ -54,7 +54,13 @@ export default function Land(props) {
   }, [toggleUpdateValues]);
 
   useEffect(() => {
-    if (propBalance === null || !Prop) return;
+    if (
+      propBalance === null ||
+      !Prop ||
+      landInfo.id === null ||
+      !landInfo.isPurchasable
+    )
+      return;
 
     const fetchNbOfPropsByRarity = async () => {
       let _nbOfPropsByRarity = [];

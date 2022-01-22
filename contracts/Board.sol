@@ -171,11 +171,13 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 			_position == 36
 		) {
 			boards[_edition].pawns[_pawnID].isChanceCard = true;
+			boards[_edition].pawns[_pawnID].isRoundCompleted = false;
 			return;
 		}
 
 		// Community card
 		boards[_edition].pawns[_pawnID].isCommunityCard = true;
+		boards[_edition].pawns[_pawnID].isRoundCompleted = false;
 	}
 
 	/** check if a land can be bought (PROP tokens available)
