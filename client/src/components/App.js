@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../css/App.css";
 import {
@@ -22,6 +22,7 @@ import AggregatorV3InterfaceJson from "../contracts/AggregatorV3Interface.json";
 import ERC20Json from "../contracts/ERC20.json";
 
 function App() {
+  const MUMBAI_NETWORK_ID = "80001";
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
   const [provider, setProvider] = useState(null);
@@ -58,13 +59,20 @@ function App() {
   const [doModalAction, setDoModalAction] = useState(null);
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [isNavbarDisplayed, setIsNavbarDisplayed] = useState(true);
+  const [balance, setBalance] = useState(null);
 
   const aggregatorV3InterfaceABI = AggregatorV3InterfaceJson.abi;
 
   function initialize() {
     window.ethereum
       .request({ method: "net_version" })
-      .then((value) => setNetworkId(value))
+      .then((_networkID) => {
+        if (_networkID !== MUMBAI_NETWORK_ID) {
+          setIsReadyToRender(true);
+          return;
+        }
+        setNetworkId(_networkID);
+      })
       .catch((err) => {
         console.error(err);
       });
@@ -89,6 +97,7 @@ function App() {
   function handleAccountsChanged(accounts) {
     if (accounts.length === 0) {
       console.log("Please connect to MetaMask.");
+      setIsReadyToRender(true);
 
       if (window.location.pathname !== "/") {
         // Redirection to Home when disconnected from all pages except home
@@ -116,7 +125,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!networkId || !address) return;
+    if (!networkId || networkId !== MUMBAI_NETWORK_ID || !address) return;
 
     setProvider(getProvider());
   }, [networkId, address]);
@@ -134,6 +143,7 @@ function App() {
               // EIP-1193 userRejectedRequest error
               // If this happens, the user rejected the connection request.
               console.log("Please connect to MetaMask.");
+              setIsReadyToRender(true);
             } else {
               console.error(err);
             }
@@ -152,6 +162,8 @@ function App() {
         provider.getSigner(address)
       )
     );
+
+    provider.getBalance(address).then((_balance) => setBalance(_balance));
 
     provider
       .getBlockNumber()
@@ -266,6 +278,29 @@ function App() {
 
   if (!isReadyToRender) {
     return <>{spinner}</>;
+  }
+
+  if (networkId !== MUMBAI_NETWORK_ID) {
+    return (
+      <div>
+        You must connect Metamask to mumbai network (polygon testnet) to play.
+        You can easily add it to Metamask clicking link at the bottom of{" "}
+        <a href="https://mumbai.polygonscan.com/#darkModaBtn">
+          mumbai explorer page
+        </a>
+        .
+      </div>
+    );
+  }
+
+  if (balance && balance.lt(ethers.utils.parseEther("0.1"))) {
+    return (
+      <div>
+        Your MATIC balance ({ethers.utils.formatEther(balance)}) is too low.
+        Fill your account with MATIC for Mumbai network
+        <a href="https://faucet.polygon.technology/"> here </a>.
+      </div>
+    );
   }
 
   return (
