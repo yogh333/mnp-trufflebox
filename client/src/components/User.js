@@ -224,6 +224,9 @@ export default function User(props) {
     if (previousPosition < 0) {
       previousPosition += 40;
     }
+    if (pawnInfo.isInJail) {
+      previousPosition = 30 - move;
+    }
     const pawn = document.querySelector(`#cell-${previousPosition} > #pawn`);
     if (pawn && pawn.parentNode && move !== 0) {
       pawn.parentNode.removeChild(pawn);
