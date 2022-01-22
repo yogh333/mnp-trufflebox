@@ -8,6 +8,19 @@ This is a React Truffle box project: for more information, please check http://t
 
 This repository contains all the MNW smart contracts (in /contracts), along with a React.js front-end (in /client).
 
+## Online demo
+https://mnp-app.herokuapp.com/
+
+Available for kovan and mumbai testnet
+
+Players must have ETH or MATIC to pay transactions.
+
+ETH on kovan
+https://faucets.chain.link/kovan
+
+MATIC faucet
+https://faucet.polygon.technology/
+
 ## Cloning the project
 
 In an empty local directory
@@ -79,19 +92,6 @@ To launch React front-end
 cd client
 npm start
 ```
-
-## Online demo
-https://mnp-app.herokuapp.com/
-
-Available for kovan and mumbai testnet
-
-Players must have ETH or MATIC to pay transactions.
-
-ETH on kovan
-https://faucets.chain.link/kovan
-
-MATIC faucet
-https://faucet.polygon.technology/
 
 ## developer documents
 `docs/devdocs/`

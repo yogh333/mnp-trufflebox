@@ -14,7 +14,7 @@ export default function Visual(props) {
   const editionID = props.edition_id;
   const monoSymbol = props.mono_symbol;
   const landInfo = props.land_info;
-  const rarity = landInfo.rarity ? landInfo.rarity : null;
+  const rarity = landInfo.rarity;
   const isChanceCard = landInfo.type === "chance";
   const isCommunityCard = landInfo.type === "community-chest";
   const landID = landInfo.id;

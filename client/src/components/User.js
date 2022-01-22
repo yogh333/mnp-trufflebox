@@ -85,6 +85,7 @@ export default function User(props) {
 
   useEffect(() => {
     if (pawnPosition === null || !pawnInfo || !pawnInfo.random) return;
+    console.log("pawnPosition", pawnPosition);
 
     setRollDice(calculateDicesNumbers(pawnInfo));
 
@@ -121,18 +122,19 @@ export default function User(props) {
   };
 
   useEffect(() => {
-    if (!startBlockNumber || !Board || !Bank || !VRFCoordinator) return;
+    if (!startBlockNumber || !Board || !Bank || !networkId) return;
+    if (!DISTANT_NETWORKS_IDS.includes(networkId) && !VRFCoordinator) return;
 
     subscribeContractsEvents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startBlockNumber, Board, Bank, VRFCoordinator]);
+  }, [startBlockNumber, Board, Bank, networkId, VRFCoordinator]);
 
   const subscribeContractsEvents = () => {
     Bank.on("RollingDices", (_player, _edition, _requestID, event) => {
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
-      console.log("event", event);
+      console.log("event RollingDices", event);
       setIsShakerDisplayed(true);
       setAreDicesDisplayed(false);
       globalVars.requestedId = _requestID;
@@ -153,10 +155,16 @@ export default function User(props) {
       // end - only with Ganache
     });
     Board.on("RandomReady", (_requestID, event) => {
+      console.log(
+        "event RandomReady",
+        event,
+        event.blockNumber <= startBlockNumber,
+        _requestID !== globalVars.requestedId
+      );
       if (event.blockNumber <= startBlockNumber) return;
       if (_requestID !== globalVars.requestedId) return;
 
-      console.log("event", event);
+      console.log("event RandomReady", event);
       setIsShakerDisplayed(false); // todo lancer l'animation 3D
       setIsDicesRolling(false);
       parentUpdateValues();
@@ -212,7 +220,11 @@ export default function User(props) {
    */
   function forgetPreviousPawnPosition() {
     const move = pawnInfo.random.mod(11).toNumber() + 2;
-    const pawn = document.querySelector(`#cell-${pawnPosition - move} > #pawn`);
+    let previousPosition = pawnPosition - move;
+    if (previousPosition < 0) {
+      previousPosition += 40;
+    }
+    const pawn = document.querySelector(`#cell-${previousPosition} > #pawn`);
     if (pawn && pawn.parentNode && move !== 0) {
       pawn.parentNode.removeChild(pawn);
     }

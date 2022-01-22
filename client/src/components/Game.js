@@ -126,11 +126,12 @@ function Game(props) {
   }, [startBlockNumber, Board]);
 
   const subscribeContractsEvents = () => {
+    console.log("subscribeContractsEvents");
     Bank.on("PropertyBought", (_player, _propID, event) => {
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
-      console.log(event);
+      console.log("event PropertyBought", event);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -138,7 +139,7 @@ function Game(props) {
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
-      console.log(event);
+      console.log("event PropertyRentPaid", event);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -146,7 +147,7 @@ function Game(props) {
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
-      console.log(event);
+      console.log("event CommunityTaxPaid", event);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -154,7 +155,7 @@ function Game(props) {
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
-      console.log(event);
+      console.log("event ChanceProfitReceived", event);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -166,13 +167,14 @@ function Game(props) {
   };
 
   const updatePawnInfo = async () => {
+    console.log("Pawn.balanceOf");
     const _pawnBalance = await Pawn.balanceOf(address);
 
-    if (_pawnBalance.toNumber() === 0) {
-      return;
-    }
+    if (_pawnBalance.toNumber() === 0) return;
 
+    console.log("Bank.locatePlayer");
     Bank.locatePlayer(editionID).then((_pawnInfo) => {
+      console.log("_pawnInfo", _pawnInfo);
       setIsRoundCompleted(_pawnInfo.isRoundCompleted);
       setPawnInfo(_pawnInfo);
       setPawnPosition(_pawnInfo.position);
@@ -180,13 +182,18 @@ function Game(props) {
   };
 
   const updatePlayerInfo = async () => {
+    console.log("Mono.balanceOf");
     const _monoBalance = await Mono.balanceOf(address);
+    console.log("Pawn.balanceOf");
+
     const _pawnBalance = await Pawn.balanceOf(address);
 
     let _isRegistered = false,
       _pawnID;
     if (_pawnBalance.toNumber() > 0) {
+      console.log("Pawn.tokenOfOwnerByIndex");
       _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
+      console.log("Board.isRegistered");
       _isRegistered = await Board.isRegistered(editionID, _pawnID);
     }
 
@@ -201,6 +208,7 @@ function Game(props) {
   const retrieveCellPrices = async (_editionId, _cellID) => {
     let propertiesPrices = [];
     for (let rarity = 0; rarity < board.maxLandRarities; rarity++) {
+      console.log(" Bank.getPriceOfProp");
       propertiesPrices[rarity] = await Bank.getPriceOfProp(
         _editionId,
         _cellID,
