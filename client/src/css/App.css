@@ -5,3 +5,13 @@
     -o-background-size: cover;
     background-size: cover;
 }
+
+#show-navbar {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px;
+}
+
+#hide-navbar {
+    position: absolute
+}

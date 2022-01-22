@@ -57,6 +57,7 @@ function App() {
   });
   const [doModalAction, setDoModalAction] = useState(null);
   const [isReadyToRender, setIsReadyToRender] = useState(false);
+  const [isNavbarDisplayed, setIsNavbarDisplayed] = useState(true);
 
   const aggregatorV3InterfaceABI = AggregatorV3InterfaceJson.abi;
 
@@ -295,7 +296,24 @@ function App() {
       </Modal>
 
       <BrowserRouter>
-        <Navbar className="px-3" bg="light">
+        <Navbar
+          id="navbar"
+          className={isNavbarDisplayed ? "d-block" : "d-none"}
+          bg="light"
+        >
+          <div id="hide-navbar" className="mx-1 my-2">
+            <Button
+              variant="outline-dark"
+              size="sm"
+              className="hide secondary"
+              onClick={() => {
+                setIsNavbarDisplayed(false);
+                document.querySelector("#user-info").style.marginTop = "-1rem";
+              }}
+            >
+              X
+            </Button>
+          </div>
           <Container>
             <Navbar.Brand className="brand">MNP World</Navbar.Brand>
             <Nav className="me-auto">
@@ -370,6 +388,8 @@ function App() {
                 do_modal_action={doModalAction}
                 set_is_doing_modal_action={setIsDoingModalAction}
                 start_block_number={startBlockNumber}
+                is_navbar_displayed={isNavbarDisplayed}
+                set_is_navbar_displayed={setIsNavbarDisplayed}
               />
             }
           />

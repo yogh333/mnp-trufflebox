@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ethers } from "ethers";
 
@@ -17,6 +17,7 @@ import MonoJson from "../contracts/MonoContract.json";
 import PawnJson from "../contracts/PawnContract.json";
 import PropJson from "../contracts/PropContract.json";
 import Rules from "./Rules";
+import { Button } from "react-bootstrap";
 
 function Game(props) {
   const spinner = props.spinner;
@@ -33,10 +34,12 @@ function Game(props) {
   const monoSymbol = props.mono_symbol;
   const doModalAction = props.do_modal_action;
   const startBlockNumber = props.start_block_number;
+  const isNavbarDisplayed = props.is_navbar_displayed;
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
   const setIsDoingModalAction = props.set_is_doing_modal_action;
+  const setIsNavbarDisplayed = props.set_is_navbar_displayed;
 
   const [Bank, setBank] = useState(null);
   const [Mono, setMono] = useState(null);
@@ -268,35 +271,53 @@ function Game(props) {
 
   return (
     <div className="Game">
-      <div className="info-area-1 text-center">
-        <h2>User info</h2>
-        {provider && (
-          <User
-            provider={provider}
-            address={address}
-            network_id={networkId}
-            edition_id={editionID}
-            mono_contract={Mono}
-            board_contract={Board}
-            prop_contract={Prop}
-            max_lands={board.maxLands}
-            land_info={landInfo}
-            pawn_id={pawnID}
-            retrieve_land_info={retrieveLandInfo}
-            parent_update_values_function={updateValues}
-            toggle_update_user_values={toggleUpdateValues}
-            bank_contract={Bank}
-            mono_symbol={monoSymbol}
-            is_round_completed={isRoundCompleted}
-            set_is_round_completed={setIsRoundCompleted}
-            pawn_info={pawnInfo}
-            pawn_position={pawnPosition}
-            set_global_vars={setGlobalVars}
-            global_vars={globalVars}
-            start_block_number={startBlockNumber}
-            set_must_reset_alert={setMustResetAlert}
-          />
-        )}
+      <div className="info-area-1">
+        <div
+          id="show-navbar"
+          className={isNavbarDisplayed ? "m-1 d-none" : "m-1 d-block"}
+        >
+          <Button
+            variant="light"
+            size="sm"
+            className="show secondary"
+            onClick={() => {
+              setIsNavbarDisplayed(true);
+              document.querySelector("#user-info").style.marginTop = "0rem";
+            }}
+          >
+            Navbar
+          </Button>
+        </div>
+        <div id="user-info" className="text-center">
+          <h2>User info</h2>
+          {provider && (
+            <User
+              provider={provider}
+              address={address}
+              network_id={networkId}
+              edition_id={editionID}
+              mono_contract={Mono}
+              board_contract={Board}
+              prop_contract={Prop}
+              max_lands={board.maxLands}
+              land_info={landInfo}
+              pawn_id={pawnID}
+              retrieve_land_info={retrieveLandInfo}
+              parent_update_values_function={updateValues}
+              toggle_update_user_values={toggleUpdateValues}
+              bank_contract={Bank}
+              mono_symbol={monoSymbol}
+              is_round_completed={isRoundCompleted}
+              set_is_round_completed={setIsRoundCompleted}
+              pawn_info={pawnInfo}
+              pawn_position={pawnPosition}
+              set_global_vars={setGlobalVars}
+              global_vars={globalVars}
+              start_block_number={startBlockNumber}
+              set_must_reset_alert={setMustResetAlert}
+            />
+          )}
+        </div>
       </div>
       <div className="info-area-2 text-center">
         <Visual

@@ -211,17 +211,8 @@ export default function User(props) {
    * description: allows to remove the highlighting of the cell of the previous sum of the dice
    */
   function forgetPreviousPawnPosition() {
-    console.log("forgetPreviousPawnPosition");
-    console.log("pawnInfo", pawnInfo);
     const move = pawnInfo.random.mod(11).toNumber() + 2;
     const pawn = document.querySelector(`#cell-${pawnPosition - move} > #pawn`);
-    console.log("pawnPosition", pawnPosition);
-    console.log("move", move);
-    console.log(
-      "pawn pawnPosition",
-      document.querySelector(`#cell-${pawnPosition} > #pawn`)
-    );
-    console.log("pawn pawnPosition - move", pawn);
     if (pawn && pawn.parentNode && move !== 0) {
       pawn.parentNode.removeChild(pawn);
     }
