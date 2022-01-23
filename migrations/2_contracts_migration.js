@@ -516,6 +516,7 @@ module.exports = async function (deployer, network, accounts) {
 
       break;
 
+    case "mumbai":
     case "polygon_infura_testnet":
       console.warn(
         "/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\"

@@ -22,6 +22,7 @@ const path = require("path");
 require("dotenv").config();
 const MNEMONIC = process.env.MNEMONIC;
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID;
+const MATIC_VIGIL_APP_ID = process.env.MATIC_VIGIL_APP_ID;
 
 module.exports = {
   /**
@@ -90,6 +91,25 @@ module.exports = {
             phrase: MNEMONIC,
           },
           providerOrUrl: `https://polygon-mumbai.infura.io/v3/${INFURA_PROJECT_ID}`,
+          //numberOfAddresses: 1,
+          //shareNonce: true,
+          //derivationPath: "m/44'/1'/0'/0/",
+        }),
+      network_id: 80001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+      //chainId: 80001,
+      gas: 6000000, // Gas sent with each transaction (default: ~6700000)
+      gasPrice: 3000000000, // 3 gwei (in wei) (default: 100 gwei)
+    },
+    mumbai: {
+      provider: () =>
+        new HDWalletProvider({
+          mnemonic: {
+            phrase: MNEMONIC,
+          },
+          providerOrUrl: `https://rpc-mumbai.maticvigil.com/v1/${MATIC_VIGIL_APP_ID}`,
           //numberOfAddresses: 1,
           //shareNonce: true,
           //derivationPath: "m/44'/1'/0'/0/",
