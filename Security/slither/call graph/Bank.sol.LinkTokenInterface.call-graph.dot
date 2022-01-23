@@ -1,0 +1,19 @@
+strict digraph {
+subgraph cluster_6325_LinkTokenInterface {
+label = "LinkTokenInterface"
+"6325_transferFrom" [label="transferFrom"]
+"6325_decimals" [label="decimals"]
+"6325_allowance" [label="allowance"]
+"6325_totalSupply" [label="totalSupply"]
+"6325_transfer" [label="transfer"]
+"6325_transferAndCall" [label="transferAndCall"]
+"6325_decreaseApproval" [label="decreaseApproval"]
+"6325_increaseApproval" [label="increaseApproval"]
+"6325_approve" [label="approve"]
+"6325_symbol" [label="symbol"]
+"6325_balanceOf" [label="balanceOf"]
+"6325_name" [label="name"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+}
+}

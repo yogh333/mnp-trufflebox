@@ -1,0 +1,48 @@
+strict digraph {
+subgraph cluster_4602_Context {
+label = "Context"
+"4602__msgData" [label="_msgData"]
+"4602__msgSender" [label="_msgSender"]
+}subgraph cluster_4507_StakingContract {
+label = "StakingContract"
+"4507_unstake" [label="unstake"]
+"4507__addPool" [label="_addPool"]
+"4507_getPools" [label="getPools"]
+"4507_constructor" [label="constructor"]
+"4507_getPoolBalance" [label="getPoolBalance"]
+"4507_stake" [label="stake"]
+"4507_slitherConstructorConstantVariables" [label="slitherConstructorConstantVariables"]
+"4507_pendingReward" [label="pendingReward"]
+"4507_addPool" [label="addPool"]
+"4507__calculateReward" [label="_calculateReward"]
+"4507_getUserBalanceInPool" [label="getUserBalanceInPool"]
+"4507_getLastPrice" [label="getLastPrice"]
+"4507_unstake" -> "4507__calculateReward"
+"4507_addPool" -> "4507_onlyOwner"
+"4507_constructor" -> "4507__addPool"
+"4507_addPool" -> "4507__addPool"
+"4507__calculateReward" -> "4507_getLastPrice"
+"4507_pendingReward" -> "4507__calculateReward"
+}subgraph cluster_5557_Ownable {
+label = "Ownable"
+"5557_transferOwnership" [label="transferOwnership"]
+"5557_constructor" [label="constructor"]
+"5557_owner" [label="owner"]
+"5557_renounceOwnership" [label="renounceOwnership"]
+"5557__transferOwnership" [label="_transferOwnership"]
+"5557_renounceOwnership" -> "5557_onlyOwner"
+"5557_constructor" -> "5557__transferOwnership"
+"5557_transferOwnership" -> "5557__transferOwnership"
+"5557_transferOwnership" -> "5557_onlyOwner"
+"5557_constructor" -> "5557__msgSender"
+"5557_renounceOwnership" -> "5557__transferOwnership"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool,string)" 
+"5557_transferOwnership" -> "require(bool,string)"
+"4507_stake" -> "require(bool,string)"
+"4507_unstake" -> "require(bool,string)"
+"4507_addPool" -> "require(bool,string)"
+"4507__calculateReward" -> "require(bool,string)"
+}
+}

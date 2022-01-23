@@ -1,0 +1,115 @@
+strict digraph {
+subgraph cluster_1792_ERC165 {
+label = "ERC165"
+"1792_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_1543_IAccessControl {
+label = "IAccessControl"
+"1543_renounceRole" [label="renounceRole"]
+"1543_getRoleAdmin" [label="getRoleAdmin"]
+"1543_hasRole" [label="hasRole"]
+"1543_grantRole" [label="grantRole"]
+"1543_revokeRole" [label="revokeRole"]
+}subgraph cluster_1804_IERC165 {
+label = "IERC165"
+"1804_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_1325_AccessControl {
+label = "AccessControl"
+"1325_supportsInterface" [label="supportsInterface"]
+"1325_getRoleAdmin" [label="getRoleAdmin"]
+"1325_revokeRole" [label="revokeRole"]
+"1325_renounceRole" [label="renounceRole"]
+"1325__setRoleAdmin" [label="_setRoleAdmin"]
+"1325__grantRole" [label="_grantRole"]
+"1325__checkRole" [label="_checkRole"]
+"1325__setupRole" [label="_setupRole"]
+"1325_hasRole" [label="hasRole"]
+"1325__revokeRole" [label="_revokeRole"]
+"1325_grantRole" [label="grantRole"]
+"1325_supportsInterface" -> "1325_supportsInterface"
+"1325__setRoleAdmin" -> "1325_getRoleAdmin"
+"1325_revokeRole" -> "1325_onlyRole"
+"1325_grantRole" -> "1325_getRoleAdmin"
+"1325_renounceRole" -> "1325__revokeRole"
+"1325_revokeRole" -> "1325__revokeRole"
+"1325_renounceRole" -> "1325__msgSender"
+"1325__setupRole" -> "1325__grantRole"
+"1325__revokeRole" -> "1325__msgSender"
+"1325__grantRole" -> "1325_hasRole"
+"1325__revokeRole" -> "1325_hasRole"
+"1325__checkRole" -> "1325_hasRole"
+"1325_grantRole" -> "1325__grantRole"
+"1325_revokeRole" -> "1325_getRoleAdmin"
+"1325_grantRole" -> "1325_onlyRole"
+"1325__grantRole" -> "1325__msgSender"
+}subgraph cluster_895_BoardContract {
+label = "BoardContract"
+"895_isRegistered" [label="isRegistered"]
+"895_getMaxEdition" [label="getMaxEdition"]
+"895_setPawnInfo" [label="setPawnInfo"]
+"895_constructor" [label="constructor"]
+"895_fulfillRandomness" [label="fulfillRandomness"]
+"895_play" [label="play"]
+"895_isPurchasable" [label="isPurchasable"]
+"895_newBoard" [label="newBoard"]
+"895_getRarityLevel" [label="getRarityLevel"]
+"895_getPawnInfo" [label="getPawnInfo"]
+"895_getNbLands" [label="getNbLands"]
+"895_requestRandomNumber" [label="requestRandomNumber"]
+"895_slitherConstructorConstantVariables" [label="slitherConstructorConstantVariables"]
+"895_gameStrategist" [label="gameStrategist"]
+"895_register" [label="register"]
+"895_fulfillRandomness" -> "895_gameStrategist"
+"895_getPawnInfo" -> "895_isRegistered"
+"895_constructor" -> "895__setupRole"
+"895_constructor" -> "895__setRoleAdmin"
+"895_register" -> "895_onlyRole"
+"895_setPawnInfo" -> "895_onlyRole"
+"895_newBoard" -> "895_onlyRole"
+"895_requestRandomNumber" -> "895_requestRandomness"
+"895_constructor" -> "895_constructor"
+"895_play" -> "895_requestRandomNumber"
+"895_play" -> "895_onlyRole"
+}subgraph cluster_1016_VRFConsumerBase {
+label = "VRFConsumerBase"
+"1016_requestRandomness" [label="requestRandomness"]
+"1016_fulfillRandomness" [label="fulfillRandomness"]
+"1016_constructor" [label="constructor"]
+"1016_rawFulfillRandomness" [label="rawFulfillRandomness"]
+"1016_requestRandomness" -> "1016_makeRequestId"
+"1016_requestRandomness" -> "1016_makeVRFInputSeed"
+"1016_rawFulfillRandomness" -> "1016_fulfillRandomness"
+}subgraph cluster_1565_Context {
+label = "Context"
+"1565__msgSender" [label="_msgSender"]
+"1565__msgData" [label="_msgData"]
+}subgraph cluster_1375_VRFRequestIDBase {
+label = "VRFRequestIDBase"
+"1375_makeRequestId" [label="makeRequestId"]
+"1375_makeVRFInputSeed" [label="makeVRFInputSeed"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"revert(string)" 
+"abi.encodePacked()" 
+"type()" 
+"require(bool,string)" 
+"abi.encode()" 
+"keccak256(bytes)" 
+"1375_makeRequestId" -> "keccak256(bytes)"
+"1792_supportsInterface" -> "type()"
+"895_play" -> "require(bool,string)"
+"895_register" -> "require(bool,string)"
+"1325_renounceRole" -> "require(bool,string)"
+"1375_makeVRFInputSeed" -> "abi.encode()"
+"1325_supportsInterface" -> "type()"
+"1016_requestRandomness" -> "abi.encode()"
+"1325__checkRole" -> "revert(string)"
+"895_requestRandomNumber" -> "require(bool,string)"
+"895_newBoard" -> "require(bool,string)"
+"1375_makeRequestId" -> "abi.encodePacked()"
+"895_slitherConstructorConstantVariables" -> "keccak256(bytes)"
+"1016_rawFulfillRandomness" -> "require(bool,string)"
+"1325__checkRole" -> "abi.encodePacked()"
+"1375_makeVRFInputSeed" -> "keccak256(bytes)"
+"895_getPawnInfo" -> "require(bool,string)"
+}
+}

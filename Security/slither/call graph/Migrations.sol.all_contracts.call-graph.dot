@@ -1,0 +1,9 @@
+strict digraph {
+subgraph cluster_32_Migrations {
+label = "Migrations"
+"32_setCompleted" [label="setCompleted"]
+"32_setCompleted" -> "32_restricted"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+}
+}

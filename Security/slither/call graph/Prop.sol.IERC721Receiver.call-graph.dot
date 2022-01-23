@@ -1,0 +1,8 @@
+strict digraph {
+subgraph cluster_3748_IERC721Receiver {
+label = "IERC721Receiver"
+"3748_onERC721Received" [label="onERC721Received"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+}
+}

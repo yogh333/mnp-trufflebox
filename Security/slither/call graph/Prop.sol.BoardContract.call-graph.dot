@@ -1,0 +1,115 @@
+strict digraph {
+subgraph cluster_936_AccessControl {
+label = "AccessControl"
+"936_revokeRole" [label="revokeRole"]
+"936__setupRole" [label="_setupRole"]
+"936_supportsInterface" [label="supportsInterface"]
+"936__checkRole" [label="_checkRole"]
+"936__revokeRole" [label="_revokeRole"]
+"936_hasRole" [label="hasRole"]
+"936__setRoleAdmin" [label="_setRoleAdmin"]
+"936_grantRole" [label="grantRole"]
+"936__grantRole" [label="_grantRole"]
+"936_getRoleAdmin" [label="getRoleAdmin"]
+"936_renounceRole" [label="renounceRole"]
+"936_grantRole" -> "936_getRoleAdmin"
+"936_revokeRole" -> "936__revokeRole"
+"936__revokeRole" -> "936__msgSender"
+"936__setupRole" -> "936__grantRole"
+"936__setRoleAdmin" -> "936_getRoleAdmin"
+"936__grantRole" -> "936__msgSender"
+"936_renounceRole" -> "936__msgSender"
+"936_grantRole" -> "936_onlyRole"
+"936_revokeRole" -> "936_getRoleAdmin"
+"936__grantRole" -> "936_hasRole"
+"936_grantRole" -> "936__grantRole"
+"936_revokeRole" -> "936_onlyRole"
+"936__revokeRole" -> "936_hasRole"
+"936_supportsInterface" -> "936_supportsInterface"
+"936_renounceRole" -> "936__revokeRole"
+"936__checkRole" -> "936_hasRole"
+}subgraph cluster_3602_VRFConsumerBase {
+label = "VRFConsumerBase"
+"3602_rawFulfillRandomness" [label="rawFulfillRandomness"]
+"3602_requestRandomness" [label="requestRandomness"]
+"3602_constructor" [label="constructor"]
+"3602_fulfillRandomness" [label="fulfillRandomness"]
+"3602_requestRandomness" -> "3602_makeRequestId"
+"3602_requestRandomness" -> "3602_makeVRFInputSeed"
+"3602_rawFulfillRandomness" -> "3602_fulfillRandomness"
+}subgraph cluster_2389_Context {
+label = "Context"
+"2389__msgSender" [label="_msgSender"]
+"2389__msgData" [label="_msgData"]
+}subgraph cluster_2294_BoardContract {
+label = "BoardContract"
+"2294_constructor" [label="constructor"]
+"2294_setPawnInfo" [label="setPawnInfo"]
+"2294_gameStrategist" [label="gameStrategist"]
+"2294_getNbLands" [label="getNbLands"]
+"2294_register" [label="register"]
+"2294_getMaxEdition" [label="getMaxEdition"]
+"2294_play" [label="play"]
+"2294_requestRandomNumber" [label="requestRandomNumber"]
+"2294_fulfillRandomness" [label="fulfillRandomness"]
+"2294_newBoard" [label="newBoard"]
+"2294_isPurchasable" [label="isPurchasable"]
+"2294_isRegistered" [label="isRegistered"]
+"2294_getRarityLevel" [label="getRarityLevel"]
+"2294_slitherConstructorConstantVariables" [label="slitherConstructorConstantVariables"]
+"2294_getPawnInfo" [label="getPawnInfo"]
+"2294_constructor" -> "2294_constructor"
+"2294_register" -> "2294_onlyRole"
+"2294_constructor" -> "2294__setupRole"
+"2294_constructor" -> "2294__setRoleAdmin"
+"2294_getPawnInfo" -> "2294_isRegistered"
+"2294_newBoard" -> "2294_onlyRole"
+"2294_setPawnInfo" -> "2294_onlyRole"
+"2294_fulfillRandomness" -> "2294_gameStrategist"
+"2294_play" -> "2294_requestRandomNumber"
+"2294_play" -> "2294_onlyRole"
+"2294_requestRandomNumber" -> "2294_requestRandomness"
+}subgraph cluster_2616_ERC165 {
+label = "ERC165"
+"2616_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_4122_VRFRequestIDBase {
+label = "VRFRequestIDBase"
+"4122_makeVRFInputSeed" [label="makeVRFInputSeed"]
+"4122_makeRequestId" [label="makeRequestId"]
+}subgraph cluster_3614_IERC165 {
+label = "IERC165"
+"3614_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_2367_IAccessControl {
+label = "IAccessControl"
+"2367_getRoleAdmin" [label="getRoleAdmin"]
+"2367_grantRole" [label="grantRole"]
+"2367_revokeRole" [label="revokeRole"]
+"2367_hasRole" [label="hasRole"]
+"2367_renounceRole" [label="renounceRole"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"revert(string)" 
+"abi.encodePacked()" 
+"type()" 
+"require(bool,string)" 
+"abi.encode()" 
+"keccak256(bytes)" 
+"4122_makeVRFInputSeed" -> "keccak256(bytes)"
+"936__checkRole" -> "revert(string)"
+"936_supportsInterface" -> "type()"
+"2294_newBoard" -> "require(bool,string)"
+"4122_makeVRFInputSeed" -> "abi.encode()"
+"2294_register" -> "require(bool,string)"
+"2294_slitherConstructorConstantVariables" -> "keccak256(bytes)"
+"3602_rawFulfillRandomness" -> "require(bool,string)"
+"2294_play" -> "require(bool,string)"
+"4122_makeRequestId" -> "keccak256(bytes)"
+"2294_getPawnInfo" -> "require(bool,string)"
+"936_renounceRole" -> "require(bool,string)"
+"2616_supportsInterface" -> "type()"
+"936__checkRole" -> "abi.encodePacked()"
+"3602_requestRandomness" -> "abi.encode()"
+"4122_makeRequestId" -> "abi.encodePacked()"
+"2294_requestRandomNumber" -> "require(bool,string)"
+}
+}

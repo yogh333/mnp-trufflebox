@@ -1,0 +1,66 @@
+strict digraph {
+subgraph cluster_1432_Context {
+label = "Context"
+"1432__msgSender" [label="_msgSender"]
+"1432__msgData" [label="_msgData"]
+}subgraph cluster_1457_IERC20Metadata {
+label = "IERC20Metadata"
+"1457_decimals" [label="decimals"]
+"1457_symbol" [label="symbol"]
+"1457_name" [label="name"]
+}subgraph cluster_1410_IERC20 {
+label = "IERC20"
+"1410_balanceOf" [label="balanceOf"]
+"1410_transfer" [label="transfer"]
+"1410_allowance" [label="allowance"]
+"1410_transferFrom" [label="transferFrom"]
+"1410_totalSupply" [label="totalSupply"]
+"1410_approve" [label="approve"]
+}subgraph cluster_1332_ERC20 {
+label = "ERC20"
+"1332_totalSupply" [label="totalSupply"]
+"1332_name" [label="name"]
+"1332_symbol" [label="symbol"]
+"1332_constructor" [label="constructor"]
+"1332_decreaseAllowance" [label="decreaseAllowance"]
+"1332__transfer" [label="_transfer"]
+"1332__mint" [label="_mint"]
+"1332__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"1332_transferFrom" [label="transferFrom"]
+"1332__approve" [label="_approve"]
+"1332_approve" [label="approve"]
+"1332__afterTokenTransfer" [label="_afterTokenTransfer"]
+"1332_allowance" [label="allowance"]
+"1332_balanceOf" [label="balanceOf"]
+"1332_transfer" [label="transfer"]
+"1332__burn" [label="_burn"]
+"1332_decimals" [label="decimals"]
+"1332_increaseAllowance" [label="increaseAllowance"]
+"1332__transfer" -> "1332__beforeTokenTransfer"
+"1332__mint" -> "1332__afterTokenTransfer"
+"1332__mint" -> "1332__beforeTokenTransfer"
+"1332__burn" -> "1332__afterTokenTransfer"
+"1332_transferFrom" -> "1332__transfer"
+"1332_transferFrom" -> "1332__approve"
+"1332_approve" -> "1332__msgSender"
+"1332_transferFrom" -> "1332__msgSender"
+"1332_increaseAllowance" -> "1332__msgSender"
+"1332_decreaseAllowance" -> "1332__approve"
+"1332_decreaseAllowance" -> "1332__msgSender"
+"1332__burn" -> "1332__beforeTokenTransfer"
+"1332_transfer" -> "1332__transfer"
+"1332_approve" -> "1332__approve"
+"1332__transfer" -> "1332__afterTokenTransfer"
+"1332_transfer" -> "1332__msgSender"
+"1332_increaseAllowance" -> "1332__approve"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool,string)" 
+"1332_transferFrom" -> "require(bool,string)"
+"1332__mint" -> "require(bool,string)"
+"1332_decreaseAllowance" -> "require(bool,string)"
+"1332__transfer" -> "require(bool,string)"
+"1332__burn" -> "require(bool,string)"
+"1332__approve" -> "require(bool,string)"
+}
+}

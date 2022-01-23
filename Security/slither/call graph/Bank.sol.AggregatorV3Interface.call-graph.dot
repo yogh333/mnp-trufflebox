@@ -1,0 +1,12 @@
+strict digraph {
+subgraph cluster_5622_AggregatorV3Interface {
+label = "AggregatorV3Interface"
+"5622_latestRoundData" [label="latestRoundData"]
+"5622_getRoundData" [label="getRoundData"]
+"5622_version" [label="version"]
+"5622_description" [label="description"]
+"5622_decimals" [label="decimals"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+}
+}

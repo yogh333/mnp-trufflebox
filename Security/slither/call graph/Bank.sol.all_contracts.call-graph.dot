@@ -1,0 +1,651 @@
+strict digraph {
+subgraph cluster_7307_IERC20Metadata {
+label = "IERC20Metadata"
+"7307_name" [label="name"]
+"7307_decimals" [label="decimals"]
+"7307_symbol" [label="symbol"]
+}subgraph cluster_6417_Pausable {
+label = "Pausable"
+"6417_paused" [label="paused"]
+"6417__unpause" [label="_unpause"]
+"6417_constructor" [label="constructor"]
+"6417__pause" [label="_pause"]
+"6417__unpause" -> "6417_whenPaused"
+"6417__pause" -> "6417__msgSender"
+"6417__pause" -> "6417_whenNotPaused"
+"6417__unpause" -> "6417__msgSender"
+}subgraph cluster_5012_ERC20Burnable {
+label = "ERC20Burnable"
+"5012_burnFrom" [label="burnFrom"]
+"5012_burn" [label="burn"]
+"5012_burnFrom" -> "5012__msgSender"
+"5012_burn" -> "5012__msgSender"
+"5012_burnFrom" -> "5012_allowance"
+"5012_burn" -> "5012__burn"
+"5012_burnFrom" -> "5012__approve"
+"5012_burnFrom" -> "5012__burn"
+}subgraph cluster_6168_ERC20 {
+label = "ERC20"
+"6168_transferFrom" [label="transferFrom"]
+"6168_name" [label="name"]
+"6168__mint" [label="_mint"]
+"6168_transfer" [label="transfer"]
+"6168__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"6168_decimals" [label="decimals"]
+"6168__burn" [label="_burn"]
+"6168_decreaseAllowance" [label="decreaseAllowance"]
+"6168__transfer" [label="_transfer"]
+"6168_approve" [label="approve"]
+"6168_symbol" [label="symbol"]
+"6168_increaseAllowance" [label="increaseAllowance"]
+"6168_constructor" [label="constructor"]
+"6168__approve" [label="_approve"]
+"6168_allowance" [label="allowance"]
+"6168_balanceOf" [label="balanceOf"]
+"6168_totalSupply" [label="totalSupply"]
+"6168__afterTokenTransfer" [label="_afterTokenTransfer"]
+"6168_transfer" -> "6168__transfer"
+"6168_approve" -> "6168__msgSender"
+"6168_transferFrom" -> "6168__approve"
+"6168_transfer" -> "6168__msgSender"
+"6168_decreaseAllowance" -> "6168__approve"
+"6168_increaseAllowance" -> "6168__approve"
+"6168__mint" -> "6168__beforeTokenTransfer"
+"6168_decreaseAllowance" -> "6168__msgSender"
+"6168__transfer" -> "6168__beforeTokenTransfer"
+"6168_approve" -> "6168__approve"
+"6168_increaseAllowance" -> "6168__msgSender"
+"6168__mint" -> "6168__afterTokenTransfer"
+"6168_transferFrom" -> "6168__msgSender"
+"6168__burn" -> "6168__afterTokenTransfer"
+"6168__burn" -> "6168__beforeTokenTransfer"
+"6168__transfer" -> "6168__afterTokenTransfer"
+"6168_transferFrom" -> "6168__transfer"
+}subgraph cluster_7450_IERC721Metadata {
+label = "IERC721Metadata"
+"7450_symbol" [label="symbol"]
+"7450_tokenURI" [label="tokenURI"]
+"7450_name" [label="name"]
+}subgraph cluster_4507_StakingContract {
+label = "StakingContract"
+"4507_unstake" [label="unstake"]
+"4507__addPool" [label="_addPool"]
+"4507_constructor" [label="constructor"]
+"4507_getPools" [label="getPools"]
+"4507_getPoolBalance" [label="getPoolBalance"]
+"4507_stake" [label="stake"]
+"4507_pendingReward" [label="pendingReward"]
+"4507_addPool" [label="addPool"]
+"4507__calculateReward" [label="_calculateReward"]
+"4507_NETWORK_TOKEN_VIRTUAL_ADDRESS" [label="NETWORK_TOKEN_VIRTUAL_ADDRESS"]
+"4507_getUserBalanceInPool" [label="getUserBalanceInPool"]
+"4507_getLastPrice" [label="getLastPrice"]
+"4507_unstake" -> "4507__calculateReward"
+"4507_addPool" -> "4507_onlyOwner"
+"4507_constructor" -> "4507__addPool"
+"4507_addPool" -> "4507__addPool"
+"4507__calculateReward" -> "4507_getLastPrice"
+"4507_pendingReward" -> "4507__calculateReward"
+}subgraph cluster_1439_BankContract {
+label = "BankContract"
+"1439_buyMono" [label="buyMono"]
+"1439_enrollPlayer" [label="enrollPlayer"]
+"1439_setPriceOfProp" [label="setPriceOfProp"]
+"1439_locatePlayer" [label="locatePlayer"]
+"1439_receiveChanceProfit" [label="receiveChanceProfit"]
+"1439_payRent" [label="payRent"]
+"1439_buyPawn" [label="buyPawn"]
+"1439_retrievePropertyRent" [label="retrievePropertyRent"]
+"1439_rollDices" [label="rollDices"]
+"1439_retrievePropertyRarity" [label="retrievePropertyRarity"]
+"1439_propertyTransfer" [label="propertyTransfer"]
+"1439_setPrices" [label="setPrices"]
+"1439_calculateRandomInteger" [label="calculateRandomInteger"]
+"1439_onERC721Received" [label="onERC721Received"]
+"1439_payCommunityTax" [label="payCommunityTax"]
+"1439_getPriceOfProp" [label="getPriceOfProp"]
+"1439_constructor" [label="constructor"]
+"1439_withdraw" [label="withdraw"]
+"1439_retrieveChanceProfit" [label="retrieveChanceProfit"]
+"1439_retrieveCommunityTax" [label="retrieveCommunityTax"]
+"1439_buyProp" [label="buyProp"]
+"1439_payCommunityTax" -> "1439_retrieveCommunityTax"
+"1439_payCommunityTax" -> "1439_locatePlayer"
+"1439_constructor" -> "1439__setupRole"
+"1439_setPriceOfProp" -> "1439_onlyRole"
+"1439_receiveChanceProfit" -> "1439_retrieveChanceProfit"
+"1439_buyProp" -> "1439_locatePlayer"
+"1439_retrievePropertyRarity" -> "1439_calculateRandomInteger"
+"1439_rollDices" -> "1439_locatePlayer"
+"1439_payRent" -> "1439_locatePlayer"
+"1439_receiveChanceProfit" -> "1439_locatePlayer"
+"1439_retrieveChanceProfit" -> "1439_calculateRandomInteger"
+"1439_retrieveCommunityTax" -> "1439_calculateRandomInteger"
+"1439_payRent" -> "1439_retrievePropertyRarity"
+"1439_withdraw" -> "1439_onlyRole"
+"1439_propertyTransfer" -> "1439_onlyRole"
+"1439_constructor" -> "1439__setRoleAdmin"
+"1439_buyProp" -> "1439_retrievePropertyRarity"
+"1439_setPrices" -> "1439_onlyRole"
+"1439_payRent" -> "1439_retrievePropertyRent"
+}subgraph cluster_3871_PropContract {
+label = "PropContract"
+"3871_constructor" [label="constructor"]
+"3871_royaltyInfo" [label="royaltyInfo"]
+"3871_mint" [label="mint"]
+"3871_setRoyalties" [label="setRoyalties"]
+"3871_isApprovedForAll" [label="isApprovedForAll"]
+"3871__isApprovedOrOwner" [label="_isApprovedOrOwner"]
+"3871_setDefaultRoyaltyPercentageBasisPoints" [label="setDefaultRoyaltyPercentageBasisPoints"]
+"3871_isValidProp" [label="isValidProp"]
+"3871_generateID" [label="generateID"]
+"3871__setRoyalties" [label="_setRoyalties"]
+"3871_getNbOfProps" [label="getNbOfProps"]
+"3871_supportsInterface" [label="supportsInterface"]
+"3871_setIsOperatorAllowed" [label="setIsOperatorAllowed"]
+"3871_tokenURI" [label="tokenURI"]
+"3871_get" [label="get"]
+"3871__baseURI" [label="_baseURI"]
+"3871_exists" [label="exists"]
+"3871__isApprovedOrOwner" -> "3871_ownerOf"
+"3871__setRoyalties" -> "3871__setRoyalties"
+"3871_constructor" -> "3871_constructor"
+"3871_mint" -> "3871_generateID"
+"3871_mint" -> "3871__safeMint"
+"3871_tokenURI" -> "3871_tokenURI"
+"3871_setRoyalties" -> "3871__setRoyalties"
+"3871_mint" -> "3871_isValidProp"
+"3871__isApprovedOrOwner" -> "3871_isApprovedForAll"
+"3871_constructor" -> "3871__setRoleAdmin"
+"3871_mint" -> "3871_onlyRole"
+"3871_get" -> "3871_exists"
+"3871_getNbOfProps" -> "3871_isValidProp"
+"3871_setRoyalties" -> "3871_onlyRole"
+"3871_mint" -> "3871__setRoyalties"
+"3871_supportsInterface" -> "3871_supportsInterface"
+"3871_setDefaultRoyaltyPercentageBasisPoints" -> "3871_onlyRole"
+"3871_constructor" -> "3871__setupRole"
+"3871_setIsOperatorAllowed" -> "3871_onlyRole"
+"3871__isApprovedOrOwner" -> "3871__exists"
+}subgraph cluster_1826_IERC20 {
+label = "IERC20"
+"1826_approve" [label="approve"]
+"1826_totalSupply" [label="totalSupply"]
+"1826_balanceOf" [label="balanceOf"]
+"1826_transferFrom" [label="transferFrom"]
+"1826_transfer" [label="transfer"]
+"1826_allowance" [label="allowance"]
+}subgraph cluster_6180_IERC165 {
+label = "IERC165"
+"6180_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_3243_PawnContract {
+label = "PawnContract"
+"3243_generateID" [label="generateID"]
+"3243__baseURI" [label="_baseURI"]
+"3243_constructor" [label="constructor"]
+"3243_get" [label="get"]
+"3243_supportsInterface" [label="supportsInterface"]
+"3243_random" [label="random"]
+"3243_tokenURI" [label="tokenURI"]
+"3243_mint" [label="mint"]
+"3243_supportsInterface" -> "3243_supportsInterface"
+"3243_constructor" -> "3243__setupRole"
+"3243_constructor" -> "3243_constructor"
+"3243_mint" -> "3243_generateID"
+"3243_mint" -> "3243__safeMint"
+"3243_mint" -> "3243_random"
+"3243_constructor" -> "3243__setRoleAdmin"
+"3243_get" -> "3243__exists"
+"3243_mint" -> "3243_balanceOf"
+"3243_tokenURI" -> "3243_tokenURI"
+"3243_mint" -> "3243_onlyRole"
+}subgraph cluster_2740_BoardContract {
+label = "BoardContract"
+"2740_setPawnInfo" [label="setPawnInfo"]
+"2740_getPawnInfo" [label="getPawnInfo"]
+"2740_getNbLands" [label="getNbLands"]
+"2740_requestRandomNumber" [label="requestRandomNumber"]
+"2740_constructor" [label="constructor"]
+"2740_register" [label="register"]
+"2740_isRegistered" [label="isRegistered"]
+"2740_isPurchasable" [label="isPurchasable"]
+"2740_fee" [label="fee"]
+"2740_gameStrategist" [label="gameStrategist"]
+"2740_newBoard" [label="newBoard"]
+"2740_getMaxEdition" [label="getMaxEdition"]
+"2740_play" [label="play"]
+"2740_fulfillRandomness" [label="fulfillRandomness"]
+"2740_getRarityLevel" [label="getRarityLevel"]
+"2740_constructor" -> "2740__setRoleAdmin"
+"2740_requestRandomNumber" -> "2740_requestRandomness"
+"2740_getPawnInfo" -> "2740_isRegistered"
+"2740_constructor" -> "2740_constructor"
+"2740_newBoard" -> "2740_onlyRole"
+"2740_play" -> "2740_requestRandomNumber"
+"2740_fulfillRandomness" -> "2740_gameStrategist"
+"2740_register" -> "2740_onlyRole"
+"2740_constructor" -> "2740__setupRole"
+"2740_setPawnInfo" -> "2740_onlyRole"
+"2740_play" -> "2740_onlyRole"
+}subgraph cluster_5557_Ownable {
+label = "Ownable"
+"5557_transferOwnership" [label="transferOwnership"]
+"5557_constructor" [label="constructor"]
+"5557_owner" [label="owner"]
+"5557_renounceOwnership" [label="renounceOwnership"]
+"5557__transferOwnership" [label="_transferOwnership"]
+"5557_renounceOwnership" -> "5557_onlyOwner"
+"5557_constructor" -> "5557__transferOwnership"
+"5557_transferOwnership" -> "5557__transferOwnership"
+"5557_transferOwnership" -> "5557_onlyOwner"
+"5557_constructor" -> "5557__msgSender"
+"5557_renounceOwnership" -> "5557__transferOwnership"
+}subgraph cluster_6325_LinkTokenInterface {
+label = "LinkTokenInterface"
+"6325_transferFrom" [label="transferFrom"]
+"6325_decimals" [label="decimals"]
+"6325_allowance" [label="allowance"]
+"6325_totalSupply" [label="totalSupply"]
+"6325_transfer" [label="transfer"]
+"6325_transferAndCall" [label="transferAndCall"]
+"6325_decreaseApproval" [label="decreaseApproval"]
+"6325_increaseApproval" [label="increaseApproval"]
+"6325_approve" [label="approve"]
+"6325_symbol" [label="symbol"]
+"6325_balanceOf" [label="balanceOf"]
+"6325_name" [label="name"]
+}subgraph cluster_1844_IERC721Receiver {
+label = "IERC721Receiver"
+"1844_onERC721Received" [label="onERC721Received"]
+}subgraph cluster_7747_Address {
+label = "Address"
+"7747_isContract" [label="isContract"]
+"7747_functionStaticCall" [label="functionStaticCall"]
+"7747_verifyCallResult" [label="verifyCallResult"]
+"7747_functionCallWithValue" [label="functionCallWithValue"]
+"7747_sendValue" [label="sendValue"]
+"7747_functionCall" [label="functionCall"]
+"7747_functionDelegateCall" [label="functionDelegateCall"]
+"7747_functionStaticCall" -> "7747_functionStaticCall"
+"7747_functionStaticCall" -> "7747_verifyCallResult"
+"7747_functionCallWithValue" -> "7747_functionCallWithValue"
+"7747_functionCallWithValue" -> "7747_verifyCallResult"
+"7747_functionCall" -> "7747_functionCall"
+"7747_functionDelegateCall" -> "7747_verifyCallResult"
+"7747_functionCall" -> "7747_functionCallWithValue"
+"7747_functionCallWithValue" -> "7747_isContract"
+"7747_functionDelegateCall" -> "7747_functionDelegateCall"
+"7747_functionStaticCall" -> "7747_isContract"
+"7747_functionDelegateCall" -> "7747_isContract"
+}subgraph cluster_4805_Strings {
+label = "Strings"
+"4805_toString" [label="toString"]
+"4805_toHexString" [label="toHexString"]
+"4805_toHexString" -> "4805_toHexString"
+}subgraph cluster_5576_IERC2981 {
+label = "IERC2981"
+"5576_royaltyInfo" [label="royaltyInfo"]
+}subgraph cluster_5452_ERC721Enumerable {
+label = "ERC721Enumerable"
+"5452_tokenOfOwnerByIndex" [label="tokenOfOwnerByIndex"]
+"5452_tokenByIndex" [label="tokenByIndex"]
+"5452_totalSupply" [label="totalSupply"]
+"5452__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"5452__addTokenToAllTokensEnumeration" [label="_addTokenToAllTokensEnumeration"]
+"5452__removeTokenFromAllTokensEnumeration" [label="_removeTokenFromAllTokensEnumeration"]
+"5452_supportsInterface" [label="supportsInterface"]
+"5452__addTokenToOwnerEnumeration" [label="_addTokenToOwnerEnumeration"]
+"5452__removeTokenFromOwnerEnumeration" [label="_removeTokenFromOwnerEnumeration"]
+"5452_tokenOfOwnerByIndex" -> "5452_balanceOf"
+"5452__beforeTokenTransfer" -> "5452__removeTokenFromOwnerEnumeration"
+"5452__beforeTokenTransfer" -> "5452__removeTokenFromAllTokensEnumeration"
+"5452__removeTokenFromOwnerEnumeration" -> "5452_balanceOf"
+"5452__beforeTokenTransfer" -> "5452__beforeTokenTransfer"
+"5452__beforeTokenTransfer" -> "5452__addTokenToOwnerEnumeration"
+"5452__beforeTokenTransfer" -> "5452__addTokenToAllTokensEnumeration"
+"5452_tokenByIndex" -> "5452_totalSupply"
+"5452_supportsInterface" -> "5452_supportsInterface"
+"5452__addTokenToOwnerEnumeration" -> "5452_balanceOf"
+}subgraph cluster_7248_ERC721 {
+label = "ERC721"
+"7248_symbol" [label="symbol"]
+"7248_getApproved" [label="getApproved"]
+"7248_constructor" [label="constructor"]
+"7248__checkOnERC721Received" [label="_checkOnERC721Received"]
+"7248_name" [label="name"]
+"7248_setApprovalForAll" [label="setApprovalForAll"]
+"7248__baseURI" [label="_baseURI"]
+"7248_safeTransferFrom" [label="safeTransferFrom"]
+"7248_tokenURI" [label="tokenURI"]
+"7248__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"7248__transfer" [label="_transfer"]
+"7248__burn" [label="_burn"]
+"7248_ownerOf" [label="ownerOf"]
+"7248_supportsInterface" [label="supportsInterface"]
+"7248__exists" [label="_exists"]
+"7248_approve" [label="approve"]
+"7248__safeMint" [label="_safeMint"]
+"7248_isApprovedForAll" [label="isApprovedForAll"]
+"7248__approve" [label="_approve"]
+"7248_transferFrom" [label="transferFrom"]
+"7248__isApprovedOrOwner" [label="_isApprovedOrOwner"]
+"7248__mint" [label="_mint"]
+"7248__safeTransfer" [label="_safeTransfer"]
+"7248__setApprovalForAll" [label="_setApprovalForAll"]
+"7248_balanceOf" [label="balanceOf"]
+"7248_safeTransferFrom" -> "7248__msgSender"
+"7248_approve" -> "7248__approve"
+"7248__approve" -> "7248_ownerOf"
+"7248_approve" -> "7248_isApprovedForAll"
+"7248_transferFrom" -> "7248__msgSender"
+"7248__transfer" -> "7248__beforeTokenTransfer"
+"7248__burn" -> "7248__beforeTokenTransfer"
+"7248_transferFrom" -> "7248__isApprovedOrOwner"
+"7248__safeTransfer" -> "7248__checkOnERC721Received"
+"7248_safeTransferFrom" -> "7248__isApprovedOrOwner"
+"7248_getApproved" -> "7248__exists"
+"7248__isApprovedOrOwner" -> "7248_isApprovedForAll"
+"7248__burn" -> "7248__approve"
+"7248__isApprovedOrOwner" -> "7248_getApproved"
+"7248_setApprovalForAll" -> "7248__setApprovalForAll"
+"7248_tokenURI" -> "7248__baseURI"
+"7248__safeMint" -> "7248__mint"
+"7248__mint" -> "7248__beforeTokenTransfer"
+"7248_tokenURI" -> "7248__exists"
+"7248_approve" -> "7248_ownerOf"
+"7248_setApprovalForAll" -> "7248__msgSender"
+"7248_safeTransferFrom" -> "7248__safeTransfer"
+"7248__safeMint" -> "7248__safeMint"
+"7248__checkOnERC721Received" -> "7248__msgSender"
+"7248__isApprovedOrOwner" -> "7248__exists"
+"7248__burn" -> "7248_ownerOf"
+"7248_transferFrom" -> "7248__transfer"
+"7248__transfer" -> "7248_ownerOf"
+"7248_safeTransferFrom" -> "7248_safeTransferFrom"
+"7248__transfer" -> "7248__approve"
+"7248__isApprovedOrOwner" -> "7248_ownerOf"
+"7248_approve" -> "7248__msgSender"
+"7248__safeTransfer" -> "7248__transfer"
+"7248_supportsInterface" -> "7248_supportsInterface"
+"7248__safeMint" -> "7248__checkOnERC721Received"
+"7248__mint" -> "7248__exists"
+}subgraph cluster_1748_AccessControl {
+label = "AccessControl"
+"1748_grantRole" [label="grantRole"]
+"1748__grantRole" [label="_grantRole"]
+"1748_renounceRole" [label="renounceRole"]
+"1748_getRoleAdmin" [label="getRoleAdmin"]
+"1748_hasRole" [label="hasRole"]
+"1748_revokeRole" [label="revokeRole"]
+"1748__revokeRole" [label="_revokeRole"]
+"1748_supportsInterface" [label="supportsInterface"]
+"1748__setRoleAdmin" [label="_setRoleAdmin"]
+"1748__setupRole" [label="_setupRole"]
+"1748__checkRole" [label="_checkRole"]
+"1748__grantRole" -> "1748_hasRole"
+"1748_supportsInterface" -> "1748_supportsInterface"
+"1748_revokeRole" -> "1748__revokeRole"
+"1748_renounceRole" -> "1748__msgSender"
+"1748_renounceRole" -> "1748__revokeRole"
+"1748_grantRole" -> "1748__grantRole"
+"1748__setupRole" -> "1748__grantRole"
+"1748__grantRole" -> "1748__msgSender"
+"1748__revokeRole" -> "1748_hasRole"
+"1748_revokeRole" -> "1748_getRoleAdmin"
+"1748__setRoleAdmin" -> "1748_getRoleAdmin"
+"1748__revokeRole" -> "1748__msgSender"
+"1748_revokeRole" -> "1748_onlyRole"
+"1748_grantRole" -> "1748_onlyRole"
+"1748_grantRole" -> "1748_getRoleAdmin"
+"1748__checkRole" -> "1748_hasRole"
+}subgraph cluster_5077_ERC20Capped {
+label = "ERC20Capped"
+"5077_cap" [label="cap"]
+"5077_constructor" [label="constructor"]
+"5077__mint" [label="_mint"]
+"5077__mint" -> "5077_totalSupply"
+"5077__mint" -> "5077__mint"
+"5077__mint" -> "5077_cap"
+}subgraph cluster_4950_VRFConsumerBase {
+label = "VRFConsumerBase"
+"4950_fulfillRandomness" [label="fulfillRandomness"]
+"4950_requestRandomness" [label="requestRandomness"]
+"4950_constructor" [label="constructor"]
+"4950_rawFulfillRandomness" [label="rawFulfillRandomness"]
+"4950_requestRandomness" -> "4950_makeRequestId"
+"4950_rawFulfillRandomness" -> "4950_fulfillRandomness"
+"4950_requestRandomness" -> "4950_makeVRFInputSeed"
+}subgraph cluster_6230_VRFRequestIDBase {
+label = "VRFRequestIDBase"
+"6230_makeVRFInputSeed" [label="makeVRFInputSeed"]
+"6230_makeRequestId" [label="makeRequestId"]
+}subgraph cluster_2900_MonoContract {
+label = "MonoContract"
+"2900__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"2900_pause" [label="pause"]
+"2900_mint" [label="mint"]
+"2900__mint" [label="_mint"]
+"2900_unpause" [label="unpause"]
+"2900_constructor" [label="constructor"]
+"2900_mint" -> "2900_onlyRole"
+"2900_constructor" -> "2900__setRoleAdmin"
+"2900_pause" -> "2900__pause"
+"2900_constructor" -> "2900_constructor"
+"2900_pause" -> "2900_onlyRole"
+"2900_unpause" -> "2900__unpause"
+"2900__mint" -> "2900__mint"
+"2900_mint" -> "2900__mint"
+"2900_unpause" -> "2900_onlyRole"
+"2900__beforeTokenTransfer" -> "2900__beforeTokenTransfer"
+"2900_constructor" -> "2900__setupRole"
+}subgraph cluster_4829_ERC165 {
+label = "ERC165"
+"4829_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_4580_IAccessControl {
+label = "IAccessControl"
+"4580_hasRole" [label="hasRole"]
+"4580_grantRole" [label="grantRole"]
+"4580_getRoleAdmin" [label="getRoleAdmin"]
+"4580_revokeRole" [label="revokeRole"]
+"4580_renounceRole" [label="renounceRole"]
+}subgraph cluster_7279_IERC721Enumerable {
+label = "IERC721Enumerable"
+"7279_totalSupply" [label="totalSupply"]
+"7279_tokenByIndex" [label="tokenByIndex"]
+"7279_tokenOfOwnerByIndex" [label="tokenOfOwnerByIndex"]
+}subgraph cluster_4602_Context {
+label = "Context"
+"4602__msgData" [label="_msgData"]
+"4602__msgSender" [label="_msgSender"]
+}subgraph cluster_5622_AggregatorV3Interface {
+label = "AggregatorV3Interface"
+"5622_latestRoundData" [label="latestRoundData"]
+"5622_getRoundData" [label="getRoundData"]
+"5622_version" [label="version"]
+"5622_description" [label="description"]
+"5622_decimals" [label="decimals"]
+}subgraph cluster_5114_ERC20Pausable {
+label = "ERC20Pausable"
+"5114__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"5114__beforeTokenTransfer" -> "5114__beforeTokenTransfer"
+"5114__beforeTokenTransfer" -> "5114_paused"
+}subgraph cluster_7423_IERC721 {
+label = "IERC721"
+"7423_approve" [label="approve"]
+"7423_getApproved" [label="getApproved"]
+"7423_balanceOf" [label="balanceOf"]
+"7423_transferFrom" [label="transferFrom"]
+"7423_isApprovedForAll" [label="isApprovedForAll"]
+"7423_ownerOf" [label="ownerOf"]
+"7423_safeTransferFrom" [label="safeTransferFrom"]
+"7423_setApprovalForAll" [label="setApprovalForAll"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"revert(string)" 
+"abi.encodePacked()" 
+"type()" 
+"require(bool,string)" 
+"require(bool)" 
+"abi.encode()" 
+"keccak256(bytes)" 
+"mload(uint256)" 
+"revert(uint256,uint256)" 
+"3871_getNbOfProps" -> "require(bool,string)"
+"1439_buyMono" -> "require(bool,string)"
+"7747_verifyCallResult" -> "mload(uint256)"
+"1748__checkRole" -> "abi.encodePacked()"
+"1439_payCommunityTax" -> "require(bool,string)"
+"7248_safeTransferFrom" -> "require(bool,string)"
+"7747_functionDelegateCall" -> "require(bool,string)"
+"7248_transferFrom" -> "require(bool,string)"
+"2740_newBoard" -> "require(bool,string)"
+"3871_generateID" -> "keccak256(bytes)"
+"4507_stake" -> "require(bool,string)"
+"4507_unstake" -> "require(bool,string)"
+"7248__mint" -> "require(bool,string)"
+"2740_getPawnInfo" -> "require(bool,string)"
+"3871_mint" -> "require(bool,string)"
+"7248__checkOnERC721Received" -> "revert(string)"
+"3243_generateID" -> "abi.encodePacked()"
+"5114__beforeTokenTransfer" -> "require(bool,string)"
+"4805_toHexString" -> "require(bool,string)"
+"1439_rollDices" -> "require(bool,string)"
+"7248_supportsInterface" -> "type()"
+"1439_propertyTransfer" -> "require(bool)"
+"6168__mint" -> "require(bool,string)"
+"1439_getPriceOfProp" -> "require(bool,string)"
+"1439_calculateRandomInteger" -> "abi.encode()"
+"6168_decreaseAllowance" -> "require(bool,string)"
+"7248__checkOnERC721Received" -> "mload(uint256)"
+"1439_buyProp" -> "require(bool,string)"
+"1748__checkRole" -> "revert(string)"
+"5077_constructor" -> "require(bool,string)"
+"5452_tokenByIndex" -> "require(bool,string)"
+"3871__isApprovedOrOwner" -> "require(bool,string)"
+"3243_mint" -> "require(bool,string)"
+"3871_generateID" -> "require(bool,string)"
+"3871_tokenURI" -> "abi.encodePacked()"
+"3871__setRoyalties" -> "require(bool,string)"
+"7248__isApprovedOrOwner" -> "require(bool,string)"
+"1748_renounceRole" -> "require(bool,string)"
+"4829_supportsInterface" -> "type()"
+"3243_random" -> "keccak256(bytes)"
+"2740_requestRandomNumber" -> "require(bool,string)"
+"7248__setApprovalForAll" -> "require(bool,string)"
+"7248_balanceOf" -> "require(bool,string)"
+"7747_functionStaticCall" -> "require(bool,string)"
+"2740_register" -> "require(bool,string)"
+"1439_buyPawn" -> "require(bool,string)"
+"1439_setPriceOfProp" -> "require(bool,string)"
+"7248_getApproved" -> "require(bool,string)"
+"7747_verifyCallResult" -> "revert(uint256,uint256)"
+"3243_get" -> "require(bool,string)"
+"1439_constructor" -> "require(bool,string)"
+"7747_functionCallWithValue" -> "require(bool,string)"
+"7248_ownerOf" -> "require(bool,string)"
+"1439_propertyTransfer" -> "require(bool,string)"
+"6168__burn" -> "require(bool,string)"
+"7248__checkOnERC721Received" -> "revert(uint256,uint256)"
+"6230_makeVRFInputSeed" -> "keccak256(bytes)"
+"7747_verifyCallResult" -> "revert(string)"
+"3871_generateID" -> "abi.encode()"
+"5012_burnFrom" -> "require(bool,string)"
+"1439_receiveChanceProfit" -> "require(bool,string)"
+"7248_tokenURI" -> "abi.encodePacked()"
+"5452_supportsInterface" -> "type()"
+"6230_makeRequestId" -> "abi.encodePacked()"
+"4507_addPool" -> "require(bool,string)"
+"6230_makeRequestId" -> "keccak256(bytes)"
+"1439_calculateRandomInteger" -> "keccak256(bytes)"
+"4950_rawFulfillRandomness" -> "require(bool,string)"
+"4507__calculateReward" -> "require(bool,string)"
+"3243_generateID" -> "keccak256(bytes)"
+"5452_tokenOfOwnerByIndex" -> "require(bool,string)"
+"2740_play" -> "require(bool,string)"
+"1439_payRent" -> "require(bool,string)"
+"5557_transferOwnership" -> "require(bool,string)"
+"6230_makeVRFInputSeed" -> "abi.encode()"
+"1439_withdraw" -> "require(bool,string)"
+"6168__approve" -> "require(bool,string)"
+"4950_requestRandomness" -> "abi.encode()"
+"7248_approve" -> "require(bool,string)"
+"1439_locatePlayer" -> "require(bool,string)"
+"3243_tokenURI" -> "abi.encodePacked()"
+"7747_sendValue" -> "require(bool,string)"
+"1748_supportsInterface" -> "type()"
+"1439_enrollPlayer" -> "require(bool,string)"
+"7248__transfer" -> "require(bool,string)"
+"7248__safeTransfer" -> "require(bool,string)"
+"6168_transferFrom" -> "require(bool,string)"
+"3871_get" -> "require(bool,string)"
+"7248_tokenURI" -> "require(bool,string)"
+"5077__mint" -> "require(bool,string)"
+"6168__transfer" -> "require(bool,string)"
+"3243_random" -> "abi.encodePacked()"
+"7248__safeMint" -> "require(bool,string)"
+}"1439_locatePlayer" -> "2740_isRegistered"
+"1439_propertyTransfer" -> "3871_isApprovedForAll"
+"1439_buyMono" -> "2900_balanceOf"
+"2740_requestRandomNumber" -> "6325_balanceOf"
+"1439_locatePlayer" -> "2740_getPawnInfo"
+"1439_enrollPlayer" -> "3243_balanceOf"
+"1439_buyMono" -> "4507_NETWORK_TOKEN_VIRTUAL_ADDRESS"
+"1439_buyProp" -> "2900_transferFrom"
+"1439_buyProp" -> "3243_tokenOfOwnerByIndex"
+"1439_payRent" -> "2900_transferFrom"
+"1439_locatePlayer" -> "2740_getMaxEdition"
+"1439_enrollPlayer" -> "2900_allowance"
+"1439_rollDices" -> "3243_tokenOfOwnerByIndex"
+"1748__checkRole" -> "4805_toHexString"
+"1439_propertyTransfer" -> "3871_royaltyInfo"
+"1439_payRent" -> "2740_setPawnInfo"
+"7248_tokenURI" -> "4805_toString"
+"1439_enrollPlayer" -> "3243_tokenOfOwnerByIndex"
+"1439_receiveChanceProfit" -> "2900_transfer"
+"1439_enrollPlayer" -> "2740_register"
+"1439_buyPawn" -> "3243_mint"
+"1439_payCommunityTax" -> "2900_transferFrom"
+"3871_isValidProp" -> "2740_getNbLands"
+"3871_isValidProp" -> "2740_getRarityLevel"
+"7248__checkOnERC721Received" -> "7747_isContract"
+"1439_receiveChanceProfit" -> "2740_setPawnInfo"
+"1439_buyProp" -> "3871_mint"
+"1439_getPriceOfProp" -> "3871_isValidProp"
+"1439_propertyTransfer" -> "2900_transferFrom"
+"1439_payRent" -> "3243_tokenOfOwnerByIndex"
+"1439_payCommunityTax" -> "3243_tokenOfOwnerByIndex"
+"3871_isValidProp" -> "2740_getMaxEdition"
+"7248__checkOnERC721Received" -> "1844_onERC721Received"
+"4507_stake" -> "6168_balanceOf"
+"4507_unstake" -> "6168_transfer"
+"1439_propertyTransfer" -> "3871_ownerOf"
+"1439_rollDices" -> "2740_play"
+"1439_buyPawn" -> "2900_transferFrom"
+"4507_stake" -> "6168_transferFrom"
+"1439_propertyTransfer" -> "3871_safeTransferFrom"
+"3871_royaltyInfo" -> "3871_owner"
+"4507__addPool" -> "6168_symbol"
+"1439_locatePlayer" -> "3243_balanceOf"
+"1439_receiveChanceProfit" -> "3243_tokenOfOwnerByIndex"
+"1439_propertyTransfer" -> "2900_balanceOf"
+"1439_payRent" -> "3871_isValidProp"
+"1439_rollDices" -> "2740_fee"
+"4507_getLastPrice" -> "5622_latestRoundData"
+"1439_rollDices" -> "2900_transferFrom"
+"1439_buyProp" -> "3871_isValidProp"
+"1439_rollDices" -> "1826_balanceOf"
+"1439_withdraw" -> "2900_transfer"
+"1439_rollDices" -> "2740_isRegistered"
+"3871_isValidProp" -> "2740_isPurchasable"
+"1439_buyMono" -> "2900_transfer"
+"1439_buyProp" -> "2740_setPawnInfo"
+"4950_requestRandomness" -> "6325_transferAndCall"
+"1439_rollDices" -> "3243_balanceOf"
+"1439_locatePlayer" -> "3243_tokenOfOwnerByIndex"
+"1439_setPriceOfProp" -> "3871_isValidProp"
+"1439_payCommunityTax" -> "2740_setPawnInfo"
+"1439_buyMono" -> "4507_getLastPrice"
+"1439_rollDices" -> "4507_getLastPrice"
+"4507_unstake" -> "1826_transfer"
+"4507_getPoolBalance" -> "6168_balanceOf"
+}

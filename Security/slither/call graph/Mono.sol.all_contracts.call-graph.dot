@@ -1,0 +1,178 @@
+strict digraph {
+subgraph cluster_705_IAccessControl {
+label = "IAccessControl"
+"705_revokeRole" [label="revokeRole"]
+"705_renounceRole" [label="renounceRole"]
+"705_getRoleAdmin" [label="getRoleAdmin"]
+"705_hasRole" [label="hasRole"]
+"705_grantRole" [label="grantRole"]
+}subgraph cluster_930_Strings {
+label = "Strings"
+"930_toHexString" [label="toHexString"]
+"930_toString" [label="toString"]
+"930_toHexString" -> "930_toHexString"
+}subgraph cluster_1604_IERC165 {
+label = "IERC165"
+"1604_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_1707_IERC20Metadata {
+label = "IERC20Metadata"
+"1707_symbol" [label="symbol"]
+"1707_decimals" [label="decimals"]
+"1707_name" [label="name"]
+}subgraph cluster_632_ERC20Pausable {
+label = "ERC20Pausable"
+"632__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"632__beforeTokenTransfer" -> "632_paused"
+"632__beforeTokenTransfer" -> "632__beforeTokenTransfer"
+}subgraph cluster_1682_IERC20 {
+label = "IERC20"
+"1682_totalSupply" [label="totalSupply"]
+"1682_balanceOf" [label="balanceOf"]
+"1682_transferFrom" [label="transferFrom"]
+"1682_approve" [label="approve"]
+"1682_transfer" [label="transfer"]
+"1682_allowance" [label="allowance"]
+}subgraph cluster_530_ERC20Burnable {
+label = "ERC20Burnable"
+"530_burn" [label="burn"]
+"530_burnFrom" [label="burnFrom"]
+"530_burnFrom" -> "530__msgSender"
+"530_burnFrom" -> "530__burn"
+"530_burn" -> "530__burn"
+"530_burn" -> "530__msgSender"
+"530_burnFrom" -> "530_allowance"
+"530_burnFrom" -> "530__approve"
+}subgraph cluster_468_AccessControl {
+label = "AccessControl"
+"468__checkRole" [label="_checkRole"]
+"468_renounceRole" [label="renounceRole"]
+"468__revokeRole" [label="_revokeRole"]
+"468_hasRole" [label="hasRole"]
+"468_grantRole" [label="grantRole"]
+"468_getRoleAdmin" [label="getRoleAdmin"]
+"468__grantRole" [label="_grantRole"]
+"468_supportsInterface" [label="supportsInterface"]
+"468_revokeRole" [label="revokeRole"]
+"468__setupRole" [label="_setupRole"]
+"468__setRoleAdmin" [label="_setRoleAdmin"]
+"468__setupRole" -> "468__grantRole"
+"468__revokeRole" -> "468__msgSender"
+"468__grantRole" -> "468_hasRole"
+"468_grantRole" -> "468__grantRole"
+"468_revokeRole" -> "468_onlyRole"
+"468_revokeRole" -> "468__revokeRole"
+"468_renounceRole" -> "468__revokeRole"
+"468_revokeRole" -> "468_getRoleAdmin"
+"468__setRoleAdmin" -> "468_getRoleAdmin"
+"468__grantRole" -> "468__msgSender"
+"468__checkRole" -> "468_hasRole"
+"468__revokeRole" -> "468_hasRole"
+"468_grantRole" -> "468_onlyRole"
+"468_grantRole" -> "468_getRoleAdmin"
+"468_renounceRole" -> "468__msgSender"
+"468_supportsInterface" -> "468_supportsInterface"
+}subgraph cluster_595_ERC20Capped {
+label = "ERC20Capped"
+"595_constructor" [label="constructor"]
+"595__mint" [label="_mint"]
+"595_cap" [label="cap"]
+"595__mint" -> "595__mint"
+"595__mint" -> "595_totalSupply"
+"595__mint" -> "595_cap"
+}subgraph cluster_727_Context {
+label = "Context"
+"727__msgSender" [label="_msgSender"]
+"727__msgData" [label="_msgData"]
+}subgraph cluster_1592_Pausable {
+label = "Pausable"
+"1592_constructor" [label="constructor"]
+"1592__unpause" [label="_unpause"]
+"1592_paused" [label="paused"]
+"1592__pause" [label="_pause"]
+"1592__pause" -> "1592__msgSender"
+"1592__unpause" -> "1592_whenPaused"
+"1592__pause" -> "1592_whenNotPaused"
+"1592__unpause" -> "1592__msgSender"
+}subgraph cluster_954_ERC165 {
+label = "ERC165"
+"954_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_1500_ERC20 {
+label = "ERC20"
+"1500__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"1500_constructor" [label="constructor"]
+"1500__mint" [label="_mint"]
+"1500_totalSupply" [label="totalSupply"]
+"1500_transfer" [label="transfer"]
+"1500__afterTokenTransfer" [label="_afterTokenTransfer"]
+"1500_increaseAllowance" [label="increaseAllowance"]
+"1500__approve" [label="_approve"]
+"1500_decimals" [label="decimals"]
+"1500_transferFrom" [label="transferFrom"]
+"1500_balanceOf" [label="balanceOf"]
+"1500_symbol" [label="symbol"]
+"1500_allowance" [label="allowance"]
+"1500_decreaseAllowance" [label="decreaseAllowance"]
+"1500__transfer" [label="_transfer"]
+"1500_approve" [label="approve"]
+"1500_name" [label="name"]
+"1500__burn" [label="_burn"]
+"1500_approve" -> "1500__msgSender"
+"1500_decreaseAllowance" -> "1500__approve"
+"1500__burn" -> "1500__afterTokenTransfer"
+"1500_approve" -> "1500__approve"
+"1500__transfer" -> "1500__beforeTokenTransfer"
+"1500__transfer" -> "1500__afterTokenTransfer"
+"1500__mint" -> "1500__beforeTokenTransfer"
+"1500__mint" -> "1500__afterTokenTransfer"
+"1500__burn" -> "1500__beforeTokenTransfer"
+"1500_transferFrom" -> "1500__transfer"
+"1500_transfer" -> "1500__msgSender"
+"1500_transferFrom" -> "1500__msgSender"
+"1500_increaseAllowance" -> "1500__msgSender"
+"1500_transfer" -> "1500__transfer"
+"1500_transferFrom" -> "1500__approve"
+"1500_decreaseAllowance" -> "1500__msgSender"
+"1500_increaseAllowance" -> "1500__approve"
+}subgraph cluster_159_MonoContract {
+label = "MonoContract"
+"159__mint" [label="_mint"]
+"159_unpause" [label="unpause"]
+"159__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"159_constructor" [label="constructor"]
+"159_pause" [label="pause"]
+"159_mint" [label="mint"]
+"159_constructor" -> "159_constructor"
+"159_constructor" -> "159__setupRole"
+"159_unpause" -> "159__unpause"
+"159_pause" -> "159__pause"
+"159_unpause" -> "159_onlyRole"
+"159_mint" -> "159__mint"
+"159__beforeTokenTransfer" -> "159__beforeTokenTransfer"
+"159_mint" -> "159_onlyRole"
+"159_constructor" -> "159__setRoleAdmin"
+"159__mint" -> "159__mint"
+"159_pause" -> "159_onlyRole"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"revert(string)" 
+"abi.encodePacked()" 
+"type()" 
+"require(bool,string)" 
+"1500__burn" -> "require(bool,string)"
+"468__checkRole" -> "revert(string)"
+"595_constructor" -> "require(bool,string)"
+"595__mint" -> "require(bool,string)"
+"468_renounceRole" -> "require(bool,string)"
+"468__checkRole" -> "abi.encodePacked()"
+"1500_decreaseAllowance" -> "require(bool,string)"
+"954_supportsInterface" -> "type()"
+"1500_transferFrom" -> "require(bool,string)"
+"632__beforeTokenTransfer" -> "require(bool,string)"
+"930_toHexString" -> "require(bool,string)"
+"530_burnFrom" -> "require(bool,string)"
+"1500__approve" -> "require(bool,string)"
+"1500__mint" -> "require(bool,string)"
+"1500__transfer" -> "require(bool,string)"
+"468_supportsInterface" -> "type()"
+}"468__checkRole" -> "930_toHexString"
+}

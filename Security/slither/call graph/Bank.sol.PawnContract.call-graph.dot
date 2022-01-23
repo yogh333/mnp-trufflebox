@@ -1,0 +1,218 @@
+strict digraph {
+subgraph cluster_4580_IAccessControl {
+label = "IAccessControl"
+"4580_hasRole" [label="hasRole"]
+"4580_grantRole" [label="grantRole"]
+"4580_getRoleAdmin" [label="getRoleAdmin"]
+"4580_revokeRole" [label="revokeRole"]
+"4580_renounceRole" [label="renounceRole"]
+}subgraph cluster_6180_IERC165 {
+label = "IERC165"
+"6180_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_7450_IERC721Metadata {
+label = "IERC721Metadata"
+"7450_symbol" [label="symbol"]
+"7450_tokenURI" [label="tokenURI"]
+"7450_name" [label="name"]
+}subgraph cluster_5452_ERC721Enumerable {
+label = "ERC721Enumerable"
+"5452_tokenOfOwnerByIndex" [label="tokenOfOwnerByIndex"]
+"5452_tokenByIndex" [label="tokenByIndex"]
+"5452_totalSupply" [label="totalSupply"]
+"5452__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"5452__addTokenToAllTokensEnumeration" [label="_addTokenToAllTokensEnumeration"]
+"5452__removeTokenFromAllTokensEnumeration" [label="_removeTokenFromAllTokensEnumeration"]
+"5452_supportsInterface" [label="supportsInterface"]
+"5452__addTokenToOwnerEnumeration" [label="_addTokenToOwnerEnumeration"]
+"5452__removeTokenFromOwnerEnumeration" [label="_removeTokenFromOwnerEnumeration"]
+"5452_tokenOfOwnerByIndex" -> "5452_balanceOf"
+"5452__beforeTokenTransfer" -> "5452__removeTokenFromOwnerEnumeration"
+"5452__beforeTokenTransfer" -> "5452__removeTokenFromAllTokensEnumeration"
+"5452__beforeTokenTransfer" -> "5452__beforeTokenTransfer"
+"5452__removeTokenFromOwnerEnumeration" -> "5452_balanceOf"
+"5452__beforeTokenTransfer" -> "5452__addTokenToOwnerEnumeration"
+"5452__beforeTokenTransfer" -> "5452__addTokenToAllTokensEnumeration"
+"5452_tokenByIndex" -> "5452_totalSupply"
+"5452_supportsInterface" -> "5452_supportsInterface"
+"5452__addTokenToOwnerEnumeration" -> "5452_balanceOf"
+}subgraph cluster_3243_PawnContract {
+label = "PawnContract"
+"3243_slitherConstructorConstantVariables" [label="slitherConstructorConstantVariables"]
+"3243_generateID" [label="generateID"]
+"3243__baseURI" [label="_baseURI"]
+"3243_constructor" [label="constructor"]
+"3243_get" [label="get"]
+"3243_supportsInterface" [label="supportsInterface"]
+"3243_random" [label="random"]
+"3243_tokenURI" [label="tokenURI"]
+"3243_mint" [label="mint"]
+"3243_supportsInterface" -> "3243_supportsInterface"
+"3243_constructor" -> "3243__setupRole"
+"3243_constructor" -> "3243_constructor"
+"3243_mint" -> "3243_generateID"
+"3243_mint" -> "3243__safeMint"
+"3243_mint" -> "3243_random"
+"3243_constructor" -> "3243__setRoleAdmin"
+"3243_get" -> "3243__exists"
+"3243_mint" -> "3243_balanceOf"
+"3243_tokenURI" -> "3243_tokenURI"
+"3243_mint" -> "3243_onlyRole"
+}subgraph cluster_7279_IERC721Enumerable {
+label = "IERC721Enumerable"
+"7279_totalSupply" [label="totalSupply"]
+"7279_tokenByIndex" [label="tokenByIndex"]
+"7279_tokenOfOwnerByIndex" [label="tokenOfOwnerByIndex"]
+}subgraph cluster_7248_ERC721 {
+label = "ERC721"
+"7248_symbol" [label="symbol"]
+"7248_getApproved" [label="getApproved"]
+"7248_constructor" [label="constructor"]
+"7248__checkOnERC721Received" [label="_checkOnERC721Received"]
+"7248_name" [label="name"]
+"7248_setApprovalForAll" [label="setApprovalForAll"]
+"7248__baseURI" [label="_baseURI"]
+"7248_safeTransferFrom" [label="safeTransferFrom"]
+"7248_tokenURI" [label="tokenURI"]
+"7248__beforeTokenTransfer" [label="_beforeTokenTransfer"]
+"7248__transfer" [label="_transfer"]
+"7248__burn" [label="_burn"]
+"7248_ownerOf" [label="ownerOf"]
+"7248_supportsInterface" [label="supportsInterface"]
+"7248__exists" [label="_exists"]
+"7248_approve" [label="approve"]
+"7248__safeMint" [label="_safeMint"]
+"7248_isApprovedForAll" [label="isApprovedForAll"]
+"7248__approve" [label="_approve"]
+"7248_transferFrom" [label="transferFrom"]
+"7248__isApprovedOrOwner" [label="_isApprovedOrOwner"]
+"7248__mint" [label="_mint"]
+"7248__safeTransfer" [label="_safeTransfer"]
+"7248__setApprovalForAll" [label="_setApprovalForAll"]
+"7248_balanceOf" [label="balanceOf"]
+"7248_safeTransferFrom" -> "7248__msgSender"
+"7248_approve" -> "7248__approve"
+"7248__approve" -> "7248_ownerOf"
+"7248_approve" -> "7248_isApprovedForAll"
+"7248_transferFrom" -> "7248__msgSender"
+"7248__transfer" -> "7248__beforeTokenTransfer"
+"7248_transferFrom" -> "7248__isApprovedOrOwner"
+"7248__burn" -> "7248__beforeTokenTransfer"
+"7248__safeTransfer" -> "7248__checkOnERC721Received"
+"7248_safeTransferFrom" -> "7248__isApprovedOrOwner"
+"7248_getApproved" -> "7248__exists"
+"7248__isApprovedOrOwner" -> "7248_isApprovedForAll"
+"7248__burn" -> "7248__approve"
+"7248__isApprovedOrOwner" -> "7248_getApproved"
+"7248_setApprovalForAll" -> "7248__setApprovalForAll"
+"7248_tokenURI" -> "7248__baseURI"
+"7248_tokenURI" -> "7248__exists"
+"7248__safeMint" -> "7248__mint"
+"7248__mint" -> "7248__beforeTokenTransfer"
+"7248_approve" -> "7248_ownerOf"
+"7248_setApprovalForAll" -> "7248__msgSender"
+"7248_safeTransferFrom" -> "7248__safeTransfer"
+"7248__safeMint" -> "7248__safeMint"
+"7248__checkOnERC721Received" -> "7248__msgSender"
+"7248__isApprovedOrOwner" -> "7248__exists"
+"7248__burn" -> "7248_ownerOf"
+"7248_transferFrom" -> "7248__transfer"
+"7248__transfer" -> "7248_ownerOf"
+"7248_safeTransferFrom" -> "7248_safeTransferFrom"
+"7248__transfer" -> "7248__approve"
+"7248__isApprovedOrOwner" -> "7248_ownerOf"
+"7248_approve" -> "7248__msgSender"
+"7248__safeTransfer" -> "7248__transfer"
+"7248_supportsInterface" -> "7248_supportsInterface"
+"7248__safeMint" -> "7248__checkOnERC721Received"
+"7248__mint" -> "7248__exists"
+}subgraph cluster_1748_AccessControl {
+label = "AccessControl"
+"1748_grantRole" [label="grantRole"]
+"1748__grantRole" [label="_grantRole"]
+"1748_renounceRole" [label="renounceRole"]
+"1748_getRoleAdmin" [label="getRoleAdmin"]
+"1748_hasRole" [label="hasRole"]
+"1748_revokeRole" [label="revokeRole"]
+"1748__revokeRole" [label="_revokeRole"]
+"1748_supportsInterface" [label="supportsInterface"]
+"1748__setRoleAdmin" [label="_setRoleAdmin"]
+"1748__setupRole" [label="_setupRole"]
+"1748__checkRole" [label="_checkRole"]
+"1748__grantRole" -> "1748_hasRole"
+"1748_supportsInterface" -> "1748_supportsInterface"
+"1748_revokeRole" -> "1748__revokeRole"
+"1748_renounceRole" -> "1748__msgSender"
+"1748_renounceRole" -> "1748__revokeRole"
+"1748_grantRole" -> "1748__grantRole"
+"1748__setupRole" -> "1748__grantRole"
+"1748__grantRole" -> "1748__msgSender"
+"1748__revokeRole" -> "1748_hasRole"
+"1748_revokeRole" -> "1748_getRoleAdmin"
+"1748__setRoleAdmin" -> "1748_getRoleAdmin"
+"1748__revokeRole" -> "1748__msgSender"
+"1748_revokeRole" -> "1748_onlyRole"
+"1748_grantRole" -> "1748_onlyRole"
+"1748_grantRole" -> "1748_getRoleAdmin"
+"1748__checkRole" -> "1748_hasRole"
+}subgraph cluster_4602_Context {
+label = "Context"
+"4602__msgData" [label="_msgData"]
+"4602__msgSender" [label="_msgSender"]
+}subgraph cluster_4829_ERC165 {
+label = "ERC165"
+"4829_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_7423_IERC721 {
+label = "IERC721"
+"7423_isApprovedForAll" [label="isApprovedForAll"]
+"7423_approve" [label="approve"]
+"7423_getApproved" [label="getApproved"]
+"7423_ownerOf" [label="ownerOf"]
+"7423_balanceOf" [label="balanceOf"]
+"7423_transferFrom" [label="transferFrom"]
+"7423_safeTransferFrom" [label="safeTransferFrom"]
+"7423_setApprovalForAll" [label="setApprovalForAll"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"revert(string)" 
+"abi.encodePacked()" 
+"type()" 
+"require(bool,string)" 
+"keccak256(bytes)" 
+"mload(uint256)" 
+"revert(uint256,uint256)" 
+"4829_supportsInterface" -> "type()"
+"7248_supportsInterface" -> "type()"
+"3243_random" -> "keccak256(bytes)"
+"1748__checkRole" -> "abi.encodePacked()"
+"3243_generateID" -> "keccak256(bytes)"
+"7248__setApprovalForAll" -> "require(bool,string)"
+"5452_tokenOfOwnerByIndex" -> "require(bool,string)"
+"7248_balanceOf" -> "require(bool,string)"
+"7248_safeTransferFrom" -> "require(bool,string)"
+"7248_getApproved" -> "require(bool,string)"
+"7248__checkOnERC721Received" -> "mload(uint256)"
+"3243_get" -> "require(bool,string)"
+"1748__checkRole" -> "revert(string)"
+"7248_approve" -> "require(bool,string)"
+"7248_ownerOf" -> "require(bool,string)"
+"7248_transferFrom" -> "require(bool,string)"
+"3243_tokenURI" -> "abi.encodePacked()"
+"1748_supportsInterface" -> "type()"
+"5452_tokenByIndex" -> "require(bool,string)"
+"7248__checkOnERC721Received" -> "revert(uint256,uint256)"
+"7248__transfer" -> "require(bool,string)"
+"3243_mint" -> "require(bool,string)"
+"7248__mint" -> "require(bool,string)"
+"7248__safeTransfer" -> "require(bool,string)"
+"7248_tokenURI" -> "require(bool,string)"
+"3243_slitherConstructorConstantVariables" -> "keccak256(bytes)"
+"7248_tokenURI" -> "abi.encodePacked()"
+"7248__isApprovedOrOwner" -> "require(bool,string)"
+"5452_supportsInterface" -> "type()"
+"3243_random" -> "abi.encodePacked()"
+"7248__checkOnERC721Received" -> "revert(string)"
+"7248__safeMint" -> "require(bool,string)"
+"1748_renounceRole" -> "require(bool,string)"
+"3243_generateID" -> "abi.encodePacked()"
+}
+}

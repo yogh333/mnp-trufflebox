@@ -1,0 +1,13 @@
+strict digraph {
+subgraph cluster_930_Strings {
+label = "Strings"
+"930_slitherConstructorConstantVariables" [label="slitherConstructorConstantVariables"]
+"930_toHexString" [label="toHexString"]
+"930_toString" [label="toString"]
+"930_toHexString" -> "930_toHexString"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool,string)" 
+"930_toHexString" -> "require(bool,string)"
+}
+}

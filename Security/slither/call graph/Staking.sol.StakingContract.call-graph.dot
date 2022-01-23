@@ -1,0 +1,48 @@
+strict digraph {
+subgraph cluster_1432_Context {
+label = "Context"
+"1432__msgSender" [label="_msgSender"]
+"1432__msgData" [label="_msgData"]
+}subgraph cluster_786_Ownable {
+label = "Ownable"
+"786_renounceOwnership" [label="renounceOwnership"]
+"786__transferOwnership" [label="_transferOwnership"]
+"786_constructor" [label="constructor"]
+"786_transferOwnership" [label="transferOwnership"]
+"786_owner" [label="owner"]
+"786_transferOwnership" -> "786_onlyOwner"
+"786_transferOwnership" -> "786__transferOwnership"
+"786_constructor" -> "786__transferOwnership"
+"786_renounceOwnership" -> "786_onlyOwner"
+"786_renounceOwnership" -> "786__transferOwnership"
+"786_constructor" -> "786__msgSender"
+}subgraph cluster_635_StakingContract {
+label = "StakingContract"
+"635_getPools" [label="getPools"]
+"635_addPool" [label="addPool"]
+"635_unstake" [label="unstake"]
+"635_stake" [label="stake"]
+"635_getPoolBalance" [label="getPoolBalance"]
+"635__addPool" [label="_addPool"]
+"635_constructor" [label="constructor"]
+"635_pendingReward" [label="pendingReward"]
+"635__calculateReward" [label="_calculateReward"]
+"635_getLastPrice" [label="getLastPrice"]
+"635_getUserBalanceInPool" [label="getUserBalanceInPool"]
+"635_slitherConstructorConstantVariables" [label="slitherConstructorConstantVariables"]
+"635_constructor" -> "635__addPool"
+"635_pendingReward" -> "635__calculateReward"
+"635_addPool" -> "635_onlyOwner"
+"635__calculateReward" -> "635_getLastPrice"
+"635_unstake" -> "635__calculateReward"
+"635_addPool" -> "635__addPool"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool,string)" 
+"635_unstake" -> "require(bool,string)"
+"635_addPool" -> "require(bool,string)"
+"635__calculateReward" -> "require(bool,string)"
+"786_transferOwnership" -> "require(bool,string)"
+"635_stake" -> "require(bool,string)"
+}
+}

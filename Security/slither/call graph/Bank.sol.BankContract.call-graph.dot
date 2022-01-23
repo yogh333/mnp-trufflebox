@@ -1,0 +1,128 @@
+strict digraph {
+subgraph cluster_4580_IAccessControl {
+label = "IAccessControl"
+"4580_hasRole" [label="hasRole"]
+"4580_grantRole" [label="grantRole"]
+"4580_getRoleAdmin" [label="getRoleAdmin"]
+"4580_revokeRole" [label="revokeRole"]
+"4580_renounceRole" [label="renounceRole"]
+}subgraph cluster_6180_IERC165 {
+label = "IERC165"
+"6180_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_1748_AccessControl {
+label = "AccessControl"
+"1748_grantRole" [label="grantRole"]
+"1748__grantRole" [label="_grantRole"]
+"1748_renounceRole" [label="renounceRole"]
+"1748_getRoleAdmin" [label="getRoleAdmin"]
+"1748_hasRole" [label="hasRole"]
+"1748_revokeRole" [label="revokeRole"]
+"1748__revokeRole" [label="_revokeRole"]
+"1748_supportsInterface" [label="supportsInterface"]
+"1748__setRoleAdmin" [label="_setRoleAdmin"]
+"1748__setupRole" [label="_setupRole"]
+"1748__checkRole" [label="_checkRole"]
+"1748__grantRole" -> "1748_hasRole"
+"1748_supportsInterface" -> "1748_supportsInterface"
+"1748_revokeRole" -> "1748__revokeRole"
+"1748_renounceRole" -> "1748__msgSender"
+"1748_renounceRole" -> "1748__revokeRole"
+"1748_grantRole" -> "1748__grantRole"
+"1748__setupRole" -> "1748__grantRole"
+"1748__grantRole" -> "1748__msgSender"
+"1748__revokeRole" -> "1748_hasRole"
+"1748_revokeRole" -> "1748_getRoleAdmin"
+"1748__setRoleAdmin" -> "1748_getRoleAdmin"
+"1748__revokeRole" -> "1748__msgSender"
+"1748_revokeRole" -> "1748_onlyRole"
+"1748_grantRole" -> "1748_onlyRole"
+"1748_grantRole" -> "1748_getRoleAdmin"
+"1748__checkRole" -> "1748_hasRole"
+}subgraph cluster_1844_IERC721Receiver {
+label = "IERC721Receiver"
+"1844_onERC721Received" [label="onERC721Received"]
+}subgraph cluster_4602_Context {
+label = "Context"
+"4602__msgData" [label="_msgData"]
+"4602__msgSender" [label="_msgSender"]
+}subgraph cluster_4829_ERC165 {
+label = "ERC165"
+"4829_supportsInterface" [label="supportsInterface"]
+}subgraph cluster_1439_BankContract {
+label = "BankContract"
+"1439_slitherConstructorConstantVariables" [label="slitherConstructorConstantVariables"]
+"1439_buyMono" [label="buyMono"]
+"1439_enrollPlayer" [label="enrollPlayer"]
+"1439_setPriceOfProp" [label="setPriceOfProp"]
+"1439_locatePlayer" [label="locatePlayer"]
+"1439_receiveChanceProfit" [label="receiveChanceProfit"]
+"1439_payRent" [label="payRent"]
+"1439_buyPawn" [label="buyPawn"]
+"1439_retrievePropertyRent" [label="retrievePropertyRent"]
+"1439_rollDices" [label="rollDices"]
+"1439_retrievePropertyRarity" [label="retrievePropertyRarity"]
+"1439_propertyTransfer" [label="propertyTransfer"]
+"1439_setPrices" [label="setPrices"]
+"1439_calculateRandomInteger" [label="calculateRandomInteger"]
+"1439_onERC721Received" [label="onERC721Received"]
+"1439_slitherConstructorVariables" [label="slitherConstructorVariables"]
+"1439_payCommunityTax" [label="payCommunityTax"]
+"1439_constructor" [label="constructor"]
+"1439_getPriceOfProp" [label="getPriceOfProp"]
+"1439_withdraw" [label="withdraw"]
+"1439_retrieveChanceProfit" [label="retrieveChanceProfit"]
+"1439_retrieveCommunityTax" [label="retrieveCommunityTax"]
+"1439_buyProp" [label="buyProp"]
+"1439_payCommunityTax" -> "1439_retrieveCommunityTax"
+"1439_payCommunityTax" -> "1439_locatePlayer"
+"1439_setPriceOfProp" -> "1439_onlyRole"
+"1439_buyProp" -> "1439_locatePlayer"
+"1439_receiveChanceProfit" -> "1439_retrieveChanceProfit"
+"1439_retrievePropertyRarity" -> "1439_calculateRandomInteger"
+"1439_rollDices" -> "1439_locatePlayer"
+"1439_payRent" -> "1439_locatePlayer"
+"1439_receiveChanceProfit" -> "1439_locatePlayer"
+"1439_buyProp" -> "1439_retrievePropertyRarity"
+"1439_retrieveChanceProfit" -> "1439_calculateRandomInteger"
+"1439_constructor" -> "1439__setRoleAdmin"
+"1439_payRent" -> "1439_retrievePropertyRarity"
+"1439_retrieveCommunityTax" -> "1439_calculateRandomInteger"
+"1439_withdraw" -> "1439_onlyRole"
+"1439_payRent" -> "1439_retrievePropertyRent"
+"1439_propertyTransfer" -> "1439_onlyRole"
+"1439_setPrices" -> "1439_onlyRole"
+"1439_constructor" -> "1439__setupRole"
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"revert(string)" 
+"abi.encodePacked()" 
+"type()" 
+"require(bool,string)" 
+"require(bool)" 
+"abi.encode()" 
+"keccak256(bytes)" 
+"1439_buyMono" -> "require(bool,string)"
+"1439_rollDices" -> "require(bool,string)"
+"1439_slitherConstructorConstantVariables" -> "keccak256(bytes)"
+"4829_supportsInterface" -> "type()"
+"1439_propertyTransfer" -> "require(bool)"
+"1748__checkRole" -> "abi.encodePacked()"
+"1439_getPriceOfProp" -> "require(bool,string)"
+"1439_payCommunityTax" -> "require(bool,string)"
+"1439_payRent" -> "require(bool,string)"
+"1439_calculateRandomInteger" -> "abi.encode()"
+"1439_withdraw" -> "require(bool,string)"
+"1439_buyPawn" -> "require(bool,string)"
+"1439_setPriceOfProp" -> "require(bool,string)"
+"1439_constructor" -> "require(bool,string)"
+"1439_buyProp" -> "require(bool,string)"
+"1748__checkRole" -> "revert(string)"
+"1439_propertyTransfer" -> "require(bool,string)"
+"1439_locatePlayer" -> "require(bool,string)"
+"1748_supportsInterface" -> "type()"
+"1439_enrollPlayer" -> "require(bool,string)"
+"1439_receiveChanceProfit" -> "require(bool,string)"
+"1439_calculateRandomInteger" -> "keccak256(bytes)"
+"1748_renounceRole" -> "require(bool,string)"
+}
+}

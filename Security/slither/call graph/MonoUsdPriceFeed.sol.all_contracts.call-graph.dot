@@ -1,0 +1,49 @@
+strict digraph {
+subgraph cluster_131_MonoUsdPriceFeed {
+label = "MonoUsdPriceFeed"
+"131_getRoundData" [label="getRoundData"]
+"131_setRoundData" [label="setRoundData"]
+"131_version" [label="version"]
+"131_latestRoundData" [label="latestRoundData"]
+"131_constructor" [label="constructor"]
+"131_decimals" [label="decimals"]
+"131_description" [label="description"]
+"131_constructor" -> "131_setRoundData"
+}subgraph cluster_360_IERC20 {
+label = "IERC20"
+"360_balanceOf" [label="balanceOf"]
+"360_allowance" [label="allowance"]
+"360_approve" [label="approve"]
+"360_transferFrom" [label="transferFrom"]
+"360_totalSupply" [label="totalSupply"]
+"360_transfer" [label="transfer"]
+}subgraph cluster_177_AggregatorV3Interface {
+label = "AggregatorV3Interface"
+"177_description" [label="description"]
+"177_decimals" [label="decimals"]
+"177_version" [label="version"]
+"177_latestRoundData" [label="latestRoundData"]
+"177_getRoundData" [label="getRoundData"]
+}subgraph cluster_282_Ownable {
+label = "Ownable"
+"282_owner" [label="owner"]
+"282__transferOwnership" [label="_transferOwnership"]
+"282_renounceOwnership" [label="renounceOwnership"]
+"282_constructor" [label="constructor"]
+"282_transferOwnership" [label="transferOwnership"]
+"282_renounceOwnership" -> "282_onlyOwner"
+"282_constructor" -> "282__msgSender"
+"282_transferOwnership" -> "282_onlyOwner"
+"282_renounceOwnership" -> "282__transferOwnership"
+"282_constructor" -> "282__transferOwnership"
+"282_transferOwnership" -> "282__transferOwnership"
+}subgraph cluster_382_Context {
+label = "Context"
+"382__msgSender" [label="_msgSender"]
+"382__msgData" [label="_msgData"]
+}subgraph cluster_solidity {
+label = "[Solidity]"
+"require(bool,string)" 
+"282_transferOwnership" -> "require(bool,string)"
+}
+}

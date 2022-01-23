@@ -8,9 +8,10 @@ reports are made with solc version 0.8.9 (slither have a bug with 0.8.10)
 
 [Detectors issues documentation](https://github.com/crytic/slither/wiki/Detector-Documentation)
 
-See slither [brut html report]()
+See [brut html report](https://github.com/jcaporossi/mnp-trufflebox/blob/feature/security/Security/slither/slither.html)  
+See [human summary html report](https://github.com/jcaporossi/mnp-trufflebox/blob/feature/security/Security/slither/human-summary.html)
 
-### High issues
+### High issues (critical)
 #### [weak PRNG](https://github.com/crytic/slither/wiki/Detector-Documentation#weak-prng)
 - PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.power = 1 + (r % 11) (share/contracts/Pawn.sol#83)"
 - PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.subject = 1 + (r % 8) (share/contracts/Pawn.sol#79)"
@@ -26,3 +27,26 @@ See slither [brut html report]()
 - StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182) ignores return value by pool.info.token.transferFrom(msg.sender,address(this),_amount) (share/contracts/Staking.sol#178)
 - StakingContract.unstake(address) (share/contracts/Staking.sol#213-238) ignores return value by pool.info.token.transfer(msg.sender,stakedAmount) (share/contracts/Staking.sol#232)
 - StakingContract.unstake(address) (share/contracts/Staking.sol#213-238) ignores return value by rewardToken.transfer(msg.sender,rewards) (share/contracts/Staking.sol#235)
+
+StakingContract._calculateReward(address,StakingContract.PoolInfo,StakingContract.UserInfo) (share/contracts/Staking.sol#192-204) performs a multiplication on the result of a division:
+-_user.amount * (block.timestamp - _user.depositDate) * _pool.yield / 100 / 365 / 24 / 60 / 60 * uint256(getLastPrice(address(rewardToken))) / uint256(getLastPrice(_token)) (share/contracts/Staking.sol#199-202)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+
+### Medium issues
+#### [Contract locking ether](https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether)
+Contract BankContract (share/contracts/Bank.sol#19-470) has payable functions:
+- BankContract.buyMono() (share/contracts/Bank.sol#192-205)
+But does not have a function to withdraw the ether
+
+#### [uninitialized local variables](https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables)
+- BoardContract.constructor(address,address,bytes32,uint256).n (share/contracts/Board.sol#100) is a local variable never initialized
+- PawnContract.mint(address).p (share/contracts/Pawn.sol#77) is a local variable never initialized
+- BoardContract.constructor(address,address,bytes32,uint256).landID (share/contracts/Board.sol#98) is a local variable never initialized
+
+#### [unused return](https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return)
+- VRFConsumerBase.requestRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152-166) ignores return value by LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+- ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) ignores return value by IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+
+
+### Call graphs
+
