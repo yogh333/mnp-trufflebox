@@ -1,0 +1,36 @@
+@font-face {
+    font-family: 'ITC Kabel Std';
+    font-style: normal;
+    font-weight: 400;
+    src: local('ITC Kabel Std'), url('./fonts/ITCKabelStdBook.woff') format('woff');
+}
+@font-face {
+    font-family: 'ITC Kabel Std';
+    font-style: normal;
+    font-weight: 500;
+    src: local('ITC Kabel Std'), url('./fonts/ITCKabelStdMedium.woff') format('woff');
+}
+@font-face {
+    font-family: 'ITC Kabel Std';
+    font-style: normal;
+    font-weight: 600;
+    src: local('ITC Kabel Std'), url('./fonts/ITCKabelStdDemi.woff') format('woff');
+}
+@font-face {
+    font-family: 'ITC Kabel Std';
+    font-style: normal;
+    font-weight: 700;
+    src: local('ITC Kabel Std'), url('./fonts/ITCKabelStdBold.woff') format('woff');
+}
+@font-face {
+    font-family: 'ITC Kabel Std';
+    font-style: normal;
+    font-weight: 800;
+    src: local('ITC Kabel Std'), url('./fonts/ITCKabelStdUltra.woff') format('woff');
+}
+@font-face {
+    font-family: 'Monopoly';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Monopoly'), url('./fonts/MONOPOLY_INLINE.woff') format('woff');
+}
