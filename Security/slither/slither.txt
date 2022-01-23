@@ -1,0 +1,1334 @@
+Compilation warnings/errors on /home/ethsec/share/contracts/Bank.sol:
+Warning: Function state mutability can be restricted to pure
+   --> share/contracts/Bank.sol:312:2:
+    |
+312 | 	function retrieveChanceProfit(uint256 randomness) internal view returns(uint256){
+    | 	^ (Relevant source part starts here and spans across multiple lines).
+
+Warning: Function state mutability can be restricted to pure
+   --> share/contracts/Bank.sol:319:2:
+    |
+319 | 	function retrieveCommunityTax(uint256 randomness) internal view returns(uint256){
+    | 	^ (Relevant source part starts here and spans across multiple lines).
+
+
+Compilation warnings/errors on /home/ethsec/share/contracts/MonoUsdPriceFeed.sol:
+Warning: This declaration shadows an existing declaration.
+  --> share/contracts/MonoUsdPriceFeed.sol:52:9:
+   |
+52 |         uint80 roundId,
+   |         ^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> share/contracts/MonoUsdPriceFeed.sol:17:5:
+   |
+17 |     uint80 roundId;
+   |     ^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+  --> share/contracts/MonoUsdPriceFeed.sol:54:9:
+   |
+54 |         uint256 startedAt,
+   |         ^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> share/contracts/MonoUsdPriceFeed.sol:18:5:
+   |
+18 |     uint256 startedAt;
+   |     ^^^^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+  --> share/contracts/MonoUsdPriceFeed.sol:55:9:
+   |
+55 |         uint256 updatedAt,
+   |         ^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> share/contracts/MonoUsdPriceFeed.sol:19:5:
+   |
+19 |     uint256 updatedAt;
+   |     ^^^^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+  --> share/contracts/MonoUsdPriceFeed.sol:56:9:
+   |
+56 |         uint80 answeredInRound
+   |         ^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> share/contracts/MonoUsdPriceFeed.sol:20:5:
+   |
+20 |     uint80 answeredInRound;
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+  --> share/contracts/MonoUsdPriceFeed.sol:69:9:
+   |
+69 |         uint80 roundId,
+   |         ^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> share/contracts/MonoUsdPriceFeed.sol:17:5:
+   |
+17 |     uint80 roundId;
+   |     ^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+  --> share/contracts/MonoUsdPriceFeed.sol:71:9:
+   |
+71 |         uint256 startedAt,
+   |         ^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> share/contracts/MonoUsdPriceFeed.sol:18:5:
+   |
+18 |     uint256 startedAt;
+   |     ^^^^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+  --> share/contracts/MonoUsdPriceFeed.sol:72:9:
+   |
+72 |         uint256 updatedAt,
+   |         ^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> share/contracts/MonoUsdPriceFeed.sol:19:5:
+   |
+19 |     uint256 updatedAt;
+   |     ^^^^^^^^^^^^^^^^^
+
+Warning: This declaration shadows an existing declaration.
+  --> share/contracts/MonoUsdPriceFeed.sol:73:9:
+   |
+73 |         uint80 answeredInRound
+   |         ^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> share/contracts/MonoUsdPriceFeed.sol:20:5:
+   |
+20 |     uint80 answeredInRound;
+   |     ^^^^^^^^^^^^^^^^^^^^^^
+
+
+[91m
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.halo = 1 + (r % 7) (share/contracts/Pawn.sol#82)" 
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.power = 1 + (r % 11) (share/contracts/Pawn.sol#83)" 
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.subject = 1 + (r % 8) (share/contracts/Pawn.sol#79)" 
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.background = 1 + (r % 10) (share/contracts/Pawn.sol#80)" 
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.material = 1 + (r % 10) (share/contracts/Pawn.sol#81)" 
+PawnContract.random(address) (share/contracts/Pawn.sol#128-130) uses a weak PRNG: "uint8(uint256(keccak256(bytes)(abi.encodePacked(block.difficulty,block.timestamp,user))) % type()(uint8).max) (share/contracts/Pawn.sol#129)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG[0m
+[91m
+BankContract.rollDices(uint16) (share/contracts/Bank.sol#170-189) ignores return value by Mono.transferFrom(msg.sender,address(this),(chainlinkFee * linkLastPrice) / monoLastPrice + 10 ** 18) (share/contracts/Bank.sol#183)
+BankContract.buyMono() (share/contracts/Bank.sol#192-205) ignores return value by Mono.transfer(msg.sender,amountToBuy) (share/contracts/Bank.sol#202)
+BankContract.propertyTransfer(address,address,uint256,uint256) (share/contracts/Bank.sol#445-469) ignores return value by Mono.transferFrom(_from,receiver,royaltyAmount) (share/contracts/Bank.sol#464)
+StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182) ignores return value by pool.info.token.transferFrom(msg.sender,address(this),_amount) (share/contracts/Staking.sol#178)
+StakingContract.unstake(address) (share/contracts/Staking.sol#213-238) ignores return value by pool.info.token.transfer(msg.sender,stakedAmount) (share/contracts/Staking.sol#232)
+StakingContract.unstake(address) (share/contracts/Staking.sol#213-238) ignores return value by rewardToken.transfer(msg.sender,rewards) (share/contracts/Staking.sol#235)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer[0m
+[93m
+StakingContract._calculateReward(address,StakingContract.PoolInfo,StakingContract.UserInfo) (share/contracts/Staking.sol#192-204) performs a multiplication on the result of a division:
+	-_user.amount * (block.timestamp - _user.depositDate) * _pool.yield / 100 / 365 / 24 / 60 / 60 * uint256(getLastPrice(address(rewardToken))) / uint256(getLastPrice(_token)) (share/contracts/Staking.sol#199-202)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply[0m
+[93m
+Contract locking ether found:
+	Contract BankContract (share/contracts/Bank.sol#19-470) has payable functions:
+	 - BankContract.buyMono() (share/contracts/Bank.sol#192-205)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether[0m
+[93m
+PawnContract.mint(address).p (share/contracts/Pawn.sol#77) is a local variable never initialized
+BoardContract.constructor(address,address,bytes32,uint256).n (share/contracts/Board.sol#100) is a local variable never initialized
+BoardContract.constructor(address,address,bytes32,uint256).landID (share/contracts/Board.sol#98) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables[0m
+[93m
+VRFConsumerBase.requestRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152-166) ignores return value by LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) ignores return value by IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return[0m
+[92m
+MonoContract.constructor(uint256)._cap (share/contracts/Mono.sol#24) shadows:
+	- ERC20Capped._cap (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol#12) (state variable)
+PawnContract.constructor(string,string,string)._name (share/contracts/Pawn.sol#39) shadows:
+	- ERC721._name (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#24) (state variable)
+PawnContract.constructor(string,string,string)._symbol (share/contracts/Pawn.sol#40) shadows:
+	- ERC721._symbol (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#27) (state variable)
+PropContract.constructor(address,string,string,string)._name (share/contracts/Prop.sol#66) shadows:
+	- ERC721._name (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#24) (state variable)
+PropContract.constructor(address,string,string,string)._symbol (share/contracts/Prop.sol#67) shadows:
+	- ERC721._symbol (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#27) (state variable)
+PropContract.isApprovedForAll(address,address)._owner (share/contracts/Prop.sol#263) shadows:
+	- Ownable._owner (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#21) (state variable)
+PropContract._isApprovedOrOwner(address,uint256).owner (share/contracts/Prop.sol#285) shadows:
+	- Ownable.owner() (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#35-37) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing[0m
+[92m
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).retval (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: retval == IERC721Receiver.onERC721Received.selector (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#390)
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).reason (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#391)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: reason.length == 0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#392)
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).reason (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#391)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: revert(uint256,uint256)(32 + reason,mload(uint256)(reason)) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#396)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#pre-declaration-usage-of-local-variables[0m
+[92m
+Reentrancy in PawnContract.mint(address) (share/contracts/Pawn.sol#74-92):
+	External calls:
+	- _safeMint(_to,id_) (share/contracts/Pawn.sol#89)
+		- IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+	State variables written after the call(s):
+	- pawns[id_] = p (share/contracts/Pawn.sol#91)
+Reentrancy in PropContract.mint(address,uint16,uint8,uint8) (share/contracts/Prop.sol#121-132):
+	External calls:
+	- _safeMint(_to,id_) (share/contracts/Prop.sol#130)
+		- IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+	State variables written after the call(s):
+	- _setRoyalties(id_) (share/contracts/Prop.sol#131)
+		- royaltiesValuesByTokenId[_tokenId] = _percentageBasisPoints (share/contracts/Prop.sol#231)
+Reentrancy in BoardContract.play(uint16,uint256) (share/contracts/Board.sol#263-273):
+	External calls:
+	- requestId = requestRandomNumber() (share/contracts/Board.sol#267)
+		- LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+	State variables written after the call(s):
+	- p.edition = _edition (share/contracts/Board.sol#271)
+	- p.pawnID = _pawnID (share/contracts/Board.sol#272)
+Reentrancy in VRFConsumerBase.requestRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152-166):
+	External calls:
+	- LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+	State variables written after the call(s):
+	- nonces[_keyHash] = nonces[_keyHash] + 1 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#164)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2[0m
+[92m
+Reentrancy in BankContract.buyMono() (share/contracts/Bank.sol#192-205):
+	External calls:
+	- Mono.transfer(msg.sender,amountToBuy) (share/contracts/Bank.sol#202)
+	Event emitted after the call(s):
+	- MonoBought(msg.sender,amountToBuy) (share/contracts/Bank.sol#204)
+Reentrancy in BankContract.buyPawn() (share/contracts/Bank.sol#120-126):
+	External calls:
+	- require(bool,string)(Mono.transferFrom(msg.sender,address(this),1000000000000000000),$MONO transfer failed) (share/contracts/Bank.sol#121)
+	- pawn_id = Pawn.mint(msg.sender) (share/contracts/Bank.sol#123)
+	Event emitted after the call(s):
+	- PawnBought(msg.sender,pawn_id) (share/contracts/Bank.sol#125)
+Reentrancy in BankContract.buyProp(uint16) (share/contracts/Bank.sol#213-229):
+	External calls:
+	- require(bool,string)(Mono.transferFrom(msg.sender,address(this),price),$MONO transfer failed) (share/contracts/Bank.sol#219)
+	- prop_id = Prop.mint(msg.sender,_edition,p.position,_rarity) (share/contracts/Bank.sol#220)
+	- Board.setPawnInfo(_edition,_pawnID,p) (share/contracts/Bank.sol#226)
+	Event emitted after the call(s):
+	- PropertyBought(msg.sender,prop_id) (share/contracts/Bank.sol#228)
+Reentrancy in BankContract.enrollPlayer(uint16) (share/contracts/Bank.sol#152-161):
+	External calls:
+	- require(bool,string)(Board.register(_edition,pawnID),error when enrolling) (share/contracts/Bank.sol#158)
+	Event emitted after the call(s):
+	- PlayerEnrolled(_edition,msg.sender) (share/contracts/Bank.sol#160)
+Reentrancy in PropContract.mint(address,uint16,uint8,uint8) (share/contracts/Prop.sol#121-132):
+	External calls:
+	- _safeMint(_to,id_) (share/contracts/Prop.sol#130)
+		- IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+	Event emitted after the call(s):
+	- RoyaltySet(_tokenId,_percentageBasisPoints) (share/contracts/Prop.sol#233)
+		- _setRoyalties(id_) (share/contracts/Prop.sol#131)
+Reentrancy in BankContract.payCommunityTax(uint16) (share/contracts/Bank.sol#262-276):
+	External calls:
+	- require(bool,string)(Mono.transferFrom(msg.sender,address(this),amount),Tax payment failed) (share/contracts/Bank.sol#270)
+	- Board.setPawnInfo(_edition,_pawnID,p) (share/contracts/Bank.sol#273)
+	Event emitted after the call(s):
+	- CommunityTaxPaid(msg.sender,amount) (share/contracts/Bank.sol#275)
+Reentrancy in BankContract.payRent(uint16) (share/contracts/Bank.sol#237-254):
+	External calls:
+	- require(bool,string)(Mono.transferFrom(msg.sender,address(this),amount),Tax payment failed) (share/contracts/Bank.sol#245)
+	- Board.setPawnInfo(_edition,_pawnID,p) (share/contracts/Bank.sol#251)
+	Event emitted after the call(s):
+	- PropertyRentPaid(msg.sender,amount) (share/contracts/Bank.sol#253)
+Reentrancy in BankContract.receiveChanceProfit(uint16) (share/contracts/Bank.sol#284-298):
+	External calls:
+	- require(bool,string)(Mono.transfer(msg.sender,amount),Tax payment failed) (share/contracts/Bank.sol#292)
+	- Board.setPawnInfo(_edition,_pawnID,p) (share/contracts/Bank.sol#295)
+	Event emitted after the call(s):
+	- ChanceProfitReceived(msg.sender,amount) (share/contracts/Bank.sol#297)
+Reentrancy in BankContract.rollDices(uint16) (share/contracts/Bank.sol#170-189):
+	External calls:
+	- Mono.transferFrom(msg.sender,address(this),(chainlinkFee * linkLastPrice) / monoLastPrice + 10 ** 18) (share/contracts/Bank.sol#183)
+	- rollDicesID = Board.play(_edition,pawnID) (share/contracts/Bank.sol#186)
+	Event emitted after the call(s):
+	- RollingDices(msg.sender,_edition,rollDicesID) (share/contracts/Bank.sol#188)
+Reentrancy in StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182):
+	External calls:
+	- pool.info.token.transferFrom(msg.sender,address(this),_amount) (share/contracts/Staking.sol#178)
+	Event emitted after the call(s):
+	- Staked(msg.sender,_token,_amount) (share/contracts/Staking.sol#181)
+Reentrancy in StakingContract.unstake(address) (share/contracts/Staking.sol#213-238):
+	External calls:
+	- (sent) = address(msg.sender).call{value: stakedAmount}() (share/contracts/Staking.sol#229)
+	- pool.info.token.transfer(msg.sender,stakedAmount) (share/contracts/Staking.sol#232)
+	- rewardToken.transfer(msg.sender,rewards) (share/contracts/Staking.sol#235)
+	External calls sending eth:
+	- (sent) = address(msg.sender).call{value: stakedAmount}() (share/contracts/Staking.sol#229)
+	Event emitted after the call(s):
+	- Unstaked(msg.sender,_token,stakedAmount) (share/contracts/Staking.sol#237)
+Reentrancy in BankContract.withdraw(address,uint256) (share/contracts/Bank.sol#388-392):
+	External calls:
+	- require(bool,string)(Mono.transfer(_to,_value),withdraw failure) (share/contracts/Bank.sol#389)
+	Event emitted after the call(s):
+	- eWithdraw(_to,_value) (share/contracts/Bank.sol#391)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3[0m
+[92m
+StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(user.amount == 0,Unstack first) (share/contracts/Staking.sol#164)
+StakingContract._calculateReward(address,StakingContract.PoolInfo,StakingContract.UserInfo) (share/contracts/Staking.sol#192-204) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= _user.depositDate,Deposit date problem) (share/contracts/Staking.sol#197)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp[0m
+[92m
+ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#395-397)
+Address.isContract(address) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#27-37) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/utils/Address.sol#33-35)
+Address.verifyCallResult(bool,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#196-216) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/utils/Address.sol#208-211)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage[0m
+[92m
+BoardContract.register(uint16,uint256) (share/contracts/Board.sol#238-250) compares to a boolean constant:
+	-require(bool,string)(boards[_edition].pawns[_pawnID].isOnBoard == false,pawn already registered) (share/contracts/Board.sol#240)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality[0m
+[92m
+Different versions of Solidity is used:
+	- Version used: ['0.8.9', '^0.8.0']
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#2)
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#2)
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol#2)
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol#2)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/interfaces/IERC165.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/security/Pausable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4)
+	- 0.8.9 (share/contracts/Bank.sol#3)
+	- 0.8.9 (share/contracts/Board.sol#3)
+	- 0.8.9 (share/contracts/Mono.sol#3)
+	- 0.8.9 (share/contracts/Pawn.sol#3)
+	- 0.8.9 (share/contracts/Prop.sol#3)
+	- 0.8.9 (share/contracts/Staking.sol#4)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used[0m
+[92m
+Address.functionCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#80-82) is never used and should be removed
+Address.functionCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#90-96) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#109-115) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#123-134) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#169-171) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#179-188) is never used and should be removed
+Address.functionStaticCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#142-144) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#152-161) is never used and should be removed
+Address.sendValue(address,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#55-60) is never used and should be removed
+Address.verifyCallResult(bool,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#196-216) is never used and should be removed
+BoardContract.fulfillRandomness(bytes32,uint256) (share/contracts/Board.sol#121-138) is never used and should be removed
+BoardContract.gameStrategist(uint16,uint256,uint8) (share/contracts/Board.sol#143-181) is never used and should be removed
+Context._msgData() (share/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+ERC20Pausable._beforeTokenTransfer(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol#24-32) is never used and should be removed
+ERC721._burn(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#302-314) is never used and should be removed
+ERC721Enumerable._addTokenToAllTokensEnumeration(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#106-109) is never used and should be removed
+ERC721Enumerable._addTokenToOwnerEnumeration(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#96-100) is never used and should be removed
+ERC721Enumerable._beforeTokenTransfer(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#72-89) is never used and should be removed
+ERC721Enumerable._removeTokenFromAllTokensEnumeration(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#144-162) is never used and should be removed
+ERC721Enumerable._removeTokenFromOwnerEnumeration(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#119-137) is never used and should be removed
+MonoContract._beforeTokenTransfer(address,address,uint256) (share/contracts/Mono.sol#50-56) is never used and should be removed
+PawnContract._baseURI() (share/contracts/Pawn.sol#53-55) is never used and should be removed
+PropContract._baseURI() (share/contracts/Prop.sol#99-101) is never used and should be removed
+PropContract._isApprovedOrOwner(address,uint256) (share/contracts/Prop.sol#283-288) is never used and should be removed
+Strings.toHexString(uint256) (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#40-51) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code[0m
+[92m
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/interfaces/IERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/security/Pausable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Address.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Bank.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Board.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Mono.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Pawn.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Prop.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Staking.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity[0m
+[92m
+Low level call in Address.sendValue(address,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#55-60):
+	- (success) = recipient.call{value: amount}() (share/node_modules/@openzeppelin/contracts/utils/Address.sol#58)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#123-134):
+	- (success,returndata) = target.call{value: value}(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#132)
+Low level call in Address.functionStaticCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#152-161):
+	- (success,returndata) = target.staticcall(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#159)
+Low level call in Address.functionDelegateCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#179-188):
+	- (success,returndata) = target.delegatecall(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#186)
+Low level call in StakingContract.unstake(address) (share/contracts/Staking.sol#213-238):
+	- (sent) = address(msg.sender).call{value: stakedAmount}() (share/contracts/Staking.sol#229)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls[0m
+[92m
+Parameter VRFConsumerBase.requestRandomness(bytes32,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152) is not in mixedCase
+Parameter VRFConsumerBase.requestRandomness(bytes32,uint256)._fee (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152) is not in mixedCase
+Variable VRFConsumerBase.LINK (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#168) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#20) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._userSeed (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#21) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._requester (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#22) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._nonce (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#23) is not in mixedCase
+Parameter VRFRequestIDBase.makeRequestId(bytes32,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#37) is not in mixedCase
+Parameter VRFRequestIDBase.makeRequestId(bytes32,uint256)._vRFInputSeed (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#37) is not in mixedCase
+Parameter ERC721.safeTransferFrom(address,address,uint256,bytes)._data (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#179) is not in mixedCase
+Event BankContracteWithdraw(address,uint256) (share/contracts/Bank.sol#47) is not in CapWords
+Parameter BankContract.locatePlayer(uint16)._edition (share/contracts/Bank.sol#135) is not in mixedCase
+Parameter BankContract.enrollPlayer(uint16)._edition (share/contracts/Bank.sol#152) is not in mixedCase
+Parameter BankContract.rollDices(uint16)._edition (share/contracts/Bank.sol#170) is not in mixedCase
+Parameter BankContract.buyProp(uint16)._edition (share/contracts/Bank.sol#213) is not in mixedCase
+Parameter BankContract.payRent(uint16)._edition (share/contracts/Bank.sol#237) is not in mixedCase
+Parameter BankContract.payCommunityTax(uint16)._edition (share/contracts/Bank.sol#262) is not in mixedCase
+Parameter BankContract.receiveChanceProfit(uint16)._edition (share/contracts/Bank.sol#284) is not in mixedCase
+Parameter BankContract.retrievePropertyRent(uint16,uint8,uint8)._edition (share/contracts/Bank.sol#305) is not in mixedCase
+Parameter BankContract.retrievePropertyRent(uint16,uint8,uint8)._land (share/contracts/Bank.sol#305) is not in mixedCase
+Parameter BankContract.retrievePropertyRent(uint16,uint8,uint8)._rarity (share/contracts/Bank.sol#305) is not in mixedCase
+Parameter BankContract.calculateRandomInteger(string,uint256,uint256,uint256)._type (share/contracts/Bank.sol#341) is not in mixedCase
+Parameter BankContract.getPriceOfProp(uint16,uint8,uint8)._edition (share/contracts/Bank.sol#356) is not in mixedCase
+Parameter BankContract.getPriceOfProp(uint16,uint8,uint8)._land (share/contracts/Bank.sol#357) is not in mixedCase
+Parameter BankContract.getPriceOfProp(uint16,uint8,uint8)._rarity (share/contracts/Bank.sol#358) is not in mixedCase
+Parameter BankContract.setPriceOfProp(uint16,uint8,uint8,uint256)._edition (share/contracts/Bank.sol#373) is not in mixedCase
+Parameter BankContract.setPriceOfProp(uint16,uint8,uint8,uint256)._land (share/contracts/Bank.sol#374) is not in mixedCase
+Parameter BankContract.setPriceOfProp(uint16,uint8,uint8,uint256)._rarity (share/contracts/Bank.sol#375) is not in mixedCase
+Parameter BankContract.setPriceOfProp(uint16,uint8,uint8,uint256)._price (share/contracts/Bank.sol#376) is not in mixedCase
+Parameter BankContract.withdraw(address,uint256)._to (share/contracts/Bank.sol#388) is not in mixedCase
+Parameter BankContract.withdraw(address,uint256)._value (share/contracts/Bank.sol#388) is not in mixedCase
+Parameter BankContract.setPrices(uint16,uint8,uint8,uint16,uint256[])._editionId (share/contracts/Bank.sol#415) is not in mixedCase
+Parameter BankContract.setPrices(uint16,uint8,uint8,uint16,uint256[])._maxLands (share/contracts/Bank.sol#416) is not in mixedCase
+Parameter BankContract.setPrices(uint16,uint8,uint8,uint16,uint256[])._maxLandRarities (share/contracts/Bank.sol#417) is not in mixedCase
+Parameter BankContract.setPrices(uint16,uint8,uint8,uint16,uint256[])._rarityMultiplier (share/contracts/Bank.sol#418) is not in mixedCase
+Parameter BankContract.setPrices(uint16,uint8,uint8,uint16,uint256[])._commonLandPrices (share/contracts/Bank.sol#419) is not in mixedCase
+Parameter BankContract.propertyTransfer(address,address,uint256,uint256)._from (share/contracts/Bank.sol#446) is not in mixedCase
+Parameter BankContract.propertyTransfer(address,address,uint256,uint256)._to (share/contracts/Bank.sol#447) is not in mixedCase
+Parameter BankContract.propertyTransfer(address,address,uint256,uint256)._tokenId (share/contracts/Bank.sol#448) is not in mixedCase
+Parameter BankContract.propertyTransfer(address,address,uint256,uint256)._salePrice (share/contracts/Bank.sol#449) is not in mixedCase
+Variable BankContract.Pawn (share/contracts/Bank.sol#23) is not in mixedCase
+Variable BankContract.Board (share/contracts/Bank.sol#24) is not in mixedCase
+Variable BankContract.Prop (share/contracts/Bank.sol#25) is not in mixedCase
+Variable BankContract.Mono (share/contracts/Bank.sol#26) is not in mixedCase
+Variable BankContract.Link (share/contracts/Bank.sol#27) is not in mixedCase
+Variable BankContract.Staking (share/contracts/Bank.sol#28) is not in mixedCase
+Variable BankContract.enroll_fee (share/contracts/Bank.sol#31) is not in mixedCase
+Event BoardContractePawn(uint16,uint256) (share/contracts/Board.sol#62) is not in CapWords
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._edition (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._pawnID (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._position (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._nbOfLands (share/contracts/Board.sol#216) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._rarityLevel (share/contracts/Board.sol#217) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._purchasableLands (share/contracts/Board.sol#218) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._maxPawns (share/contracts/Board.sol#219) is not in mixedCase
+Parameter BoardContract.register(uint16,uint256)._edition (share/contracts/Board.sol#238) is not in mixedCase
+Parameter BoardContract.register(uint16,uint256)._pawnID (share/contracts/Board.sol#238) is not in mixedCase
+Parameter BoardContract.isRegistered(uint16,uint256)._edition (share/contracts/Board.sol#256) is not in mixedCase
+Parameter BoardContract.isRegistered(uint16,uint256)._pawnID (share/contracts/Board.sol#256) is not in mixedCase
+Parameter BoardContract.play(uint16,uint256)._edition (share/contracts/Board.sol#263) is not in mixedCase
+Parameter BoardContract.play(uint16,uint256)._pawnID (share/contracts/Board.sol#263) is not in mixedCase
+Parameter BoardContract.getPawnInfo(uint16,uint256)._edition (share/contracts/Board.sol#279) is not in mixedCase
+Parameter BoardContract.getPawnInfo(uint16,uint256)._pawnID (share/contracts/Board.sol#279) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._edition (share/contracts/Board.sol#289) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._pawnID (share/contracts/Board.sol#290) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._pawnInfo (share/contracts/Board.sol#291) is not in mixedCase
+Parameter PawnContract.tokenURI(uint256)._id (share/contracts/Pawn.sol#60) is not in mixedCase
+Parameter PawnContract.mint(address)._to (share/contracts/Pawn.sol#74) is not in mixedCase
+Parameter PawnContract.supportsInterface(bytes4)._interfaceId (share/contracts/Pawn.sol#97) is not in mixedCase
+Parameter PawnContract.get(uint256)._id (share/contracts/Pawn.sol#109) is not in mixedCase
+Parameter PawnContract.generateID(PawnContract.PawnInfo)._p (share/contracts/Pawn.sol#118) is not in mixedCase
+Parameter PropContract.tokenURI(uint256)._id (share/contracts/Prop.sol#106) is not in mixedCase
+Parameter PropContract.mint(address,uint16,uint8,uint8)._to (share/contracts/Prop.sol#122) is not in mixedCase
+Parameter PropContract.mint(address,uint16,uint8,uint8)._edition (share/contracts/Prop.sol#123) is not in mixedCase
+Parameter PropContract.mint(address,uint16,uint8,uint8)._land (share/contracts/Prop.sol#124) is not in mixedCase
+Parameter PropContract.mint(address,uint16,uint8,uint8)._rarity (share/contracts/Prop.sol#125) is not in mixedCase
+Parameter PropContract.get(uint256)._id (share/contracts/Prop.sol#137) is not in mixedCase
+Parameter PropContract.exists(uint256)._id (share/contracts/Prop.sol#146) is not in mixedCase
+Parameter PropContract.getNbOfProps(uint16,uint8,uint8)._edition (share/contracts/Prop.sol#160) is not in mixedCase
+Parameter PropContract.getNbOfProps(uint16,uint8,uint8)._land (share/contracts/Prop.sol#161) is not in mixedCase
+Parameter PropContract.getNbOfProps(uint16,uint8,uint8)._rarity (share/contracts/Prop.sol#162) is not in mixedCase
+Parameter PropContract.supportsInterface(bytes4)._interfaceId (share/contracts/Prop.sol#171) is not in mixedCase
+Parameter PropContract.generateID(uint16,uint8,uint8)._edition (share/contracts/Prop.sol#190) is not in mixedCase
+Parameter PropContract.generateID(uint16,uint8,uint8)._land (share/contracts/Prop.sol#191) is not in mixedCase
+Parameter PropContract.generateID(uint16,uint8,uint8)._rarity (share/contracts/Prop.sol#192) is not in mixedCase
+Parameter PropContract.setDefaultRoyaltyPercentageBasisPoints(uint96)._percentageBasisPoints (share/contracts/Prop.sol#206) is not in mixedCase
+Parameter PropContract.setRoyalties(uint256,uint96)._tokenId (share/contracts/Prop.sol#213) is not in mixedCase
+Parameter PropContract.setRoyalties(uint256,uint96)._percentageBasisPoints (share/contracts/Prop.sol#213) is not in mixedCase
+Parameter PropContract.royaltyInfo(uint256,uint256)._tokenId (share/contracts/Prop.sol#246) is not in mixedCase
+Parameter PropContract.royaltyInfo(uint256,uint256)._salePrice (share/contracts/Prop.sol#246) is not in mixedCase
+Parameter PropContract.isApprovedForAll(address,address)._operator (share/contracts/Prop.sol#263) is not in mixedCase
+Parameter PropContract.setIsOperatorAllowed(address,bool)._address (share/contracts/Prop.sol#277) is not in mixedCase
+Variable PropContract.Board (share/contracts/Prop.sol#38) is not in mixedCase
+Parameter StakingContract.getUserBalanceInPool(address,address)._token (share/contracts/Staking.sol#93) is not in mixedCase
+Parameter StakingContract.getUserBalanceInPool(address,address)._user (share/contracts/Staking.sol#93) is not in mixedCase
+Parameter StakingContract.getPoolBalance(address)._token (share/contracts/Staking.sol#102) is not in mixedCase
+Parameter StakingContract.addPool(address,address,uint256)._token (share/contracts/Staking.sol#142) is not in mixedCase
+Parameter StakingContract.addPool(address,address,uint256)._priceFeed (share/contracts/Staking.sol#142) is not in mixedCase
+Parameter StakingContract.addPool(address,address,uint256)._yield (share/contracts/Staking.sol#142) is not in mixedCase
+Parameter StakingContract.stake(address,uint256)._token (share/contracts/Staking.sol#160) is not in mixedCase
+Parameter StakingContract.stake(address,uint256)._amount (share/contracts/Staking.sol#160) is not in mixedCase
+Parameter StakingContract.unstake(address)._token (share/contracts/Staking.sol#213) is not in mixedCase
+Parameter StakingContract.pendingReward(address)._token (share/contracts/Staking.sol#245) is not in mixedCase
+Parameter StakingContract.getLastPrice(address)._token (share/contracts/Staking.sol#262) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions[0m
+[92m
+Redundant expression "operator (share/contracts/Bank.sol#401)" inBankContract (share/contracts/Bank.sol#19-470)
+Redundant expression "from (share/contracts/Bank.sol#402)" inBankContract (share/contracts/Bank.sol#19-470)
+Redundant expression "tokenId (share/contracts/Bank.sol#403)" inBankContract (share/contracts/Bank.sol#19-470)
+Redundant expression "data (share/contracts/Bank.sol#404)" inBankContract (share/contracts/Bank.sol#19-470)
+Redundant expression "_owner (share/contracts/Prop.sol#269)" inPropContract (share/contracts/Prop.sol#20-289)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements[0m
+[92m
+BoardContract (share/contracts/Board.sol#13-295) does not implement functions:
+	- VRFConsumerBase.fulfillRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#116)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions[0m
+[92m
+BankContract.enroll_fee (share/contracts/Bank.sol#31) should be constant
+BoardContract.randomResult (share/contracts/Board.sol#49) should be constant
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant[0m
+[92m
+grantRole(bytes32,address) should be declared external:
+	- AccessControl.grantRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#130-132)
+revokeRole(bytes32,address) should be declared external:
+	- AccessControl.revokeRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#143-145)
+renounceRole(bytes32,address) should be declared external:
+	- AccessControl.renounceRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#161-165)
+renounceOwnership() should be declared external:
+	- Ownable.renounceOwnership() (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#54-56)
+transferOwnership(address) should be declared external:
+	- Ownable.transferOwnership(address) (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#62-65)
+name() should be declared external:
+	- ERC20.name() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#62-64)
+symbol() should be declared external:
+	- ERC20.symbol() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#70-72)
+decimals() should be declared external:
+	- ERC20.decimals() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#87-89)
+balanceOf(address) should be declared external:
+	- ERC20.balanceOf(address) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#101-103)
+transfer(address,uint256) should be declared external:
+	- ERC20.transfer(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#113-116)
+approve(address,uint256) should be declared external:
+	- ERC20.approve(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#132-135)
+transferFrom(address,address,uint256) should be declared external:
+	- ERC20.transferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#150-164)
+increaseAllowance(address,uint256) should be declared external:
+	- ERC20.increaseAllowance(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#178-181)
+decreaseAllowance(address,uint256) should be declared external:
+	- ERC20.decreaseAllowance(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#197-205)
+burn(uint256) should be declared external:
+	- ERC20Burnable.burn(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#20-22)
+burnFrom(address,uint256) should be declared external:
+	- ERC20Burnable.burnFrom(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#35-42)
+name() should be declared external:
+	- ERC721.name() (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#79-81)
+symbol() should be declared external:
+	- ERC721.symbol() (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#86-88)
+approve(address,uint256) should be declared external:
+	- ERC721.approve(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#112-122)
+setApprovalForAll(address,bool) should be declared external:
+	- ERC721.setApprovalForAll(address,bool) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#136-138)
+transferFrom(address,address,uint256) should be declared external:
+	- ERC721.transferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#150-159)
+safeTransferFrom(address,address,uint256) should be declared external:
+	- ERC721.safeTransferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#164-170)
+tokenOfOwnerByIndex(address,uint256) should be declared external:
+	- ERC721Enumerable.tokenOfOwnerByIndex(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#37-40)
+tokenByIndex(uint256) should be declared external:
+	- ERC721Enumerable.tokenByIndex(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#52-55)
+enrollPlayer(uint16) should be declared external:
+	- BankContract.enrollPlayer(uint16) (share/contracts/Bank.sol#152-161)
+buyMono() should be declared external:
+	- BankContract.buyMono() (share/contracts/Bank.sol#192-205)
+buyProp(uint16) should be declared external:
+	- BankContract.buyProp(uint16) (share/contracts/Bank.sol#213-229)
+payRent(uint16) should be declared external:
+	- BankContract.payRent(uint16) (share/contracts/Bank.sol#237-254)
+payCommunityTax(uint16) should be declared external:
+	- BankContract.payCommunityTax(uint16) (share/contracts/Bank.sol#262-276)
+receiveChanceProfit(uint16) should be declared external:
+	- BankContract.receiveChanceProfit(uint16) (share/contracts/Bank.sol#284-298)
+setPriceOfProp(uint16,uint8,uint8,uint256) should be declared external:
+	- BankContract.setPriceOfProp(uint16,uint8,uint8,uint256) (share/contracts/Bank.sol#372-380)
+newBoard(uint8,uint8,uint8[],uint16) should be declared external:
+	- BoardContract.newBoard(uint8,uint8,uint8[],uint16) (share/contracts/Board.sol#215-233)
+get(uint256) should be declared external:
+	- PawnContract.get(uint256) (share/contracts/Pawn.sol#109-113)
+get(uint256) should be declared external:
+	- PropContract.get(uint256) (share/contracts/Prop.sol#137-141)
+getNbOfProps(uint16,uint8,uint8) should be declared external:
+	- PropContract.getNbOfProps(uint16,uint8,uint8) (share/contracts/Prop.sol#159-166)
+setDefaultRoyaltyPercentageBasisPoints(uint96) should be declared external:
+	- PropContract.setDefaultRoyaltyPercentageBasisPoints(uint96) (share/contracts/Prop.sol#206-208)
+setRoyalties(uint256,uint96) should be declared external:
+	- PropContract.setRoyalties(uint256,uint96) (share/contracts/Prop.sol#213-215)
+stake(address,uint256) should be declared external:
+	- StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external[0m
+[93m
+BoardContract.constructor(address,address,bytes32,uint256).n (share/contracts/Board.sol#100) is a local variable never initialized
+BoardContract.constructor(address,address,bytes32,uint256).landID (share/contracts/Board.sol#98) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables[0m
+[93m
+VRFConsumerBase.requestRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152-166) ignores return value by LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return[0m
+[92m
+Reentrancy in BoardContract.play(uint16,uint256) (share/contracts/Board.sol#263-273):
+	External calls:
+	- requestId = requestRandomNumber() (share/contracts/Board.sol#267)
+		- LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+	State variables written after the call(s):
+	- p.edition = _edition (share/contracts/Board.sol#271)
+	- p.pawnID = _pawnID (share/contracts/Board.sol#272)
+Reentrancy in VRFConsumerBase.requestRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152-166):
+	External calls:
+	- LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+	State variables written after the call(s):
+	- nonces[_keyHash] = nonces[_keyHash] + 1 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#164)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2[0m
+[92m
+BoardContract.register(uint16,uint256) (share/contracts/Board.sol#238-250) compares to a boolean constant:
+	-require(bool,string)(boards[_edition].pawns[_pawnID].isOnBoard == false,pawn already registered) (share/contracts/Board.sol#240)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality[0m
+[92m
+Different versions of Solidity is used:
+	- Version used: ['0.8.9', '^0.8.0']
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#2)
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#2)
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol#2)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4)
+	- 0.8.9 (share/contracts/Board.sol#3)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used[0m
+[92m
+BoardContract.fulfillRandomness(bytes32,uint256) (share/contracts/Board.sol#121-138) is never used and should be removed
+BoardContract.gameStrategist(uint16,uint256,uint8) (share/contracts/Board.sol#143-181) is never used and should be removed
+Context._msgData() (share/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Strings.toHexString(uint256) (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#40-51) is never used and should be removed
+Strings.toString(uint256) (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#15-35) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code[0m
+[92m
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Board.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity[0m
+[92m
+Parameter VRFConsumerBase.requestRandomness(bytes32,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152) is not in mixedCase
+Parameter VRFConsumerBase.requestRandomness(bytes32,uint256)._fee (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152) is not in mixedCase
+Variable VRFConsumerBase.LINK (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#168) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#20) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._userSeed (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#21) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._requester (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#22) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._nonce (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#23) is not in mixedCase
+Parameter VRFRequestIDBase.makeRequestId(bytes32,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#37) is not in mixedCase
+Parameter VRFRequestIDBase.makeRequestId(bytes32,uint256)._vRFInputSeed (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#37) is not in mixedCase
+Event BoardContractePawn(uint16,uint256) (share/contracts/Board.sol#62) is not in CapWords
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._edition (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._pawnID (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._position (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._nbOfLands (share/contracts/Board.sol#216) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._rarityLevel (share/contracts/Board.sol#217) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._purchasableLands (share/contracts/Board.sol#218) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._maxPawns (share/contracts/Board.sol#219) is not in mixedCase
+Parameter BoardContract.register(uint16,uint256)._edition (share/contracts/Board.sol#238) is not in mixedCase
+Parameter BoardContract.register(uint16,uint256)._pawnID (share/contracts/Board.sol#238) is not in mixedCase
+Parameter BoardContract.isRegistered(uint16,uint256)._edition (share/contracts/Board.sol#256) is not in mixedCase
+Parameter BoardContract.isRegistered(uint16,uint256)._pawnID (share/contracts/Board.sol#256) is not in mixedCase
+Parameter BoardContract.play(uint16,uint256)._edition (share/contracts/Board.sol#263) is not in mixedCase
+Parameter BoardContract.play(uint16,uint256)._pawnID (share/contracts/Board.sol#263) is not in mixedCase
+Parameter BoardContract.getPawnInfo(uint16,uint256)._edition (share/contracts/Board.sol#279) is not in mixedCase
+Parameter BoardContract.getPawnInfo(uint16,uint256)._pawnID (share/contracts/Board.sol#279) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._edition (share/contracts/Board.sol#289) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._pawnID (share/contracts/Board.sol#290) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._pawnInfo (share/contracts/Board.sol#291) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions[0m
+[92m
+BoardContract (share/contracts/Board.sol#13-295) does not implement functions:
+	- VRFConsumerBase.fulfillRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#116)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions[0m
+[92m
+BoardContract.randomResult (share/contracts/Board.sol#49) should be constant
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant[0m
+[92m
+grantRole(bytes32,address) should be declared external:
+	- AccessControl.grantRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#130-132)
+revokeRole(bytes32,address) should be declared external:
+	- AccessControl.revokeRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#143-145)
+renounceRole(bytes32,address) should be declared external:
+	- AccessControl.renounceRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#161-165)
+newBoard(uint8,uint8,uint8[],uint16) should be declared external:
+	- BoardContract.newBoard(uint8,uint8,uint8[],uint16) (share/contracts/Board.sol#215-233)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external[0m
+[92m
+Pragma version0.8.9 (share/contracts/Migrations.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity[0m
+[92m
+Variable Migrations.last_completed_migration (share/contracts/Migrations.sol#7) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions[0m
+[92m
+setCompleted(uint256) should be declared external:
+	- Migrations.setCompleted(uint256) (share/contracts/Migrations.sol#14-16)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external[0m
+[92m
+MonoContract.constructor(uint256)._cap (share/contracts/Mono.sol#24) shadows:
+	- ERC20Capped._cap (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol#12) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing[0m
+[92m
+Different versions of Solidity is used:
+	- Version used: ['0.8.9', '^0.8.0']
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/security/Pausable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4)
+	- 0.8.9 (share/contracts/Mono.sol#3)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used[0m
+[92m
+Context._msgData() (share/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+ERC20Pausable._beforeTokenTransfer(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol#24-32) is never used and should be removed
+MonoContract._beforeTokenTransfer(address,address,uint256) (share/contracts/Mono.sol#50-56) is never used and should be removed
+Strings.toHexString(uint256) (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#40-51) is never used and should be removed
+Strings.toString(uint256) (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#15-35) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code[0m
+[92m
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/security/Pausable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Mono.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity[0m
+[92m
+grantRole(bytes32,address) should be declared external:
+	- AccessControl.grantRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#130-132)
+revokeRole(bytes32,address) should be declared external:
+	- AccessControl.revokeRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#143-145)
+renounceRole(bytes32,address) should be declared external:
+	- AccessControl.renounceRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#161-165)
+name() should be declared external:
+	- ERC20.name() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#62-64)
+symbol() should be declared external:
+	- ERC20.symbol() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#70-72)
+decimals() should be declared external:
+	- ERC20.decimals() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#87-89)
+balanceOf(address) should be declared external:
+	- ERC20.balanceOf(address) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#101-103)
+transfer(address,uint256) should be declared external:
+	- ERC20.transfer(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#113-116)
+approve(address,uint256) should be declared external:
+	- ERC20.approve(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#132-135)
+transferFrom(address,address,uint256) should be declared external:
+	- ERC20.transferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#150-164)
+increaseAllowance(address,uint256) should be declared external:
+	- ERC20.increaseAllowance(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#178-181)
+decreaseAllowance(address,uint256) should be declared external:
+	- ERC20.decreaseAllowance(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#197-205)
+burn(uint256) should be declared external:
+	- ERC20Burnable.burn(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#20-22)
+burnFrom(address,uint256) should be declared external:
+	- ERC20Burnable.burnFrom(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#35-42)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external[0m
+[92m
+MonoUsdPriceFeed.getRoundData(uint80).roundId (share/contracts/MonoUsdPriceFeed.sol#52) shadows:
+	- MonoUsdPriceFeed.roundId (share/contracts/MonoUsdPriceFeed.sol#17) (state variable)
+MonoUsdPriceFeed.getRoundData(uint80).startedAt (share/contracts/MonoUsdPriceFeed.sol#54) shadows:
+	- MonoUsdPriceFeed.startedAt (share/contracts/MonoUsdPriceFeed.sol#18) (state variable)
+MonoUsdPriceFeed.getRoundData(uint80).updatedAt (share/contracts/MonoUsdPriceFeed.sol#55) shadows:
+	- MonoUsdPriceFeed.updatedAt (share/contracts/MonoUsdPriceFeed.sol#19) (state variable)
+MonoUsdPriceFeed.getRoundData(uint80).answeredInRound (share/contracts/MonoUsdPriceFeed.sol#56) shadows:
+	- MonoUsdPriceFeed.answeredInRound (share/contracts/MonoUsdPriceFeed.sol#20) (state variable)
+MonoUsdPriceFeed.latestRoundData().roundId (share/contracts/MonoUsdPriceFeed.sol#69) shadows:
+	- MonoUsdPriceFeed.roundId (share/contracts/MonoUsdPriceFeed.sol#17) (state variable)
+MonoUsdPriceFeed.latestRoundData().startedAt (share/contracts/MonoUsdPriceFeed.sol#71) shadows:
+	- MonoUsdPriceFeed.startedAt (share/contracts/MonoUsdPriceFeed.sol#18) (state variable)
+MonoUsdPriceFeed.latestRoundData().updatedAt (share/contracts/MonoUsdPriceFeed.sol#72) shadows:
+	- MonoUsdPriceFeed.updatedAt (share/contracts/MonoUsdPriceFeed.sol#19) (state variable)
+MonoUsdPriceFeed.latestRoundData().answeredInRound (share/contracts/MonoUsdPriceFeed.sol#73) shadows:
+	- MonoUsdPriceFeed.answeredInRound (share/contracts/MonoUsdPriceFeed.sol#20) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing[0m
+[92m
+Different versions of Solidity is used:
+	- Version used: ['0.8.9', '^0.8.0']
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol#2)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- 0.8.9 (share/contracts/MonoUsdPriceFeed.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used[0m
+[92m
+Context._msgData() (share/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code[0m
+[92m
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/MonoUsdPriceFeed.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity[0m
+[92m
+Parameter MonoUsdPriceFeed.setRoundData(int256)._value (share/contracts/MonoUsdPriceFeed.sol#42) is not in mixedCase
+Parameter MonoUsdPriceFeed.getRoundData(uint80)._roundId (share/contracts/MonoUsdPriceFeed.sol#50) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions[0m
+[92m
+MonoUsdPriceFeed._decimals (share/contracts/MonoUsdPriceFeed.sol#21) should be constant
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant[0m
+[92m
+renounceOwnership() should be declared external:
+	- Ownable.renounceOwnership() (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#54-56)
+transferOwnership(address) should be declared external:
+	- Ownable.transferOwnership(address) (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#62-65)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external[0m
+[91m
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.material = 1 + (r % 10) (share/contracts/Pawn.sol#81)" 
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.halo = 1 + (r % 7) (share/contracts/Pawn.sol#82)" 
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.power = 1 + (r % 11) (share/contracts/Pawn.sol#83)" 
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.subject = 1 + (r % 8) (share/contracts/Pawn.sol#79)" 
+PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.background = 1 + (r % 10) (share/contracts/Pawn.sol#80)" 
+PawnContract.random(address) (share/contracts/Pawn.sol#128-130) uses a weak PRNG: "uint8(uint256(keccak256(bytes)(abi.encodePacked(block.difficulty,block.timestamp,user))) % type()(uint8).max) (share/contracts/Pawn.sol#129)" 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#weak-PRNG[0m
+[93m
+PawnContract.mint(address).p (share/contracts/Pawn.sol#77) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables[0m
+[93m
+ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) ignores return value by IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return[0m
+[92m
+PawnContract.constructor(string,string,string)._name (share/contracts/Pawn.sol#39) shadows:
+	- ERC721._name (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#24) (state variable)
+PawnContract.constructor(string,string,string)._symbol (share/contracts/Pawn.sol#40) shadows:
+	- ERC721._symbol (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#27) (state variable)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing[0m
+[92m
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).retval (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: retval == IERC721Receiver.onERC721Received.selector (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#390)
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).reason (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#391)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: reason.length == 0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#392)
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).reason (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#391)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: revert(uint256,uint256)(32 + reason,mload(uint256)(reason)) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#396)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#pre-declaration-usage-of-local-variables[0m
+[92m
+Reentrancy in PawnContract.mint(address) (share/contracts/Pawn.sol#74-92):
+	External calls:
+	- _safeMint(_to,id_) (share/contracts/Pawn.sol#89)
+		- IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+	State variables written after the call(s):
+	- pawns[id_] = p (share/contracts/Pawn.sol#91)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2[0m
+[92m
+ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#395-397)
+Address.isContract(address) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#27-37) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/utils/Address.sol#33-35)
+Address.verifyCallResult(bool,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#196-216) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/utils/Address.sol#208-211)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage[0m
+[92m
+Different versions of Solidity is used:
+	- Version used: ['0.8.9', '^0.8.0']
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4)
+	- 0.8.9 (share/contracts/Pawn.sol#3)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used[0m
+[92m
+Address.functionCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#80-82) is never used and should be removed
+Address.functionCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#90-96) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#109-115) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#123-134) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#169-171) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#179-188) is never used and should be removed
+Address.functionStaticCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#142-144) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#152-161) is never used and should be removed
+Address.sendValue(address,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#55-60) is never used and should be removed
+Address.verifyCallResult(bool,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#196-216) is never used and should be removed
+Context._msgData() (share/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+ERC721._burn(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#302-314) is never used and should be removed
+ERC721Enumerable._addTokenToAllTokensEnumeration(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#106-109) is never used and should be removed
+ERC721Enumerable._addTokenToOwnerEnumeration(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#96-100) is never used and should be removed
+ERC721Enumerable._beforeTokenTransfer(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#72-89) is never used and should be removed
+ERC721Enumerable._removeTokenFromAllTokensEnumeration(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#144-162) is never used and should be removed
+ERC721Enumerable._removeTokenFromOwnerEnumeration(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#119-137) is never used and should be removed
+PawnContract._baseURI() (share/contracts/Pawn.sol#53-55) is never used and should be removed
+Strings.toHexString(uint256) (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#40-51) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code[0m
+[92m
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Address.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Pawn.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity[0m
+[92m
+Low level call in Address.sendValue(address,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#55-60):
+	- (success) = recipient.call{value: amount}() (share/node_modules/@openzeppelin/contracts/utils/Address.sol#58)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#123-134):
+	- (success,returndata) = target.call{value: value}(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#132)
+Low level call in Address.functionStaticCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#152-161):
+	- (success,returndata) = target.staticcall(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#159)
+Low level call in Address.functionDelegateCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#179-188):
+	- (success,returndata) = target.delegatecall(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#186)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls[0m
+[92m
+Parameter ERC721.safeTransferFrom(address,address,uint256,bytes)._data (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#179) is not in mixedCase
+Parameter PawnContract.tokenURI(uint256)._id (share/contracts/Pawn.sol#60) is not in mixedCase
+Parameter PawnContract.mint(address)._to (share/contracts/Pawn.sol#74) is not in mixedCase
+Parameter PawnContract.supportsInterface(bytes4)._interfaceId (share/contracts/Pawn.sol#97) is not in mixedCase
+Parameter PawnContract.get(uint256)._id (share/contracts/Pawn.sol#109) is not in mixedCase
+Parameter PawnContract.generateID(PawnContract.PawnInfo)._p (share/contracts/Pawn.sol#118) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions[0m
+[92m
+grantRole(bytes32,address) should be declared external:
+	- AccessControl.grantRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#130-132)
+revokeRole(bytes32,address) should be declared external:
+	- AccessControl.revokeRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#143-145)
+renounceRole(bytes32,address) should be declared external:
+	- AccessControl.renounceRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#161-165)
+name() should be declared external:
+	- ERC721.name() (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#79-81)
+symbol() should be declared external:
+	- ERC721.symbol() (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#86-88)
+approve(address,uint256) should be declared external:
+	- ERC721.approve(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#112-122)
+setApprovalForAll(address,bool) should be declared external:
+	- ERC721.setApprovalForAll(address,bool) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#136-138)
+transferFrom(address,address,uint256) should be declared external:
+	- ERC721.transferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#150-159)
+safeTransferFrom(address,address,uint256) should be declared external:
+	- ERC721.safeTransferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#164-170)
+tokenOfOwnerByIndex(address,uint256) should be declared external:
+	- ERC721Enumerable.tokenOfOwnerByIndex(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#37-40)
+tokenByIndex(uint256) should be declared external:
+	- ERC721Enumerable.tokenByIndex(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#52-55)
+get(uint256) should be declared external:
+	- PawnContract.get(uint256) (share/contracts/Pawn.sol#109-113)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external[0m
+[93m
+BoardContract.constructor(address,address,bytes32,uint256).n (share/contracts/Board.sol#100) is a local variable never initialized
+BoardContract.constructor(address,address,bytes32,uint256).landID (share/contracts/Board.sol#98) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables[0m
+[93m
+VRFConsumerBase.requestRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152-166) ignores return value by LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) ignores return value by IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return[0m
+[92m
+PropContract.constructor(address,string,string,string)._name (share/contracts/Prop.sol#66) shadows:
+	- ERC721._name (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#24) (state variable)
+PropContract.constructor(address,string,string,string)._symbol (share/contracts/Prop.sol#67) shadows:
+	- ERC721._symbol (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#27) (state variable)
+PropContract.isApprovedForAll(address,address)._owner (share/contracts/Prop.sol#263) shadows:
+	- Ownable._owner (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#21) (state variable)
+PropContract._isApprovedOrOwner(address,uint256).owner (share/contracts/Prop.sol#285) shadows:
+	- Ownable.owner() (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#35-37) (function)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#local-variable-shadowing[0m
+[92m
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).retval (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: retval == IERC721Receiver.onERC721Received.selector (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#390)
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).reason (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#391)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: reason.length == 0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#392)
+Variable 'ERC721._checkOnERC721Received(address,address,uint256,bytes).reason (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#391)' in ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) potentially used before declaration: revert(uint256,uint256)(32 + reason,mload(uint256)(reason)) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#396)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#pre-declaration-usage-of-local-variables[0m
+[92m
+Reentrancy in PropContract.mint(address,uint16,uint8,uint8) (share/contracts/Prop.sol#121-132):
+	External calls:
+	- _safeMint(_to,id_) (share/contracts/Prop.sol#130)
+		- IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+	State variables written after the call(s):
+	- _setRoyalties(id_) (share/contracts/Prop.sol#131)
+		- royaltiesValuesByTokenId[_tokenId] = _percentageBasisPoints (share/contracts/Prop.sol#231)
+Reentrancy in BoardContract.play(uint16,uint256) (share/contracts/Board.sol#263-273):
+	External calls:
+	- requestId = requestRandomNumber() (share/contracts/Board.sol#267)
+		- LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+	State variables written after the call(s):
+	- p.edition = _edition (share/contracts/Board.sol#271)
+	- p.pawnID = _pawnID (share/contracts/Board.sol#272)
+Reentrancy in VRFConsumerBase.requestRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152-166):
+	External calls:
+	- LINK.transferAndCall(vrfCoordinator,_fee,abi.encode(_keyHash,USER_SEED_PLACEHOLDER)) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#153)
+	State variables written after the call(s):
+	- nonces[_keyHash] = nonces[_keyHash] + 1 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#164)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-2[0m
+[92m
+Reentrancy in PropContract.mint(address,uint16,uint8,uint8) (share/contracts/Prop.sol#121-132):
+	External calls:
+	- _safeMint(_to,id_) (share/contracts/Prop.sol#130)
+		- IERC721Receiver(to).onERC721Received(_msgSender(),from,tokenId,_data) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#389-399)
+	Event emitted after the call(s):
+	- RoyaltySet(_tokenId,_percentageBasisPoints) (share/contracts/Prop.sol#233)
+		- _setRoyalties(id_) (share/contracts/Prop.sol#131)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3[0m
+[92m
+ERC721._checkOnERC721Received(address,address,uint256,bytes) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#382-403) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#395-397)
+Address.isContract(address) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#27-37) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/utils/Address.sol#33-35)
+Address.verifyCallResult(bool,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#196-216) uses assembly
+	- INLINE ASM (share/node_modules/@openzeppelin/contracts/utils/Address.sol#208-211)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage[0m
+[92m
+BoardContract.register(uint16,uint256) (share/contracts/Board.sol#238-250) compares to a boolean constant:
+	-require(bool,string)(boards[_edition].pawns[_pawnID].isOnBoard == false,pawn already registered) (share/contracts/Board.sol#240)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#boolean-equality[0m
+[92m
+Different versions of Solidity is used:
+	- Version used: ['0.8.9', '^0.8.0']
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#2)
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#2)
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol#2)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/interfaces/IERC165.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4)
+	- 0.8.9 (share/contracts/Board.sol#3)
+	- 0.8.9 (share/contracts/Prop.sol#3)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used[0m
+[92m
+Address.functionCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#80-82) is never used and should be removed
+Address.functionCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#90-96) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#109-115) is never used and should be removed
+Address.functionCallWithValue(address,bytes,uint256,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#123-134) is never used and should be removed
+Address.functionDelegateCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#169-171) is never used and should be removed
+Address.functionDelegateCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#179-188) is never used and should be removed
+Address.functionStaticCall(address,bytes) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#142-144) is never used and should be removed
+Address.functionStaticCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#152-161) is never used and should be removed
+Address.sendValue(address,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#55-60) is never used and should be removed
+Address.verifyCallResult(bool,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#196-216) is never used and should be removed
+BoardContract.fulfillRandomness(bytes32,uint256) (share/contracts/Board.sol#121-138) is never used and should be removed
+BoardContract.gameStrategist(uint16,uint256,uint8) (share/contracts/Board.sol#143-181) is never used and should be removed
+Context._msgData() (share/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+ERC721._burn(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#302-314) is never used and should be removed
+ERC721Enumerable._addTokenToAllTokensEnumeration(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#106-109) is never used and should be removed
+ERC721Enumerable._addTokenToOwnerEnumeration(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#96-100) is never used and should be removed
+ERC721Enumerable._beforeTokenTransfer(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#72-89) is never used and should be removed
+ERC721Enumerable._removeTokenFromAllTokensEnumeration(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#144-162) is never used and should be removed
+ERC721Enumerable._removeTokenFromOwnerEnumeration(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#119-137) is never used and should be removed
+PropContract._baseURI() (share/contracts/Prop.sol#99-101) is never used and should be removed
+PropContract._isApprovedOrOwner(address,uint256) (share/contracts/Prop.sol#283-288) is never used and should be removed
+Strings.toHexString(uint256) (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#40-51) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code[0m
+[92m
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/IAccessControl.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/interfaces/IERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/interfaces/IERC2981.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Address.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Strings.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Board.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Prop.sol#3) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity[0m
+[92m
+Low level call in Address.sendValue(address,uint256) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#55-60):
+	- (success) = recipient.call{value: amount}() (share/node_modules/@openzeppelin/contracts/utils/Address.sol#58)
+Low level call in Address.functionCallWithValue(address,bytes,uint256,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#123-134):
+	- (success,returndata) = target.call{value: value}(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#132)
+Low level call in Address.functionStaticCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#152-161):
+	- (success,returndata) = target.staticcall(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#159)
+Low level call in Address.functionDelegateCall(address,bytes,string) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#179-188):
+	- (success,returndata) = target.delegatecall(data) (share/node_modules/@openzeppelin/contracts/utils/Address.sol#186)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls[0m
+[92m
+Parameter VRFConsumerBase.requestRandomness(bytes32,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152) is not in mixedCase
+Parameter VRFConsumerBase.requestRandomness(bytes32,uint256)._fee (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#152) is not in mixedCase
+Variable VRFConsumerBase.LINK (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#168) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#20) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._userSeed (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#21) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._requester (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#22) is not in mixedCase
+Parameter VRFRequestIDBase.makeVRFInputSeed(bytes32,uint256,address,uint256)._nonce (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#23) is not in mixedCase
+Parameter VRFRequestIDBase.makeRequestId(bytes32,uint256)._keyHash (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#37) is not in mixedCase
+Parameter VRFRequestIDBase.makeRequestId(bytes32,uint256)._vRFInputSeed (share/node_modules/@chainlink/contracts/src/v0.8/VRFRequestIDBase.sol#37) is not in mixedCase
+Parameter ERC721.safeTransferFrom(address,address,uint256,bytes)._data (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#179) is not in mixedCase
+Event BoardContractePawn(uint16,uint256) (share/contracts/Board.sol#62) is not in CapWords
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._edition (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._pawnID (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.gameStrategist(uint16,uint256,uint8)._position (share/contracts/Board.sol#143) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._nbOfLands (share/contracts/Board.sol#216) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._rarityLevel (share/contracts/Board.sol#217) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._purchasableLands (share/contracts/Board.sol#218) is not in mixedCase
+Parameter BoardContract.newBoard(uint8,uint8,uint8[],uint16)._maxPawns (share/contracts/Board.sol#219) is not in mixedCase
+Parameter BoardContract.register(uint16,uint256)._edition (share/contracts/Board.sol#238) is not in mixedCase
+Parameter BoardContract.register(uint16,uint256)._pawnID (share/contracts/Board.sol#238) is not in mixedCase
+Parameter BoardContract.isRegistered(uint16,uint256)._edition (share/contracts/Board.sol#256) is not in mixedCase
+Parameter BoardContract.isRegistered(uint16,uint256)._pawnID (share/contracts/Board.sol#256) is not in mixedCase
+Parameter BoardContract.play(uint16,uint256)._edition (share/contracts/Board.sol#263) is not in mixedCase
+Parameter BoardContract.play(uint16,uint256)._pawnID (share/contracts/Board.sol#263) is not in mixedCase
+Parameter BoardContract.getPawnInfo(uint16,uint256)._edition (share/contracts/Board.sol#279) is not in mixedCase
+Parameter BoardContract.getPawnInfo(uint16,uint256)._pawnID (share/contracts/Board.sol#279) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._edition (share/contracts/Board.sol#289) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._pawnID (share/contracts/Board.sol#290) is not in mixedCase
+Parameter BoardContract.setPawnInfo(uint16,uint256,BoardContract.PawnInfo)._pawnInfo (share/contracts/Board.sol#291) is not in mixedCase
+Parameter PropContract.tokenURI(uint256)._id (share/contracts/Prop.sol#106) is not in mixedCase
+Parameter PropContract.mint(address,uint16,uint8,uint8)._to (share/contracts/Prop.sol#122) is not in mixedCase
+Parameter PropContract.mint(address,uint16,uint8,uint8)._edition (share/contracts/Prop.sol#123) is not in mixedCase
+Parameter PropContract.mint(address,uint16,uint8,uint8)._land (share/contracts/Prop.sol#124) is not in mixedCase
+Parameter PropContract.mint(address,uint16,uint8,uint8)._rarity (share/contracts/Prop.sol#125) is not in mixedCase
+Parameter PropContract.get(uint256)._id (share/contracts/Prop.sol#137) is not in mixedCase
+Parameter PropContract.exists(uint256)._id (share/contracts/Prop.sol#146) is not in mixedCase
+Parameter PropContract.getNbOfProps(uint16,uint8,uint8)._edition (share/contracts/Prop.sol#160) is not in mixedCase
+Parameter PropContract.getNbOfProps(uint16,uint8,uint8)._land (share/contracts/Prop.sol#161) is not in mixedCase
+Parameter PropContract.getNbOfProps(uint16,uint8,uint8)._rarity (share/contracts/Prop.sol#162) is not in mixedCase
+Parameter PropContract.supportsInterface(bytes4)._interfaceId (share/contracts/Prop.sol#171) is not in mixedCase
+Parameter PropContract.generateID(uint16,uint8,uint8)._edition (share/contracts/Prop.sol#190) is not in mixedCase
+Parameter PropContract.generateID(uint16,uint8,uint8)._land (share/contracts/Prop.sol#191) is not in mixedCase
+Parameter PropContract.generateID(uint16,uint8,uint8)._rarity (share/contracts/Prop.sol#192) is not in mixedCase
+Parameter PropContract.setDefaultRoyaltyPercentageBasisPoints(uint96)._percentageBasisPoints (share/contracts/Prop.sol#206) is not in mixedCase
+Parameter PropContract.setRoyalties(uint256,uint96)._tokenId (share/contracts/Prop.sol#213) is not in mixedCase
+Parameter PropContract.setRoyalties(uint256,uint96)._percentageBasisPoints (share/contracts/Prop.sol#213) is not in mixedCase
+Parameter PropContract.royaltyInfo(uint256,uint256)._tokenId (share/contracts/Prop.sol#246) is not in mixedCase
+Parameter PropContract.royaltyInfo(uint256,uint256)._salePrice (share/contracts/Prop.sol#246) is not in mixedCase
+Parameter PropContract.isApprovedForAll(address,address)._operator (share/contracts/Prop.sol#263) is not in mixedCase
+Parameter PropContract.setIsOperatorAllowed(address,bool)._address (share/contracts/Prop.sol#277) is not in mixedCase
+Variable PropContract.Board (share/contracts/Prop.sol#38) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions[0m
+[92m
+Redundant expression "_owner (share/contracts/Prop.sol#269)" inPropContract (share/contracts/Prop.sol#20-289)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#redundant-statements[0m
+[92m
+BoardContract (share/contracts/Board.sol#13-295) does not implement functions:
+	- VRFConsumerBase.fulfillRandomness(bytes32,uint256) (share/node_modules/@chainlink/contracts/src/v0.8/VRFConsumerBase.sol#116)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions[0m
+[92m
+BoardContract.randomResult (share/contracts/Board.sol#49) should be constant
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant[0m
+[92m
+grantRole(bytes32,address) should be declared external:
+	- AccessControl.grantRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#130-132)
+revokeRole(bytes32,address) should be declared external:
+	- AccessControl.revokeRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#143-145)
+renounceRole(bytes32,address) should be declared external:
+	- AccessControl.renounceRole(bytes32,address) (share/node_modules/@openzeppelin/contracts/access/AccessControl.sol#161-165)
+renounceOwnership() should be declared external:
+	- Ownable.renounceOwnership() (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#54-56)
+transferOwnership(address) should be declared external:
+	- Ownable.transferOwnership(address) (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#62-65)
+name() should be declared external:
+	- ERC721.name() (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#79-81)
+symbol() should be declared external:
+	- ERC721.symbol() (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#86-88)
+approve(address,uint256) should be declared external:
+	- ERC721.approve(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#112-122)
+setApprovalForAll(address,bool) should be declared external:
+	- ERC721.setApprovalForAll(address,bool) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#136-138)
+transferFrom(address,address,uint256) should be declared external:
+	- ERC721.transferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#150-159)
+safeTransferFrom(address,address,uint256) should be declared external:
+	- ERC721.safeTransferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/ERC721.sol#164-170)
+tokenOfOwnerByIndex(address,uint256) should be declared external:
+	- ERC721Enumerable.tokenOfOwnerByIndex(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#37-40)
+tokenByIndex(uint256) should be declared external:
+	- ERC721Enumerable.tokenByIndex(uint256) (share/node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol#52-55)
+newBoard(uint8,uint8,uint8[],uint16) should be declared external:
+	- BoardContract.newBoard(uint8,uint8,uint8[],uint16) (share/contracts/Board.sol#215-233)
+get(uint256) should be declared external:
+	- PropContract.get(uint256) (share/contracts/Prop.sol#137-141)
+getNbOfProps(uint16,uint8,uint8) should be declared external:
+	- PropContract.getNbOfProps(uint16,uint8,uint8) (share/contracts/Prop.sol#159-166)
+setDefaultRoyaltyPercentageBasisPoints(uint96) should be declared external:
+	- PropContract.setDefaultRoyaltyPercentageBasisPoints(uint96) (share/contracts/Prop.sol#206-208)
+setRoyalties(uint256,uint96) should be declared external:
+	- PropContract.setRoyalties(uint256,uint96) (share/contracts/Prop.sol#213-215)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external[0m
+[91m
+StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182) ignores return value by pool.info.token.transferFrom(msg.sender,address(this),_amount) (share/contracts/Staking.sol#178)
+StakingContract.unstake(address) (share/contracts/Staking.sol#213-238) ignores return value by pool.info.token.transfer(msg.sender,stakedAmount) (share/contracts/Staking.sol#232)
+StakingContract.unstake(address) (share/contracts/Staking.sol#213-238) ignores return value by rewardToken.transfer(msg.sender,rewards) (share/contracts/Staking.sol#235)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer[0m
+[93m
+StakingContract._calculateReward(address,StakingContract.PoolInfo,StakingContract.UserInfo) (share/contracts/Staking.sol#192-204) performs a multiplication on the result of a division:
+	-_user.amount * (block.timestamp - _user.depositDate) * _pool.yield / 100 / 365 / 24 / 60 / 60 * uint256(getLastPrice(address(rewardToken))) / uint256(getLastPrice(_token)) (share/contracts/Staking.sol#199-202)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply[0m
+[92m
+Reentrancy in StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182):
+	External calls:
+	- pool.info.token.transferFrom(msg.sender,address(this),_amount) (share/contracts/Staking.sol#178)
+	Event emitted after the call(s):
+	- Staked(msg.sender,_token,_amount) (share/contracts/Staking.sol#181)
+Reentrancy in StakingContract.unstake(address) (share/contracts/Staking.sol#213-238):
+	External calls:
+	- (sent) = address(msg.sender).call{value: stakedAmount}() (share/contracts/Staking.sol#229)
+	- pool.info.token.transfer(msg.sender,stakedAmount) (share/contracts/Staking.sol#232)
+	- rewardToken.transfer(msg.sender,rewards) (share/contracts/Staking.sol#235)
+	External calls sending eth:
+	- (sent) = address(msg.sender).call{value: stakedAmount}() (share/contracts/Staking.sol#229)
+	Event emitted after the call(s):
+	- Unstaked(msg.sender,_token,stakedAmount) (share/contracts/Staking.sol#237)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3[0m
+[92m
+StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(user.amount == 0,Unstack first) (share/contracts/Staking.sol#164)
+StakingContract._calculateReward(address,StakingContract.PoolInfo,StakingContract.UserInfo) (share/contracts/Staking.sol#192-204) uses timestamp for comparisons
+	Dangerous comparisons:
+	- require(bool,string)(block.timestamp >= _user.depositDate,Deposit date problem) (share/contracts/Staking.sol#197)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp[0m
+[92m
+Different versions of Solidity is used:
+	- Version used: ['0.8.9', '^0.8.0']
+	- ^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol#2)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- 0.8.9 (share/contracts/Staking.sol#4)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used[0m
+[92m
+Context._msgData() (share/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+ERC20._burn(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#275-290) is never used and should be removed
+ERC20._mint(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#252-262) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code[0m
+[92m
+Pragma version^0.8.0 (share/node_modules/@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol#2) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version^0.8.0 (share/node_modules/@openzeppelin/contracts/utils/Context.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+Pragma version0.8.9 (share/contracts/Staking.sol#4) necessitates a version too recent to be trusted. Consider deploying with 0.6.12/0.7.6
+solc-0.8.9 is not recommended for deployment
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity[0m
+[92m
+Low level call in StakingContract.unstake(address) (share/contracts/Staking.sol#213-238):
+	- (sent) = address(msg.sender).call{value: stakedAmount}() (share/contracts/Staking.sol#229)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls[0m
+[92m
+Parameter StakingContract.getUserBalanceInPool(address,address)._token (share/contracts/Staking.sol#93) is not in mixedCase
+Parameter StakingContract.getUserBalanceInPool(address,address)._user (share/contracts/Staking.sol#93) is not in mixedCase
+Parameter StakingContract.getPoolBalance(address)._token (share/contracts/Staking.sol#102) is not in mixedCase
+Parameter StakingContract.addPool(address,address,uint256)._token (share/contracts/Staking.sol#142) is not in mixedCase
+Parameter StakingContract.addPool(address,address,uint256)._priceFeed (share/contracts/Staking.sol#142) is not in mixedCase
+Parameter StakingContract.addPool(address,address,uint256)._yield (share/contracts/Staking.sol#142) is not in mixedCase
+Parameter StakingContract.stake(address,uint256)._token (share/contracts/Staking.sol#160) is not in mixedCase
+Parameter StakingContract.stake(address,uint256)._amount (share/contracts/Staking.sol#160) is not in mixedCase
+Parameter StakingContract.unstake(address)._token (share/contracts/Staking.sol#213) is not in mixedCase
+Parameter StakingContract.pendingReward(address)._token (share/contracts/Staking.sol#245) is not in mixedCase
+Parameter StakingContract.getLastPrice(address)._token (share/contracts/Staking.sol#262) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions[0m
+[92m
+renounceOwnership() should be declared external:
+	- Ownable.renounceOwnership() (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#54-56)
+transferOwnership(address) should be declared external:
+	- Ownable.transferOwnership(address) (share/node_modules/@openzeppelin/contracts/access/Ownable.sol#62-65)
+name() should be declared external:
+	- ERC20.name() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#62-64)
+symbol() should be declared external:
+	- ERC20.symbol() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#70-72)
+decimals() should be declared external:
+	- ERC20.decimals() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#87-89)
+totalSupply() should be declared external:
+	- ERC20.totalSupply() (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#94-96)
+balanceOf(address) should be declared external:
+	- ERC20.balanceOf(address) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#101-103)
+transfer(address,uint256) should be declared external:
+	- ERC20.transfer(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#113-116)
+allowance(address,address) should be declared external:
+	- ERC20.allowance(address,address) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#121-123)
+approve(address,uint256) should be declared external:
+	- ERC20.approve(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#132-135)
+transferFrom(address,address,uint256) should be declared external:
+	- ERC20.transferFrom(address,address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#150-164)
+increaseAllowance(address,uint256) should be declared external:
+	- ERC20.increaseAllowance(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#178-181)
+decreaseAllowance(address,uint256) should be declared external:
+	- ERC20.decreaseAllowance(address,uint256) (share/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#197-205)
+stake(address,uint256) should be declared external:
+	- StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#public-function-that-could-be-declared-external[0m
+/home/ethsec/share/contracts/ analyzed (103 contracts with 75 detectors), 644 result(s) found
