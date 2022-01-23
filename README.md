@@ -11,15 +11,27 @@ This repository contains all the MNW smart contracts (in /contracts), along with
 ## Online demo
 https://mnp-app.herokuapp.com/
 
-Available for kovan and mumbai testnet
+Available for mumbai testnet
 
-Players must have ETH or MATIC to pay transactions.
-
-ETH on kovan
-https://faucets.chain.link/kovan
+Players must have MATIC to pay transactions.
 
 MATIC faucet
 https://faucet.polygon.technology/
+
+See [Deployed addresses](DEPLOYED_ADDRESSES.md)
+
+## Security reports
+See Slither analysis at [`security` branch](https://github.com/jcaporossi/mnp-trufflebox/tree/feature/security)
+
+## Use of Chainlink VRF oracle for randomness
+### ChainLink workflow
+1- Receive request
+2- Generating the random and sending crypto proofs to the VRF contract
+3- Verify and send random number to our Board contract
+
+### Our workflow
+1- Send request via Bank.
+
 
 ## Cloning the project
 
@@ -69,10 +81,7 @@ truffle test
 
 ## Migration
 
-Don't forget, deployer account must have ETH on local or Kovan network or MATIC on Mumbai network
-
-ETH on kovan
-https://faucets.chain.link/kovan
+Don't forget, deployer account must have MATIC on Mumbai network
 
 MATIC faucet
 https://faucet.polygon.technology/
