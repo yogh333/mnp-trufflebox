@@ -4,6 +4,18 @@
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+
+    font-family: 'ITC Kabel Std', sans-serif;
+    font-size: 1.1rem;
+}
+
+.navbar-brand {
+    font-family: 'Monopoly', sans-serif;
+    font-size: 2rem
+}
+
+h1, h2 {
+    font-family: 'Monopoly', sans-serif;
 }
 
 #show-navbar {

@@ -1,5 +1,5 @@
 .symbol{
-    font-size: 0.75rem;
+    font-size: 0.9rem;
     font-weight: bold;
 }
 
@@ -14,7 +14,7 @@ img.symbol {
     width: 1rem;
     height: 1rem;
     margin-left: 0.3rem;
-    margin-bottom: -0.2rem;
+    margin-bottom: 0.2rem;
 }
 
 .price {

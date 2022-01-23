@@ -279,7 +279,7 @@ function Game(props) {
 
   return (
     <div className="Game">
-      <div className="info-area-1">
+      <div className="grid-area info-area-1">
         <div
           id="show-navbar"
           className={isNavbarDisplayed ? "m-1 d-none" : "m-1 d-block"}
@@ -327,7 +327,7 @@ function Game(props) {
           )}
         </div>
       </div>
-      <div className="info-area-2 text-center">
+      <div className="grid-area info-area-2 text-center">
         <Visual
           spinner={spinner}
           land_info={landInfo}
@@ -344,7 +344,7 @@ function Game(props) {
           set_must_reset_alert={setMustResetAlert}
         />
       </div>
-      <div className="info-area-3 text-center">
+      <div className="grid-area info-area-3 text-center">
         <h2>Game info</h2>
         <Rules
           game_info_by_type={board.game_info_by_type}
@@ -352,7 +352,7 @@ function Game(props) {
           pawn_info={pawnInfo}
         />
       </div>
-      <div className="info-area-4 text-center">
+      <div className="grid-area info-area-4 text-center">
         <h2>NFT Info</h2>
         {isRetrievingInfo ? (
           spinner
@@ -373,7 +373,7 @@ function Game(props) {
           />
         )}
       </div>
-      <div className="main-area">
+      <div className="grid-area main-area">
         <Grid
           board={board}
           retrieve_land_info={retrieveLandInfo}

@@ -3,9 +3,9 @@
   grid-template-columns: 90px repeat(9, 60px) 90px;
   grid-template-rows: 90px repeat(9, 60px) 90px;
   gap: 0px;
-  padding: 1px;
+  /*padding: 1px;
   border: 1px solid black;
-  margin: 1px;
+  margin: 1px;*/
   place-items: center;
   /*background: #dae9d4;*/
   background-image: url("../images/board.jpg");
