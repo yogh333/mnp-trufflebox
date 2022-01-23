@@ -259,6 +259,7 @@ export default function User(props) {
       <div>{propertyCount} NFT</div>
 
       <Button
+        id="roll_dices"
         type="submit"
         variant="danger"
         size="sm"
@@ -275,7 +276,7 @@ export default function User(props) {
       >
         <div className="m-3">
           <img
-            style={{ height: "10rem", aspectRatio: "1" }}
+            style={{ height: "9rem", aspectRatio: "1" }}
             src={require("../assets/dices_shaker.gif").default}
             alt="dices shaker"
           />

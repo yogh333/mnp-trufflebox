@@ -349,7 +349,7 @@ function App() {
               className="hide secondary"
               onClick={() => {
                 setIsNavbarDisplayed(false);
-                document.querySelector("#user-info").style.marginTop = "-1rem";
+                document.querySelector("#user-info").style.marginTop = "-2rem";
               }}
             >
               X
