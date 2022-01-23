@@ -11,15 +11,17 @@ export default function Land(props) {
   const networkId = props.network_id;
   const address = props.address;
   const provider = props.provider;
-  const landInfo = props.land_info;
+  // Contracts
   const Bank = props.bank_contract;
+  const Prop = props.prop_contract;
+  // vars
+  const landInfo = props.land_info;
   const editionId = props.edition_id;
   const maxRarity = props.max_rarity;
   const rarityMultiplier = props.rarity_multiplier;
   const toggleUpdateValues = props.toggle_update_values;
   const monoSymbol = props.mono_symbol;
 
-  const [Prop, setProp] = useState(null);
   const [propBalance, setPropBalance] = useState(null);
   const [nbOfPropsByRarity, setNbOfPropsByRarity] = useState([]);
   const [propertiesCountByRarity, setPropertiesCountByRarity] = useState([]);
@@ -32,19 +34,7 @@ export default function Land(props) {
     useState(_propertyInformationByRarity);
 
   useEffect(() => {
-    if (!(provider && address && networkId && landInfo.id && editionId)) return;
-
-    setProp(
-      new ethers.Contract(
-        PropJson.networks[networkId].address,
-        PropJson.abi,
-        provider
-      )
-    );
-  }, [address, provider, networkId, landInfo.id, editionId]);
-
-  useEffect(() => {
-    if (!Prop) return;
+    if (!Prop || !landInfo || landInfo.id === null) return;
 
     updateValues();
   }, [Prop, landInfo.id]);
@@ -64,7 +54,13 @@ export default function Land(props) {
   }, [toggleUpdateValues]);
 
   useEffect(() => {
-    if (propBalance === null || !Prop) return;
+    if (
+      propBalance === null ||
+      !Prop ||
+      landInfo.id === null ||
+      !landInfo.isPurchasable
+    )
+      return;
 
     const fetchNbOfPropsByRarity = async () => {
       let _nbOfPropsByRarity = [];
@@ -79,7 +75,7 @@ export default function Land(props) {
     };
 
     fetchNbOfPropsByRarity();
-  }, [propBalance, Prop]);
+  }, [propBalance, Prop, landInfo.id]);
 
   useEffect(() => {
     if (nbOfPropsByRarity.length !== maxRarity || !Prop) return;
@@ -90,7 +86,9 @@ export default function Land(props) {
       for (let index = 0; index < propBalance; index++) {
         const idx = await Prop.tokenOfOwnerByIndex(address, index);
         properties[index] = await Prop.get(idx); // can be used
-        _propertiesCountByRarity[properties[index].rarity]++;
+        if (properties[index].land === landInfo.id) {
+          _propertiesCountByRarity[properties[index].rarity]++;
+        }
       }
 
       setPropertiesCountByRarity(_propertiesCountByRarity);
@@ -105,7 +103,7 @@ export default function Land(props) {
     let _propertyInformationByRarity = [];
     for (let rarity = 0; rarity < maxRarity; rarity++) {
       _propertyInformationByRarity[rarity] = {
-        owned: nbOfPropsByRarity[rarity],
+        owned: propertiesCountByRarity[rarity],
         left: rarityMultiplier ** rarity - nbOfPropsByRarity[rarity],
       };
     }
@@ -121,7 +119,7 @@ export default function Land(props) {
     <>
       <h3 className="mb-2">{landInfo.title}</h3>
       <div className="price">
-        Rare {landInfo.prices[0]}
+        <span className="rare">Rare</span> {landInfo.prices[0]}
         {monoSymbol}
       </div>
       <div className="mb-2">
@@ -129,7 +127,7 @@ export default function Land(props) {
         {propertyInformationByRarity[0].left}
       </div>
       <div className="price">
-        Uncommon {landInfo.prices[1]}
+        <span className="uncommon">Uncommon</span> {landInfo.prices[1]}
         {monoSymbol}
       </div>
       <div className="mb-2">
@@ -137,7 +135,7 @@ export default function Land(props) {
         {propertyInformationByRarity[1].left}
       </div>
       <div className="price">
-        Common {landInfo.prices[2]}
+        <span className="common">Common</span> {landInfo.prices[2]}
         {monoSymbol}
       </div>
       <div className="mb-2">

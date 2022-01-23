@@ -7,6 +7,7 @@
     height: 4rem;
     aspect-ratio: 1;
     display: inline-block;
+    filter: drop-shadow(1rem 1rem 1rem black);
 }
 
 .ml-150{
@@ -15,4 +16,12 @@
 
 .mr-20{
   margin-right: 20px;
+}
+
+#random-switch {
+  margin-left: 0px !important;
+}
+
+#roll_dices {
+    font-size: 1.3rem;
 }

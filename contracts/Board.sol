@@ -19,6 +19,9 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 		bool isPropertyBought;
 		bool isRentPaid;
 		bool isRoundCompleted;
+		bool isInJail;
+		bool isChanceCard;
+		bool isCommunityCard;
 	}
 
 	/// @dev structure used to store pawn's attribute
@@ -124,6 +127,10 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 
 		boards[p.edition].pawns[p.pawnID].isPropertyBought = false;
 		boards[p.edition].pawns[p.pawnID].isRentPaid = false;
+		boards[p.edition].pawns[p.pawnID].isInJail = false;
+		boards[p.edition].pawns[p.pawnID].isChanceCard = false;
+		boards[p.edition].pawns[p.pawnID].isCommunityCard = false;
+		boards[p.edition].pawns[p.pawnID].isRoundCompleted = true;
 
 		gameStrategist(p.edition, p.pawnID, boards[p.edition].pawns[p.pawnID].position);
 
@@ -134,14 +141,43 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 	 * @param _edition board edition
 	 * @param _pawnID pawn ID*/
 	function gameStrategist(uint16 _edition, uint256 _pawnID, uint8 _position) internal {
+		// Purchasable lands
 		if (boards[_edition].isPurchasable[_position]) {
 			boards[_edition].pawns[_pawnID].isRoundCompleted = false;
 
 			return;
 		}
 
-		// Actually, not purchasable lands don't have strategies, except to throw the dices.
-		boards[_edition].pawns[_pawnID].isRoundCompleted = true;
+		// Go to jail
+		if (_position == 30) {
+			boards[_edition].pawns[_pawnID].isInJail = true;
+			boards[_edition].pawns[_pawnID].position = 10;
+			return;
+		}
+
+		// Free park
+		if (_position == 20) {
+			return;
+		}
+
+		// Jail simple visit
+		if (_position == 10) {
+			return;
+		}
+
+		// Chance card
+		if (_position == 7 ||
+			_position == 22 ||
+			_position == 36
+		) {
+			boards[_edition].pawns[_pawnID].isChanceCard = true;
+			boards[_edition].pawns[_pawnID].isRoundCompleted = false;
+			return;
+		}
+
+		// Community card
+		boards[_edition].pawns[_pawnID].isCommunityCard = true;
+		boards[_edition].pawns[_pawnID].isRoundCompleted = false;
 	}
 
 	/** check if a land can be bought (PROP tokens available)

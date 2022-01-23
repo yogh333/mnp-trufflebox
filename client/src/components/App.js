@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../css/App.css";
 import {
@@ -22,6 +22,7 @@ import AggregatorV3InterfaceJson from "../contracts/AggregatorV3Interface.json";
 import ERC20Json from "../contracts/ERC20.json";
 
 function App() {
+  const MUMBAI_NETWORK_ID = "80001";
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
   const [provider, setProvider] = useState(null);
@@ -56,13 +57,22 @@ function App() {
     action: "",
   });
   const [doModalAction, setDoModalAction] = useState(null);
+  const [isReadyToRender, setIsReadyToRender] = useState(false);
+  const [isNavbarDisplayed, setIsNavbarDisplayed] = useState(true);
+  const [balance, setBalance] = useState(null);
 
   const aggregatorV3InterfaceABI = AggregatorV3InterfaceJson.abi;
 
   function initialize() {
     window.ethereum
       .request({ method: "net_version" })
-      .then((value) => setNetworkId(value))
+      .then((_networkID) => {
+        if (_networkID !== MUMBAI_NETWORK_ID) {
+          setIsReadyToRender(true);
+          return;
+        }
+        setNetworkId(_networkID);
+      })
       .catch((err) => {
         console.error(err);
       });
@@ -87,6 +97,7 @@ function App() {
   function handleAccountsChanged(accounts) {
     if (accounts.length === 0) {
       console.log("Please connect to MetaMask.");
+      setIsReadyToRender(true);
 
       if (window.location.pathname !== "/") {
         // Redirection to Home when disconnected from all pages except home
@@ -114,13 +125,13 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!networkId || networkId !== MUMBAI_NETWORK_ID || !address) return;
+
     setProvider(getProvider());
   }, [networkId, address]);
 
   function connectWallet() {
-    if (address) {
-      return;
-    }
+    if (address) return;
 
     if (typeof window.ethereum !== "undefined") {
       if (window.ethereum.isMetaMask) {
@@ -132,6 +143,7 @@ function App() {
               // EIP-1193 userRejectedRequest error
               // If this happens, the user rejected the connection request.
               console.log("Please connect to MetaMask.");
+              setIsReadyToRender(true);
             } else {
               console.error(err);
             }
@@ -141,9 +153,7 @@ function App() {
   }
 
   useEffect(() => {
-    if (!(provider && address && networkId)) {
-      return;
-    }
+    if (!(provider && address && networkId)) return;
 
     setStaking(
       new ethers.Contract(
@@ -152,6 +162,8 @@ function App() {
         provider.getSigner(address)
       )
     );
+
+    provider.getBalance(address).then((_balance) => setBalance(_balance));
 
     provider
       .getBlockNumber()
@@ -163,6 +175,7 @@ function App() {
       return;
     }
 
+    console.log("Staking.rewardToken");
     Staking.rewardToken().then((_address) => setRewardTokenAddress(_address));
   }, [Staking]);
 
@@ -171,6 +184,7 @@ function App() {
       return;
     }
 
+    console.log("Staking.pools(rewardTokenAddress)");
     Staking.pools(rewardTokenAddress).then((_pool) =>
       setRewardTokenPriceFeed(_pool.priceFeed)
     );
@@ -187,11 +201,14 @@ function App() {
       provider.getSigner()
     );
 
+    console.log("RewardTokenInstance.name");
     RewardTokenInstance.name().then((_name) => setRewardTokenName(_name));
+    console.log("RewardTokenInstance.symbol");
     RewardTokenInstance.symbol().then((_symbol) => {
       setRewardTokenSymbol(_symbol);
       setRewardTokenIcon("/images/tokens/" + _symbol.toLowerCase() + ".svg");
     });
+    console.log("RewardTokenInstance.decimals");
     RewardTokenInstance.decimals();
   }, [Staking, rewardTokenAddress, rewardTokenPriceFeed]);
 
@@ -214,6 +231,7 @@ function App() {
       provider.getSigner()
     );
 
+    console.log("RewardTokenPriceFeedInstance.latestRoundData");
     RewardTokenPriceFeedInstance.latestRoundData().then((roundData) => {
       setRewardTokenPrice(
         ethers.utils.formatEther(roundData.answer + "0000000000")
@@ -221,6 +239,7 @@ function App() {
     });
 
     setIsRewardTokenDisplay(true);
+    setIsReadyToRender(true);
   }, [
     Staking,
     rewardTokenAddress,
@@ -257,6 +276,33 @@ function App() {
     return string.substring(0, 5) + "..." + string.slice(-3);
   };
 
+  if (!isReadyToRender) {
+    return <>{spinner}</>;
+  }
+
+  if (networkId !== MUMBAI_NETWORK_ID) {
+    return (
+      <div>
+        You must connect Metamask to mumbai network (polygon testnet) to play.
+        You can easily add it to Metamask clicking link at the bottom of{" "}
+        <a href="https://mumbai.polygonscan.com/#darkModaBtn">
+          mumbai explorer page
+        </a>
+        .
+      </div>
+    );
+  }
+
+  if (balance && balance.lt(ethers.utils.parseEther("0.1"))) {
+    return (
+      <div>
+        Your MATIC balance ({ethers.utils.formatEther(balance)}) is too low.
+        Fill your account with MATIC for Mumbai network
+        <a href="https://faucet.polygon.technology/"> here </a>.
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <Modal show={isModalShown} centered backdrop="static">
@@ -291,7 +337,24 @@ function App() {
       </Modal>
 
       <BrowserRouter>
-        <Navbar className="px-3" bg="light">
+        <Navbar
+          id="navbar"
+          className={isNavbarDisplayed ? "d-block" : "d-none"}
+          bg="light"
+        >
+          <div id="hide-navbar" className="mx-1 my-2">
+            <Button
+              variant="outline-dark"
+              size="sm"
+              className="hide secondary"
+              onClick={() => {
+                setIsNavbarDisplayed(false);
+                document.querySelector("#user-info").style.marginTop = "-2rem";
+              }}
+            >
+              X
+            </Button>
+          </div>
           <Container>
             <Navbar.Brand className="brand">MNP World</Navbar.Brand>
             <Nav className="me-auto">
@@ -358,12 +421,16 @@ function App() {
                 provider={provider}
                 network_id={networkId}
                 address={address}
+                staking_contract={Staking}
                 spinner={spinner}
                 mono_symbol={monoSymbol}
                 set_is_modal_shown={setIsModalShown}
                 set_modal_html={setModalHTML}
                 do_modal_action={doModalAction}
                 set_is_doing_modal_action={setIsDoingModalAction}
+                start_block_number={startBlockNumber}
+                is_navbar_displayed={isNavbarDisplayed}
+                set_is_navbar_displayed={setIsNavbarDisplayed}
               />
             }
           />
@@ -375,6 +442,7 @@ function App() {
                 provider={provider}
                 network_id={networkId}
                 address={address}
+                staking_contract={Staking}
                 reward_token_name={rewardTokenName}
                 reward_token_symbol={rewardTokenSymbol}
                 reward_token_icon={rewardTokenIcon}
@@ -382,7 +450,6 @@ function App() {
                 reward_token_price={rewardTokenPrice}
                 reward_token_price_feed={rewardTokenPriceFeed}
                 mono_symbol={monoSymbol}
-                staking_contract={Staking}
                 start_block_number={startBlockNumber}
               />
             }

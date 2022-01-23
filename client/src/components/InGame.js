@@ -4,36 +4,33 @@ import { ethers } from "ethers";
 
 import "../css/Game.css";
 
-import boards from "../data/boards.json";
-
-import StakingJson from "../contracts/StakingContract.json";
-
 import { Button, Card, Container, Spinner } from "react-bootstrap";
 
 function InGame(props) {
-  const IN_GAME_MONO_AMOUNT = 50;
+  const IN_GAME_MONO_AMOUNT = 500;
 
   const spinner = <Spinner as="span" animation="border" size="sm" />;
 
   const provider = props.provider;
   const networkId = props.network_id;
   const address = props.address;
+  // Contracts
+  const Staking = props.staking_contract;
   const Bank = props.bank_contract;
   const Mono = props.mono_contract;
   const Board = props.board_contract;
   const Pawn = props.pawn_contract;
+  // vars
   const pawnID = props.pawn_id;
-
+  const startBlockNumber = props.start_block_number;
   // functions
   const parentUpdateValues = props.parent_update_values_function;
 
-  const [Staking, setStaking] = useState(null);
   const [isReadyToRender, setIsReadyToRender] = useState(false);
   const [isPerforming, setIsPerforming] = useState(false);
   const [inGameStep, setInGameStep] = useState(1);
   const [isRegistered, setIsRegistered] = useState(false);
 
-  const [startBlockNumber, setStartBlockNumber] = useState(null);
   const [monoBalance, setMonoBalance] = useState(null);
   const [pawnBalance, setPawnBalance] = useState(ethers.utils.parseEther("0"));
   const [monoToBuy, setMonoToBuy] = useState(0);
@@ -46,31 +43,11 @@ function InGame(props) {
   }, []);
 
   useEffect(() => {
-    if (!(provider && address && networkId)) {
-      return;
-    }
-
-    setStaking(
-      new ethers.Contract(
-        StakingJson.networks[networkId].address,
-        StakingJson.abi,
-        provider.getSigner(address)
-      )
-    );
-
-    provider
-      .getBlockNumber()
-      .then((_blockNumber) => setStartBlockNumber(_blockNumber));
-  }, [provider, address, networkId]);
-
-  useEffect(() => {
-    if (!Staking) {
-      return;
-    }
+    if (!Mono || !Pawn || !Staking) return;
 
     updateValues();
     setIsReadyToRender(true);
-  }, [Staking]);
+  }, [Mono, Pawn, Staking]);
 
   useEffect(() => {
     if (!startBlockNumber || !Bank) {
@@ -253,7 +230,10 @@ function InGame(props) {
 
     setNetworkTokensToBuy(
       Math.ceil(
-        ((_monoToBuy * monoLastPrice) / networkTokenLastPrice) * 10 ** 18
+        ethers.utils
+          .parseEther(_monoToBuy.toString())
+          .mul(ethers.BigNumber.from(monoLastPrice))
+          .div(ethers.BigNumber.from(networkTokenLastPrice))
       )
     );
     setData(1);
@@ -267,7 +247,9 @@ function InGame(props) {
     setIsPerforming(true);
 
     try {
-      const result = await Bank.buyMono({ value: networkTokensToBuy });
+      const result = await Bank.buyMono({
+        value: ethers.BigNumber.from(networkTokensToBuy.toString()),
+      });
       if (!result.hash) {
         setIsPerforming(false);
         return;

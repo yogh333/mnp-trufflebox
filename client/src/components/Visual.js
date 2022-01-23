@@ -5,24 +5,31 @@ import Button from "react-bootstrap/Button";
 import boards from "../data/boards.json";
 
 export default function Visual(props) {
-  const spinner = props.spinner;
-  const editionID = props.edition_id;
   const board = require(`../data/${boards[parseInt(props.edition_id)]}.json`);
 
+  // Contracts
   const Bank = props.bank_contract;
+  // vars
+  const spinner = props.spinner;
+  const editionID = props.edition_id;
   const monoSymbol = props.mono_symbol;
   const landInfo = props.land_info;
-  const rarity = landInfo.rarity ? landInfo.rarity : null;
+  const rarity = landInfo.rarity;
+  const isChanceCard = landInfo.type === "chance";
+  const isCommunityCard = landInfo.type === "community-chest";
   const landID = landInfo.id;
   const prices = landInfo.prices;
   const isRoundCompleted = props.is_round_completed;
   const doModalAction = props.do_modal_action;
-
+  const mustResetAlert = props.must_reset_alert;
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
   const setIsDoingModalAction = props.set_is_doing_modal_action;
   const updateValues = props.parent_update_values_function;
+  const setMustResetAlert = props.set_must_reset_alert;
+
+  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
     if (!doModalAction) return;
@@ -31,6 +38,13 @@ export default function Visual(props) {
       payRent();
     }
   }, [doModalAction]);
+
+  useEffect(() => {
+    if (!mustResetAlert) return;
+
+    setAlert(null);
+    setMustResetAlert(false);
+  }, [mustResetAlert]);
 
   const payRent = (event) => {
     if (!(Bank && editionID)) return;
@@ -46,6 +60,7 @@ export default function Visual(props) {
         button: "",
         action: "",
       });
+      setAlert("Rent payed");
       updateValues();
     });
   };
@@ -55,6 +70,27 @@ export default function Visual(props) {
 
     Bank.buyProp(editionID).then((value) => {
       console.log("Property bought");
+      setAlert("Property bought");
+      updateValues();
+    });
+  };
+
+  const receiveChance = (event) => {
+    if (!(Bank && editionID)) return;
+
+    Bank.receiveChanceProfit(editionID).then((value) => {
+      console.log("Chance profit received");
+      setAlert("Chance profit received");
+      updateValues();
+    });
+  };
+
+  const payCommunityTax = (event) => {
+    if (!(Bank && editionID)) return;
+
+    Bank.payCommunityTax(editionID).then((value) => {
+      console.log("Community tax paid");
+      setAlert("Community tax paid");
       updateValues();
     });
   };
@@ -67,8 +103,6 @@ export default function Visual(props) {
   if (landID === null) {
     return <>{spinner}</>;
   }
-
-  console.log(isRoundCompleted);
 
   if (rarity !== null && !isRoundCompleted) {
     return (
@@ -114,6 +148,52 @@ export default function Visual(props) {
     );
   }
 
+  if (isChanceCard && !isRoundCompleted) {
+    return (
+      <>
+        <img
+          className="land m-3 text-center"
+          style={{ border: "2px solid black" }}
+          src={board.lands[landID].visual}
+        />
+
+        <div>
+          <Button
+            className="m-1"
+            variant="success"
+            size="sm"
+            onClick={receiveChance}
+          >
+            Receive
+          </Button>
+        </div>
+      </>
+    );
+  }
+
+  if (isCommunityCard && !isRoundCompleted) {
+    return (
+      <>
+        <img
+          className="land m-3 text-center"
+          style={{ border: "2px solid black" }}
+          src={board.lands[landID].visual}
+        />
+
+        <div>
+          <Button
+            className="m-1"
+            variant="success"
+            size="sm"
+            onClick={payCommunityTax}
+          >
+            Pay
+          </Button>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <img
@@ -121,6 +201,9 @@ export default function Visual(props) {
         style={{ border: "2px solid black" }}
         src={board.lands[landID].visual}
       />
+      <div className={alert ? "d-block" : "d-none"}>
+        <div className="alert alert-success m-3">{alert}</div>
+      </div>
     </>
   );
 }

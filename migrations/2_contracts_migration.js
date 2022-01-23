@@ -57,6 +57,7 @@ module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const player1 = accounts[1];
   const player2 = accounts[2];
+  const MonoUsdPrice = 0.001 * 10 ** 8;
 
   if (network === "test") {
     // Deploy stubs
@@ -95,7 +96,7 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       // Deploy price feeds
       // ***************
-      await deployer.deploy(MonoUsdPriceFeed, 0.01 * 10 ** 8);
+      await deployer.deploy(MonoUsdPriceFeed, MonoUsdPrice);
       MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.deployed();
       /*let latestRoundData = await MonoUsdPriceFeedInstance.latestRoundData();
       console.log("MonoUsdPriceFeed");
@@ -189,17 +190,17 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       await MonoInstance.mint(
         StakingInstance.address,
-        ethers.utils.parseEther("2000")
+        ethers.utils.parseEther("200000")
       );
       await MonoInstance.mint(
         BankInstance.address,
-        ethers.utils.parseEther("10000")
+        ethers.utils.parseEther("1000000")
       );
 
-      for (let index = 1; index < 2; index++) {
+      for (let index = 0; index < 2; index++) {
         await MonoInstance.mint(
           accounts[index],
-          ethers.utils.parseEther("1000")
+          ethers.utils.parseEther("100000")
         );
       }
       // Transfer Links to ganache account 1
@@ -265,7 +266,7 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       await MonoInstance.approve(
         BankInstance.address,
-        ethers.utils.parseEther("1000"),
+        ethers.utils.parseEther("100000"),
         {
           from: player1,
         }
@@ -330,7 +331,7 @@ module.exports = async function (deployer, network, accounts) {
       ETH_USD = "0x9326BFA02ADD2366b30bacB125260Af641031331";
       LINK_USD = "0x396c5E36DD0a0F5a5D33dae44368D4193f69a1F0";
 
-      await deployer.deploy(MonoUsdPriceFeed, 0.01 * 10 ** 8);
+      await deployer.deploy(MonoUsdPriceFeed, MonoUsdPrice);
       MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.deployed();
 
       //await deployer.deploy(MaticUsdPriceFeed, 2.48 * 10 ** 8);
@@ -405,17 +406,17 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       await MonoInstance.mint(
         StakingInstance.address,
-        ethers.utils.parseEther("2000")
+        ethers.utils.parseEther("200000")
       );
       await MonoInstance.mint(
         BankInstance.address,
-        ethers.utils.parseEther("10000")
+        ethers.utils.parseEther("1000000")
       );
 
-      for (let index = 1; index < 2; index++) {
+      for (let index = 0; index < 2; index++) {
         await MonoInstance.mint(
           accounts[index],
-          ethers.utils.parseEther("1000")
+          ethers.utils.parseEther("100000")
         );
       }
 
@@ -475,7 +476,7 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       await MonoInstance.approve(
         BankInstance.address,
-        ethers.utils.parseEther("1000"),
+        ethers.utils.parseEther("100000"),
         {
           from: player1,
         }
@@ -515,6 +516,7 @@ module.exports = async function (deployer, network, accounts) {
 
       break;
 
+    case "mumbai":
     case "polygon_infura_testnet":
       console.warn(
         "/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\"
@@ -551,7 +553,7 @@ module.exports = async function (deployer, network, accounts) {
       await deployer.deploy(LinkUsdPriceFeed, 21.86 * 10 ** 8);
       LinkUsdPriceFeedInstance = await LinkUsdPriceFeed.deployed();
 
-      await deployer.deploy(MonoUsdPriceFeed, 0.01 * 10 ** 8);
+      await deployer.deploy(MonoUsdPriceFeed, MonoUsdPrice);
       MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.deployed();
 
       // ***************
@@ -623,17 +625,17 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       await MonoInstance.mint(
         StakingInstance.address,
-        ethers.utils.parseEther("2000")
+        ethers.utils.parseEther("200000")
       );
       await MonoInstance.mint(
         BankInstance.address,
-        ethers.utils.parseEther("10000")
+        ethers.utils.parseEther("1000000")
       );
 
-      for (let index = 1; index < 2; index++) {
+      for (let index = 0; index < 2; index++) {
         await MonoInstance.mint(
           accounts[index],
-          ethers.utils.parseEther("1000")
+          ethers.utils.parseEther("100000")
         );
       }
 
@@ -697,7 +699,7 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       await MonoInstance.approve(
         BankInstance.address,
-        ethers.utils.parseEther("1000"),
+        ethers.utils.parseEther("100000"),
         {
           from: player1,
         }
