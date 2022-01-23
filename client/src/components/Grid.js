@@ -5,9 +5,12 @@ export default function Grid(props) {
   const board = props.board;
   let elements = [];
 
-  function handleClick(e) {
-    console.log(e.target.id.substring(5));
-    props.retrieve_land_info(parseInt(e.target.id.substring(5)), null);
+  function handleClick(event) {
+    let target = event.target;
+    if (target.id === "pawn") {
+      target = event.target.parentNode;
+    }
+    props.retrieve_land_info(parseInt(target.id.substring(5)), null);
   }
 
   board.lands.forEach((element, index) => {
