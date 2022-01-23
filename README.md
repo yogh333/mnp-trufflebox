@@ -59,9 +59,9 @@ But does not have a function to withdraw the ether
 
 ### Function summary
 [documentation](https://github.com/trailofbits/slither/wiki/Printer-documentation#function-summary)
-Exemple
+Exemple  
 Contract BankContract  
-Contract vars: ['_roles', 'DEFAULT_ADMIN_ROLE', 'ADMIN_ROLE', 'BANKER_ROLE', 'Pawn', 'Board', 'Prop', 'Mono', 'Link', 'Staking', 'enroll_fee', 'propPrices']  
+Contract vars: ['_roles', 'DEFAULT_ADMIN_ROLE', 'ADMIN_ROLE', 'BANKER_ROLE', 'Pawn', 'Board', 'Prop', 'Mono', 'Link', 'Staking', 'enroll_fee', 'propPrices']    
 Inheritance:: ['IERC721Receiver', 'AccessControl', 'ERC165', 'IERC165', 'IAccessControl', 'Context']  
 
 
@@ -148,4 +148,13 @@ Inheritance:: ['IERC721Receiver', 'AccessControl', 'ERC165', 'IERC165', 'IAccess
 | onlyRole(bytes32) |  internal  |  []  |   []  | ['_msgSender', '_checkRole'] |       []       |
 |-------------------|------------|------|-------|------------------------------|----------------|
 
+### Inheritance graphs
+[documentation](https://github.com/crytic/slither/wiki/Printer-documentation#inheritance-graph)
+
+Examples
+Bank contract
+![Bank contract graph](Security/slither/inheritance-graph/Bank.sol.inheritance-graph.dot.png)
+
+Board contract  
+![Board contract graph](Security/slither/inheritance-graph/Board.sol.inheritance-graph.dot.png)
 
