@@ -1,100 +1,28 @@
-# mnp-trufflebox
+# MNP contracts security
+Some security analysis and reports
 
-![This is an image](assets/images/still-albert-veldhuis.jpg)
+## with Slither, the Solidity source analyzer
+[Slither repo](https://github.com/crytic/slither)
 
-MNW smart contracts and React-based Dapp
+reports are made with solc version 0.8.9 (slither have a bug with 0.8.10)
 
-This is a React Truffle box project: for more information, please check http://trufflesuite.com/boxes/react/index.html
+[Detectors issues documentation](https://github.com/crytic/slither/wiki/Detector-Documentation)
 
-This repository contains all the MNW smart contracts (in /contracts), along with a React.js front-end (in /client).
+See slither [brut html report]()
 
-## Online demo
-https://mnp-app.herokuapp.com/
+### High issues
+#### [weak PRNG](https://github.com/crytic/slither/wiki/Detector-Documentation#weak-prng)
+- PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.power = 1 + (r % 11) (share/contracts/Pawn.sol#83)"
+- PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.subject = 1 + (r % 8) (share/contracts/Pawn.sol#79)"
+- PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.background = 1 + (r % 10) (share/contracts/Pawn.sol#80)"
+- PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.material = 1 + (r % 10) (share/contracts/Pawn.sol#81)"
+- PawnContract.mint(address) (share/contracts/Pawn.sol#74-92) uses a weak PRNG: "p.halo = 1 + (r % 7) (share/contracts/Pawn.sol#82)"
+- PawnContract.random(address) (share/contracts/Pawn.sol#128-130) uses a weak PRNG: "uint8(uint256(keccak256(bytes)(abi.encodePacked(block.difficulty,block.timestamp,user))) % type()(uint8).max) (share/contracts/Pawn.sol#129)"
 
-Available for kovan and mumbai testnet
-
-Players must have ETH or MATIC to pay transactions.
-
-ETH on kovan
-https://faucets.chain.link/kovan
-
-MATIC faucet
-https://faucet.polygon.technology/
-
-## Cloning the project
-
-In an empty local directory
-
-```
-git clone https://github.com/jcaporossi/mnp-trufflebox.git
-```
-
-## Installation
-
-After cloning the project, install dependencies with
-
-```
-cd mnp-trufflebox
-npm install
-cd client
-npm install
-cd ..
-```
-
-## Compilation
-
-To compile all smart contracts:
-
-```
-truffle compile
-```
-
-## Local node
-
-Start a local node
-
-Open a shell window and launch
-
-```
-ganache-cli
-```
-
-## Unit Tests
-
-To launch unit tests associated with each smart contracts, in another terminal windows, at root of the project
-
-```
-truffle test
-```
-
-## Migration
-
-Don't forget, deployer account must have ETH on local or Kovan network or MATIC on Mumbai network
-
-ETH on kovan
-https://faucets.chain.link/kovan
-
-MATIC faucet
-https://faucet.polygon.technology/
-
-```
-truffle migrate
-```
-
-After deployment, give some LINK to Board and Bank contracts.<br/>
-LINK faucet https://faucets.chain.link
-
-## Front-end
-
-To launch React front-end
-
-```
-cd client
-npm start
-```
-
-## developer documents
-`docs/devdocs/`
-
-## user documents
-`docs/userdocs/`
+#### [unchecked transfer](https://github.com/crytic/slither/wiki/Detector-Documentation#unchecked-transfer)
+- BankContract.rollDices(uint16) (share/contracts/Bank.sol#170-189) ignores return value by Mono.transferFrom(msg.sender,address(this),(chainlinkFee * linkLastPrice) / monoLastPrice + 10 ** 18) (share/contracts/Bank.sol#183)
+- BankContract.buyMono() (share/contracts/Bank.sol#192-205) ignores return value by Mono.transfer(msg.sender,amountToBuy) (share/contracts/Bank.sol#202)
+- BankContract.propertyTransfer(address,address,uint256,uint256) (share/contracts/Bank.sol#445-469) ignores return value by Mono.transferFrom(_from,receiver,royaltyAmount) (share/contracts/Bank.sol#464)
+- StakingContract.stake(address,uint256) (share/contracts/Staking.sol#160-182) ignores return value by pool.info.token.transferFrom(msg.sender,address(this),_amount) (share/contracts/Staking.sol#178)
+- StakingContract.unstake(address) (share/contracts/Staking.sol#213-238) ignores return value by pool.info.token.transfer(msg.sender,stakedAmount) (share/contracts/Staking.sol#232)
+- StakingContract.unstake(address) (share/contracts/Staking.sol#213-238) ignores return value by rewardToken.transfer(msg.sender,rewards) (share/contracts/Staking.sol#235)
