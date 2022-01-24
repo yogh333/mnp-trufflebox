@@ -180,9 +180,11 @@ export default function User(props) {
     const dicesSum =
       ethers.BigNumber.from(pawnInfo.random).mod(11).toNumber() + 2;
     console.log("dicesSum", dicesSum);
-    const min = Math.min(6, dicesSum - 1);
-    const max = Math.max(1, dicesSum - 6);
-    const diceA = Math.floor(Math.random() * (min - max + 1)) + max;
+    const limit1 = Math.min(6, dicesSum - 1);
+    const limit2 = Math.max(1, dicesSum - 6);
+    const min = Math.min(limit1, limit2);
+    const max = Math.max(limit1, limit2);
+    const diceA = getRandomInteger("dice", min, max, pawnInfo.random);
     console.log("diceA", diceA);
     const diceB = dicesSum - diceA;
     console.log("diceB", diceB);
@@ -256,7 +258,7 @@ export default function User(props) {
         {balance}
         {monoSymbol}
       </div>
-      <div>{propertyCount} NFT</div>
+      <div>{propertyCount} NFT owned</div>
 
       <Button
         id="roll_dices"
@@ -267,7 +269,7 @@ export default function User(props) {
         onClick={rollDices}
         disabled={!isRoundCompleted || isDicesRolling}
       >
-        Roll the dices!
+        Roll the dice!
       </Button>
 
       <div
