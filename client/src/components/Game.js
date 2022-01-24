@@ -64,9 +64,7 @@ function Game(props) {
   const [mustResetAlert, setMustResetAlert] = useState(false);
 
   useEffect(() => {
-    if (!(provider && address && networkId)) {
-      return;
-    }
+    if (!(provider && address && networkId)) return;
 
     setBank(
       new ethers.Contract(

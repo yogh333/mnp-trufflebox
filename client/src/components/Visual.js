@@ -95,9 +95,12 @@ export default function Visual(props) {
     });
   };
 
-  const borderColor = (rarity) => {
-    const COLORS = ["yellow", "green", "blue"];
-    return COLORS[rarity];
+  const cardStyle = (_rarity) => {
+    const COLORS = ["gold", "green", "blue"];
+    return {
+      boxShadow: `0 0 1rem ${COLORS[rarity]}`,
+      filter: `drop-shadow(0 0 1rem ${COLORS[rarity]})`,
+    };
   };
 
   if (landID === null) {
@@ -109,7 +112,7 @@ export default function Visual(props) {
       <>
         <img
           className="land m-3"
-          style={{ border: `1rem solid ${borderColor(rarity)}` }}
+          style={cardStyle(rarity)}
           src={board.lands[landID].visual}
         />
         <div className="price">

@@ -123,7 +123,7 @@ export default function Land(props) {
         {monoSymbol}
       </div>
       <div className="mb-2">
-        mine {propertyInformationByRarity[0].owned}, left{" "}
+        owned {propertyInformationByRarity[0].owned}, left{" "}
         {propertyInformationByRarity[0].left}
       </div>
       <div className="price">
@@ -131,7 +131,7 @@ export default function Land(props) {
         {monoSymbol}
       </div>
       <div className="mb-2">
-        mine {propertyInformationByRarity[1].owned}, left{" "}
+        owned {propertyInformationByRarity[1].owned}, left{" "}
         {propertyInformationByRarity[1].left}
       </div>
       <div className="price">
@@ -139,7 +139,7 @@ export default function Land(props) {
         {monoSymbol}
       </div>
       <div className="mb-2">
-        mine {propertyInformationByRarity[2].owned}, left{" "}
+        owned {propertyInformationByRarity[2].owned}, left{" "}
         {propertyInformationByRarity[2].left}
       </div>
     </>
