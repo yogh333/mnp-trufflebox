@@ -309,14 +309,14 @@ contract BankContract is AccessControl, IERC721Receiver {
 	/** @dev Retrieve chance profit
 	 * @param randomness ChainLink VRF random number
 	 * @return amount*/
-	function retrieveChanceProfit(uint256 randomness) internal view returns(uint256){
+	function retrieveChanceProfit(uint256 randomness) internal pure returns(uint256){
 		return calculateRandomInteger("chance", 1, 50, randomness) * 10**18;
 	}
 
 	/** @dev Retrieve community tax
 	 * @param randomness ChainLink VRF random number
 	 * @return amount*/
-	function retrieveCommunityTax(uint256 randomness) internal view returns(uint256){
+	function retrieveCommunityTax(uint256 randomness) internal pure returns(uint256){
 		return calculateRandomInteger("community", 1, 50, randomness) * 10**18;
 	}
 
