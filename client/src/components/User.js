@@ -177,6 +177,7 @@ export default function User(props) {
     });
     Board.on("RandomReady", (_requestID, event) => {
       if (event.blockNumber <= startBlockNumber) return;
+      //if(_requestID != requestedID) return;
 
       console.log("event", event);
       setRequestID(_requestID);
@@ -193,9 +194,10 @@ export default function User(props) {
       !VRFCoordinator
     )
       return;
-
-    VRFCoordinator.sendRandomness(requestedID).then(() => {
-      console.log("VRFCoordinator response asked");
+    VRFCoordinator.saveData(requestedID, 1121541545, Board.address).then(() => {
+      VRFCoordinator.sendRandomness(requestedID).then(() => {
+        console.log("VRFCoordinator response asked");
+      });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedID]);
@@ -204,6 +206,8 @@ export default function User(props) {
     if (!requestID || !Bank || !requestedID || !props.edition_id) return;
     if (requestID !== requestedID) return;
 
+    setRequestedID(0);
+    setRequestID(0);
     Bank.locatePlayer(props.edition_id).then((_pawnInfo) => {
       setRollDice(calculateDicesNumbers(_pawnInfo)); // to throw dices 3D animation and display dices results
     });
@@ -226,22 +230,22 @@ export default function User(props) {
    * @param pawnInfo
    * @return pawnInfo
    */
-  const calculateDicesNumbers = (pawnInfo) => {
-    const dicesSum =
-      ethers.BigNumber.from(pawnInfo.random).mod(11).toNumber() + 2;
-    console.log("dicesSum", dicesSum);
-    const min = Math.min(6, dicesSum - 1);
-    const max = Math.max(1, dicesSum - 6);
-    const diceA = Math.floor(Math.random() * (min - max + 1)) + max;
-    console.log("diceA", diceA);
-    const diceB = dicesSum - diceA;
-    console.log("diceB", diceB);
+  const calculateDicesNumbers = (_pawnInfo) => {
+    var randomNumber = _pawnInfo.random;
+
+    randomNumber = randomNumber.mod(11).toNumber() + 2;
+    const min = Math.min(6, randomNumber - 1);
+    const max = Math.max(1, randomNumber - 6);
+    const diceA = Math.floor(Math.random() * (min - max)) + max;
+    const diceB = randomNumber - diceA;
+
+    randomDiceThrow(diceA, diceB);
 
     return {
-      random: pawnInfo.random,
-      position: pawnInfo.position,
+      random: _pawnInfo.random,
+      position: _pawnInfo.position,
       dices: [diceA, diceB],
-      dicesSum: dicesSum,
+      dicesSum: diceA+diceB,
     };
   };
 
@@ -255,11 +259,15 @@ export default function User(props) {
 
     Bank.rollDices(props.edition_id);
 
+
+    /*
+    const [value1, value2] = [1,3];
+    randomDiceThrow(value1, value2);
+    */
     //TODO: Manage the connection with th blockchain
     //const receipt = await Bank.rollDices(props.edition_id)
     //console.log(receipt);
-    const [value1, value2] = [1,3]
-    randomDiceThrow(value1, value2)
+
   }
 
   /**
