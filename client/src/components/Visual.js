@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
 import boards from "../data/boards.json";
+import { ethers } from "ethers";
 
 export default function Visual(props) {
   const board = require(`../data/${boards[parseInt(props.edition_id)]}.json`);
@@ -22,6 +23,7 @@ export default function Visual(props) {
   const isRoundCompleted = props.is_round_completed;
   const doModalAction = props.do_modal_action;
   const mustResetAlert = props.must_reset_alert;
+  const pawnInfo = props.pawn_info;
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
@@ -45,6 +47,31 @@ export default function Visual(props) {
     setAlert(null);
     setMustResetAlert(false);
   }, [mustResetAlert]);
+
+  const retrievePropertyRent = (_price) => {
+    return parseInt(_price) / 100 > 1 ? parseInt(_price) : 1;
+  };
+
+  const retrieveChanceProfit = () => {
+    return getRandomInteger("chance", 1, 50, pawnInfo.random);
+  };
+
+  const retrieveCommunityTax = () => {
+    return getRandomInteger("community", 1, 50, pawnInfo.random);
+  };
+
+  const getRandomInteger = (type, min, max, randomNumber) => {
+    // Simulate another random number from Chainlink VRF random number
+    // Logical is the same in Bank contract
+    const modulo = max - min + 1;
+    const value = ethers.utils.defaultAbiCoder.encode(
+      ["uint256", "string"],
+      [ethers.BigNumber.from(randomNumber), type]
+    );
+    const number = ethers.BigNumber.from(ethers.utils.keccak256(value));
+
+    return ethers.BigNumber.from(number).mod(modulo).toNumber() + min;
+  };
 
   const payRent = (event) => {
     if (!(Bank && editionID)) return;
@@ -138,7 +165,7 @@ export default function Visual(props) {
               setModalHTML({
                 title: "Pay the rent",
                 body: "To continue, you must pay a rent. This rent will be shares between NFT owners of this land.",
-                button: "Pay",
+                button: `Pay ${retrievePropertyRent(prices[rarity])} $MONO`,
                 action: "payRent",
               });
               setIsModalShown(true);
@@ -167,7 +194,8 @@ export default function Visual(props) {
             size="sm"
             onClick={receiveChance}
           >
-            Receive
+            Receive {retrieveChanceProfit()}
+            {monoSymbol}
           </Button>
         </div>
       </>
@@ -190,7 +218,8 @@ export default function Visual(props) {
             size="sm"
             onClick={payCommunityTax}
           >
-            Pay
+            Pay {retrieveCommunityTax()}
+            {monoSymbol}
           </Button>
         </div>
       </>

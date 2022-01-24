@@ -340,6 +340,7 @@ function Game(props) {
           is_round_completed={isRoundCompleted}
           must_reset_alert={mustResetAlert}
           set_must_reset_alert={setMustResetAlert}
+          pawn_info={pawnInfo}
         />
       </div>
       <div className="grid-area info-area-3 text-center">

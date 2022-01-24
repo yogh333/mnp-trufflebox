@@ -342,19 +342,25 @@ function App() {
           className={isNavbarDisplayed ? "d-block" : "d-none"}
           bg="light"
         >
-          <div id="hide-navbar" className="mx-1 my-2">
-            <Button
-              variant="outline-dark"
-              size="sm"
-              className="hide secondary"
-              onClick={() => {
-                setIsNavbarDisplayed(false);
-                document.querySelector("#user-info").style.marginTop = "-2rem";
-              }}
-            >
-              X
-            </Button>
-          </div>
+          {" "}
+          {window.location.pathname === "/game" ? (
+            <div id="hide-navbar" className="mx-1 my-2">
+              <Button
+                variant="outline-dark"
+                size="sm"
+                className="hide secondary"
+                onClick={() => {
+                  setIsNavbarDisplayed(false);
+                  document.querySelector("#user-info").style.marginTop =
+                    "-2rem";
+                }}
+              >
+                X
+              </Button>
+            </div>
+          ) : (
+            <></>
+          )}
           <Container>
             <Navbar.Brand className="brand">MNP World</Navbar.Brand>
             <Nav className="me-auto">
