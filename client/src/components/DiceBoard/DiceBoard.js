@@ -118,11 +118,11 @@ function init() {
     scene.add(die.getObject());
     dice.push(die);
   }
+  console.log("dice", dice);
   requestAnimationFrame(animate);
 }
 
 export function randomDiceThrow(value0, value1) {
-  console.log("randomDiceThrow", value0, value1);
   for (var i = 0; i < dice.length; i++) {
     let yRand = Math.random() * 20;
     dice[i].getObject().position.x = -15 - (i % 3) * 1.5;
@@ -175,6 +175,10 @@ function render() {
 }
 
 export default function DiceBoard() {
-  useEffect(init, []);
+  useEffect(() => {
+    const canvas = document.querySelector(".canvas");
+    canvas.style.display = "none";
+    init();
+  }, []);
   return <div className="canvas"></div>;
 }

@@ -38,9 +38,13 @@ export default function User(props) {
   const [balance, setBalance] = useState(spinner);
   const [propertyCount, setPropertyCount] = useState(spinner);
   const [rollDice, setRollDice] = useState(null);
-  const [areDicesDisplayed, setAreDicesDisplayed] = useState(false);
+  const [areDiceDisplayed, setAreDiceDisplayed] = useState(false);
   const [isShakerDisplayed, setIsShakerDisplayed] = useState(false);
-  const [isDicesRolling, setIsDicesRolling] = useState(false);
+  const [isRollRequested, setIsRollRequested] = useState(false);
+  const [areDiceRolling, setAreDiceRolling] = useState(false);
+  const [isInitialization, setIsInitialization] = useState(true);
+
+  useEffect(() => {}, []);
 
   useEffect(() => {
     if (!(provider && address && networkId)) return;
@@ -86,26 +90,44 @@ export default function User(props) {
     console.log("pawnPosition", pawnPosition);
 
     setRollDice(calculateDicesNumbers(pawnInfo));
-
-    displayPawn(pawnPosition);
-    const rarity = getRandomRarity(pawnInfo.random);
-    retrieveLandInfo(pawnPosition, rarity);
-    forgetPreviousPawnPosition();
   }, [pawnPosition]);
 
   useEffect(() => {
-    setAreDicesDisplayed(!isRoundCompleted);
+    if (areDiceRolling) return;
+    if (isInitialization) return;
+
+    setAreDiceDisplayed(!isRoundCompleted);
   }, [isRoundCompleted]);
 
   useEffect(() => {
-    if (!rollDice || !rollDice[0] || !rollDice[1]) return;
+    if (!rollDice || !rollDice.dices[0] || !rollDice.dices[1]) return;
 
-    randomDiceThrow(rollDice[0], rollDice[1]);
+    const canvas = document.querySelector(".canvas");
+    canvas.style.display = "block";
+    console.log("rollDice", rollDice);
+    setAreDiceRolling(true);
+    let time = 1;
+    if (!isInitialization) {
+      randomDiceThrow(rollDice.dices[0], rollDice.dices[1]);
+      time = 2500;
+    }
+    function delay(_time) {
+      return new Promise((_resolve) => setTimeout(_resolve, _time));
+    }
+
+    delay(time).then(() => {
+      if (!isInitialization) {
+        setAreDiceDisplayed(true);
+      }
+
+      setAreDiceRolling(false);
+      canvas.style.display = "none";
+      displayPawn(pawnPosition);
+      const rarity = getRandomRarity(pawnInfo.random);
+      retrieveLandInfo(pawnPosition, rarity);
+      forgetPreviousPawnPosition();
+    });
   }, [rollDice]);
-
-  useEffect(() => {
-    setAreDicesDisplayed(!isRoundCompleted);
-  }, [isRoundCompleted]);
 
   const getRandomRarity = (randomness) => {
     // Logical is the same in Bank contract
@@ -144,9 +166,10 @@ export default function User(props) {
 
       console.log("event RollingDices", event);
       setIsShakerDisplayed(true);
-      setAreDicesDisplayed(false);
+      setAreDiceDisplayed(false);
       globalVars.requestedId = _requestID;
       setGlobalVars(globalVars);
+      setIsInitialization(false);
 
       // begin - only with Ganache
       if (
@@ -174,7 +197,8 @@ export default function User(props) {
 
       console.log("event RandomReady", event);
       setIsShakerDisplayed(false);
-      setIsDicesRolling(false);
+      setIsRollRequested(false);
+      setAreDiceRolling(true);
       parentUpdateValues();
     });
   };
@@ -214,13 +238,13 @@ export default function User(props) {
     if (!Bank || !props.edition_id) return;
 
     setMustResetAlert(true);
-    setAreDicesDisplayed(false);
-    setIsDicesRolling(true);
+    setAreDiceDisplayed(false);
+    setIsRollRequested(true);
     try {
       Bank.rollDices(props.edition_id);
     } catch (error) {
-      setAreDicesDisplayed(true);
-      setIsDicesRolling(false);
+      setAreDiceDisplayed(true);
+      setIsRollRequested(false);
     }
   }
 
@@ -275,7 +299,7 @@ export default function User(props) {
         size="sm"
         className="btn btn-primary btn-lg btn-block m-2"
         onClick={rollDices}
-        disabled={!isRoundCompleted || isDicesRolling}
+        disabled={!isRoundCompleted || isRollRequested}
       >
         Roll the dice!
       </Button>
@@ -294,7 +318,7 @@ export default function User(props) {
         </div>
       </div>
 
-      <div id="dices" className={areDicesDisplayed ? "d-block" : "d-none"}>
+      <div id="dices" className={areDiceDisplayed ? "d-block" : "d-none"}>
         <div className="m-4 text-center">
           {/* first dice display */}
           <img
