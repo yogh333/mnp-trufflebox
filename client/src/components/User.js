@@ -2,13 +2,11 @@ import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import Spinner from "react-bootstrap/Spinner";
 
-import MonoJson from "../contracts/MonoContract.json";
-import PropJson from "../contracts/PropContract.json";
-import BoardJson from "../contracts/BoardContract.json";
 import VRFCoordinatorJson from "../contracts/VRFCoordinatorContract.json";
 
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
+import { randomDiceThrow } from "./DiceBoard/DiceBoard";
 
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -99,6 +97,16 @@ export default function User(props) {
     setAreDicesDisplayed(!isRoundCompleted);
   }, [isRoundCompleted]);
 
+  useEffect(() => {
+    if (!rollDice || !rollDice[0] || !rollDice[1]) return;
+
+    randomDiceThrow(rollDice[0], rollDice[1]);
+  }, [rollDice]);
+
+  useEffect(() => {
+    setAreDicesDisplayed(!isRoundCompleted);
+  }, [isRoundCompleted]);
+
   const getRandomRarity = (randomness) => {
     // Logical is the same in Bank contract
     const number = getRandomInteger("rarity", 1, 111, randomness);
@@ -165,7 +173,7 @@ export default function User(props) {
       if (_requestID !== globalVars.requestedId) return;
 
       console.log("event RandomReady", event);
-      setIsShakerDisplayed(false); // todo lancer l'animation 3D
+      setIsShakerDisplayed(false);
       setIsDicesRolling(false);
       parentUpdateValues();
     });

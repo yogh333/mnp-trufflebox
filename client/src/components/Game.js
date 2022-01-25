@@ -10,6 +10,7 @@ import User from "./User";
 import Land from "./Land";
 import Visual from "./Visual";
 import InGame from "./InGame";
+import DiceBoard from "./DiceBoard/DiceBoard";
 
 import BankJson from "../contracts/BankContract.json";
 import BoardJson from "../contracts/BoardContract.json";
@@ -373,6 +374,7 @@ function Game(props) {
         )}
       </div>
       <div className="grid-area main-area">
+        <DiceBoard />
         <Grid
           board={board}
           retrieve_land_info={retrieveLandInfo}
