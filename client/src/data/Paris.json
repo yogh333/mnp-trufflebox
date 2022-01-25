@@ -495,7 +495,7 @@
     }
     ],
     "game_info_by_type": {
-        "go": "Each time a player's pawn lands on or passes over 'Départ', whether by throwing the dice or drawing a card, the Banker pays that player a 200 $MONO salary. The 200 $MONO is paid only once each time around the board.",
+        "go": "Each time a player's pawn lands on or passes over 'Départ', nothing happens!",
         "property":  "Whenever you land on an unowned property you may buy that property from the Bank at its printed price. You receive the NFT showing ownership. If you don't want to buy it, you must pay a rent. This rent will be shares between NFT owners of this land.",
         "community-chest": "When you land on community chest, to continue to play, you may pay a tax to community of NFT owners.",
         "tax": "Whenever you land on an unowned property NFT you may buy that NFT from the Bank.",

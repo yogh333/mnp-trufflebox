@@ -11,15 +11,27 @@ This repository contains all the MNW smart contracts (in /contracts), along with
 ## Online demo
 https://mnp-app.herokuapp.com/
 
-Available for kovan and mumbai testnet
+Available for mumbai (Polygon testnet)
 
-Players must have ETH or MATIC to pay transactions.
-
-ETH on kovan
-https://faucets.chain.link/kovan
+Players must have MATIC to pay transactions.
 
 MATIC faucet
 https://faucet.polygon.technology/
+
+See [Deployed addresses](DEPLOYED_ADDRESSES.md)
+
+## Security reports
+See Slither analysis at [`feature/security` branch](https://github.com/jcaporossi/mnp-trufflebox/blob/feature/security/README.md)
+
+## Use of Chainlink VRF oracle for secure randomness
+See [explanations there](AVOIDING_COMMON_ATTACKS.md)
+
+# For developers
+## developer documents
+See [docs/devdoc/](docs/devdoc/)
+
+## user documents
+See [docs/userdoc/](docs/userdoc/)
 
 ## Cloning the project
 
@@ -61,7 +73,8 @@ ganache-cli
 
 ## Unit Tests
 
-To launch unit tests associated with each smart contracts, in another terminal windows, at root of the project
+To launch unit tests associated with each smart contracts, in another terminal windows, at root of the project  
+See [explanations there](test/TESTS_EXPLICATION.md)
 
 ```
 truffle test
@@ -69,32 +82,33 @@ truffle test
 
 ## Migration
 
-Don't forget, deployer account must have ETH on local or Kovan network or MATIC on Mumbai network
+### On mumbai
+fill `.env` file.
 
-ETH on kovan
-https://faucets.chain.link/kovan
+Don't forget, deployer account must have MATIC on Mumbai network
 
 MATIC faucet
 https://faucet.polygon.technology/
 
 ```
-truffle migrate
+truffle migrate --network mumbai
 ```
 
 After deployment, give some LINK to Board and Bank contracts.<br/>
 LINK faucet https://faucets.chain.link
 
-## Front-end
+### Locally, not on mumbai
+```
+truffle migrate
+```
 
+
+## Front-end
 To launch React front-end
 
 ```
 cd client
 npm start
 ```
-
-## developer documents
-`docs/devdocs/`
-
-## user documents
-`docs/userdocs/`
+### Locally, not on mumbai
+change rename replace `App.js` component with `App.local.js`

@@ -64,9 +64,7 @@ function Game(props) {
   const [mustResetAlert, setMustResetAlert] = useState(false);
 
   useEffect(() => {
-    if (!(provider && address && networkId)) {
-      return;
-    }
+    if (!(provider && address && networkId)) return;
 
     setBank(
       new ethers.Contract(
@@ -342,6 +340,7 @@ function Game(props) {
           is_round_completed={isRoundCompleted}
           must_reset_alert={mustResetAlert}
           set_must_reset_alert={setMustResetAlert}
+          pawn_info={pawnInfo}
         />
       </div>
       <div className="grid-area info-area-3 text-center">

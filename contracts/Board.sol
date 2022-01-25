@@ -175,9 +175,18 @@ contract BoardContract is AccessControl, VRFConsumerBase {
 			return;
 		}
 
-		// Community card
-		boards[_edition].pawns[_pawnID].isCommunityCard = true;
-		boards[_edition].pawns[_pawnID].isRoundCompleted = false;
+		// Community chest card
+		if (_position == 2 ||
+			_position == 17 ||
+			_position == 33
+		) {
+			boards[_edition].pawns[_pawnID].isCommunityCard = true;
+			boards[_edition].pawns[_pawnID].isRoundCompleted = false;
+			return;
+		}
+
+		// Go case
+		// Nothing is implemented when a player pass over Go.
 	}
 
 	/** check if a land can be bought (PROP tokens available)

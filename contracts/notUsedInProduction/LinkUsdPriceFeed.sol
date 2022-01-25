@@ -6,7 +6,7 @@ import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol';
 
 
-// @dev For local development only
+// @dev For local development or used on mumbai (polygon testnet)
 contract LinkUsdPriceFeed is AggregatorV3Interface, Ownable {
     
     int256 value;

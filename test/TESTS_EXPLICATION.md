@@ -11,6 +11,9 @@ Test only Bank.propertyTransfer() method related to transfer NFT PROP and pay ro
 ## Board.test.js
 Test all Board contract methods
 
+## Board#gameStrategist.test.js
+Test gameStrategist method only
+
 ## Board.Random.test.js
 Dans ce fichier, nous allons trouver les différents tests relatifs à la génération de l'aléatoire pour le lancer de dé.
 
