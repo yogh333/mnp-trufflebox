@@ -11,7 +11,7 @@ This repository contains all the MNW smart contracts (in /contracts), along with
 ## Online demo
 https://mnp-app.herokuapp.com/
 
-Available for mumbai testnet
+Available for mumbai (Polygon testnet)
 
 Players must have MATIC to pay transactions.
 
@@ -21,36 +21,17 @@ https://faucet.polygon.technology/
 See [Deployed addresses](DEPLOYED_ADDRESSES.md)
 
 ## Security reports
-See Slither analysis at [`security` branch](https://github.com/jcaporossi/mnp-trufflebox/tree/feature/security)
+See Slither analysis at [`feature/security` branch](https://github.com/jcaporossi/mnp-trufflebox/blob/feature/security/README.md)
 
-## Use of Chainlink VRF oracle for randomness
-### ChainLink workflow
-1. Receive request  
-2. Generating the random and sending crypto proofs to the VRF contract  
-3. Verify and send random number to our Board contract  
+## Use of Chainlink VRF oracle for secure randomness
+See [explanations there](AVOIDING_COMMON_ATTACKS.md)
 
-### Our workflow
-1. Send request  
-Bank.`rollDices()` -> Board.`play()` -> Board.requestRandomNumber() -> VRFConsumerBase.requestRandomness()  
-2. Receive random number  
-ChainLink VRF Coordinator call  
-Board.rawFulfillRandomness() -> Board.fulfillRandomness() -> Board.gameStrategist()  
-#### /!\ ChainLink limit callback function to 200k gas 
-Low gas strategy is to record booleans in Board.fulfillRandomness() via gameStrategist()
+# For developers
+## developer documents
+See [docs/devdoc/](docs/devdoc/)
 
-These flags will be managed in the front.
-The necessary checks and calculations will be made in the contract at the time of a transaction made by the player.
-That way we don't overload the callback called by Chainlink and we charge the user fees.  
-
-#### Retrieving gas used
-search `RandomReady` event for Board contract in mumbai explorer
-https://mumbai.polygonscan.com/address/0x8d4d0C5da875f1396c1974C114Eb920871cCd8f0#events
-event no is '0x1954c6845304788fb449c20d6a568c6672d0d11585f9d8f32673fba15c9cbf22'
-find a transaction related to this event
-https://mumbai.polygonscan.com/tx/0x13dfabb80bb5d17d78c667dc7d95076a4c4951ed11fafc4250180d124db8076c  
-We find :  
-Gas Used by Transaction: 109,418
-WELL DONE... is less than 200k 
+## user documents
+See [docs/userdoc/](docs/userdoc/)
 
 ## Cloning the project
 
@@ -92,7 +73,8 @@ ganache-cli
 
 ## Unit Tests
 
-To launch unit tests associated with each smart contracts, in another terminal windows, at root of the project
+To launch unit tests associated with each smart contracts, in another terminal windows, at root of the project  
+See [explanations there](test/TESTS_EXPLICATION.md)
 
 ```
 truffle test
@@ -100,29 +82,33 @@ truffle test
 
 ## Migration
 
+### On mumbai
+fill `.env` file.
+
 Don't forget, deployer account must have MATIC on Mumbai network
 
 MATIC faucet
 https://faucet.polygon.technology/
 
 ```
-truffle migrate
+truffle migrate --network mumbai
 ```
 
 After deployment, give some LINK to Board and Bank contracts.<br/>
 LINK faucet https://faucets.chain.link
 
-## Front-end
+### Locally, not on mumbai
+```
+truffle migrate
+```
 
+
+## Front-end
 To launch React front-end
 
 ```
 cd client
 npm start
 ```
-
-## developer documents
-`docs/devdocs/`
-
-## user documents
-`docs/userdocs/`
+### Locally, not on mumbai
+change rename replace `App.js` component with `App.local.js`

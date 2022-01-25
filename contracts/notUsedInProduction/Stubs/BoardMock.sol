@@ -3,7 +3,7 @@
 
 pragma solidity 0.8.10;
 
-import "../Board.sol";
+import "../../Board.sol";
 
 // @dev For tests only
 contract BoardMock is BoardContract {

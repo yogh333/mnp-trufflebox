@@ -1,6 +1,6 @@
 # Avoiding Common Attacks
 ## Security reports
-See Slither analysis at [`security` branch](https://github.com/jcaporossi/mnp-trufflebox/tree/feature/security)
+See Slither analysis at [`feature/security` branch](https://github.com/jcaporossi/mnp-trufflebox/blob/feature/security/README.md)
 
 ## Génération de nombres aléatoires (dices roll)
 
@@ -24,12 +24,12 @@ Dans un deuxième temps, nous prévoyons d'utiliser la fonctionnalité VRF de l'
 
 ### Our workflow
 1. Send request  
-   Bank.`rollDices()` -> Board.`play()` -> Board.requestRandomNumber() -> VRFConsumerBase.requestRandomness()
+   Bank.`rollDices()` -> Board.`play()` -> Board.`requestRandomNumber()` -> VRFConsumerBase.`requestRandomness()`
 2. Receive random number  
    ChainLink VRF Coordinator call  
-   Board.rawFulfillRandomness() -> Board.fulfillRandomness() -> Board.gameStrategist()
+   Board.`rawFulfillRandomness()` -> Board.`fulfillRandomness()` -> Board.`gameStrategist()`
 #### /!\ ChainLink limit callback function to 200k gas
-Low gas strategy is to record booleans in Board.fulfillRandomness() via gameStrategist()
+Low gas strategy is to record booleans in Board.`fulfillRandomness()` via Board.`gameStrategist()`
 
 These flags will be managed in the front.
 The necessary checks and calculations will be made in the contract at the time of a transaction made by the player.
