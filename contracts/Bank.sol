@@ -303,7 +303,7 @@ contract BankContract is AccessControl, IERC721Receiver {
 	 * @param _rarity rarity
 	 * @return amount*/
 	function retrievePropertyRent(uint16 _edition, uint8 _land, uint8 _rarity) internal view returns(uint256){
-		return propPrices[_edition][_land][_rarity] / 100 > 10**18 ? propPrices[_edition][_land][_rarity] : 10**18;
+		return propPrices[_edition][_land][_rarity] / 100 > 10**18 ? propPrices[_edition][_land][_rarity] / 100 : 10**18;
 	}
 
 	/** @dev Retrieve chance profit

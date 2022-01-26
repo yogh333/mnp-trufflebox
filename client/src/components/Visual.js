@@ -10,8 +10,10 @@ export default function Visual(props) {
 
   // Contracts
   const Bank = props.bank_contract;
+  const Mono = props.mono_contract;
   // vars
   const spinner = props.spinner;
+  const address = props.address;
   const editionID = props.edition_id;
   const monoSymbol = props.mono_symbol;
   const landInfo = props.land_info;
@@ -24,6 +26,9 @@ export default function Visual(props) {
   const doModalAction = props.do_modal_action;
   const mustResetAlert = props.must_reset_alert;
   const pawnInfo = props.pawn_info;
+  const isProcessing = props.is_processing;
+  const setIsProcessing = props.set_is_processing;
+  const areDiceRolling = props.are_dice_rolling;
   // functions
   const setIsModalShown = props.set_is_modal_shown;
   const setModalHTML = props.set_modal_html;
@@ -49,7 +54,7 @@ export default function Visual(props) {
   }, [mustResetAlert]);
 
   const retrievePropertyRent = (_price) => {
-    return parseInt(_price) / 100 > 1 ? parseInt(_price) : 1;
+    return parseInt(_price) / 100 > 1 ? parseInt(_price) / 100 : 1;
   };
 
   const retrieveChanceProfit = () => {
@@ -73,8 +78,14 @@ export default function Visual(props) {
     return ethers.BigNumber.from(number).mod(modulo).toNumber() + min;
   };
 
-  const payRent = (event) => {
+  const payRent = async (event) => {
     if (!(Bank && editionID)) return;
+
+    let isValid = await checkBalance(retrievePropertyRent().toString());
+    if (!isValid) return;
+
+    isValid = await checkAllowance(retrievePropertyRent().toString());
+    if (!isValid) return;
 
     Bank.payRent(editionID).then((value) => {
       console.log("rent payed");
@@ -92,34 +103,106 @@ export default function Visual(props) {
     });
   };
 
-  const buyProperty = (event) => {
+  const checkBalance = async (_amount) => {
+    const playerBalance = await Mono.balanceOf(address);
+    if (playerBalance.lt(ethers.utils.parseEther(_amount))) {
+      console.log("Too low player balance.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const checkAllowance = async (_amount) => {
+    const allowance = await Mono.allowance(address, Bank.address);
+
+    if (allowance.lt(ethers.utils.parseEther(_amount))) {
+      try {
+        const result = await Mono.approve(
+          Bank.address,
+          ethers.utils.parseEther(_amount)
+        );
+        if (!result.hash) {
+          return false;
+        }
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const buyProperty = async (event) => {
     if (!(Bank && editionID)) return;
 
-    Bank.buyProp(editionID).then((value) => {
-      console.log("Property bought");
-      setAlert("Property bought");
-      updateValues();
-    });
+    setIsProcessing(true);
+
+    let isValid = await checkBalance(prices[rarity]);
+    if (!isValid) {
+      setIsProcessing(false);
+    }
+
+    isValid = await checkAllowance(prices[rarity]);
+    if (!isValid) {
+      setIsProcessing(false);
+    }
+
+    Bank.buyProp(editionID).then(
+      (value) => {
+        console.log("Property bought");
+        setAlert("Property bought");
+        updateValues();
+      },
+      (error) => {
+        setIsProcessing(false);
+      }
+    );
   };
 
   const receiveChance = (event) => {
     if (!(Bank && editionID)) return;
 
-    Bank.receiveChanceProfit(editionID).then((value) => {
-      console.log("Chance profit received");
-      setAlert("Chance profit received");
-      updateValues();
-    });
+    setIsProcessing(true);
+
+    Bank.receiveChanceProfit(editionID).then(
+      (value) => {
+        console.log("Chance profit received");
+        setAlert("Chance profit received");
+        updateValues();
+      },
+      (error) => {
+        setIsProcessing(false);
+      }
+    );
   };
 
-  const payCommunityTax = (event) => {
+  const payCommunityTax = async (event) => {
     if (!(Bank && editionID)) return;
 
-    Bank.payCommunityTax(editionID).then((value) => {
-      console.log("Community tax paid");
-      setAlert("Community tax paid");
-      updateValues();
-    });
+    setIsProcessing(true);
+
+    let isValid = await checkBalance(retrieveCommunityTax().toString());
+    if (!isValid) {
+      setIsProcessing(false);
+    }
+
+    isValid = await checkAllowance(retrieveCommunityTax().toString());
+    if (!isValid) {
+      setIsProcessing(false);
+    }
+
+    Bank.payCommunityTax(editionID).then(
+      (value) => {
+        console.log("Community tax paid");
+        setAlert("Community tax paid");
+        updateValues();
+      },
+      (error) => {
+        setIsProcessing(false);
+      }
+    );
   };
 
   const cardStyle = (_rarity) => {
@@ -134,7 +217,7 @@ export default function Visual(props) {
     return <>{spinner}</>;
   }
 
-  if (rarity !== null && !isRoundCompleted) {
+  if (rarity !== null && !isRoundCompleted && !areDiceRolling) {
     return (
       <>
         <img
@@ -151,16 +234,18 @@ export default function Visual(props) {
             className="m-1"
             variant="success"
             size="sm"
+            disabled={isProcessing}
             onClick={buyProperty}
             data-rarity={rarity.toString()}
             data-land-id={landID.toString()}
           >
-            Buy
+            {isProcessing ? spinner : "Buy"}
           </Button>
           <Button
             className="m-1"
             variant="danger"
             size="sm"
+            disabled={isProcessing}
             onClick={() => {
               setModalHTML({
                 title: "Pay the rent",
@@ -178,7 +263,7 @@ export default function Visual(props) {
     );
   }
 
-  if (isChanceCard && !isRoundCompleted) {
+  if (isChanceCard && !isRoundCompleted && !areDiceRolling) {
     return (
       <>
         <img
@@ -194,7 +279,9 @@ export default function Visual(props) {
             size="sm"
             onClick={receiveChance}
           >
-            Receive {retrieveChanceProfit()}
+            {isProcessing
+              ? spinner
+              : `Receive ${retrieveChanceProfit().toString()}`}
             {monoSymbol}
           </Button>
         </div>
@@ -202,7 +289,7 @@ export default function Visual(props) {
     );
   }
 
-  if (isCommunityCard && !isRoundCompleted) {
+  if (isCommunityCard && !isRoundCompleted && !areDiceRolling) {
     return (
       <>
         <img
@@ -218,7 +305,9 @@ export default function Visual(props) {
             size="sm"
             onClick={payCommunityTax}
           >
-            Pay {retrieveCommunityTax()}
+            {isProcessing
+              ? spinner
+              : `Pay ${retrieveCommunityTax().toString()}`}
             {monoSymbol}
           </Button>
         </div>

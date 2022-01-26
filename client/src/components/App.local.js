@@ -118,6 +118,7 @@ function App() {
     }
 
     setProvider(getProvider());
+    setIsReadyToRender(true);
   }, []);
 
   useEffect(() => {
@@ -171,7 +172,6 @@ function App() {
       return;
     }
 
-    console.log("Staking.rewardToken");
     Staking.rewardToken().then((_address) => setRewardTokenAddress(_address));
   }, [Staking]);
 
@@ -180,32 +180,22 @@ function App() {
       return;
     }
 
-    console.log("Staking.pools(rewardTokenAddress)");
-    Staking.pools(rewardTokenAddress).then((_pool) =>
-      setRewardTokenPriceFeed(_pool.priceFeed)
-    );
+    Staking.pools(rewardTokenAddress).then((_pool) => {
+      setRewardTokenPriceFeed(_pool.info.priceFeed);
+      setRewardTokenName(_pool.info.name);
+      setRewardTokenSymbol(_pool.info.symbol);
+      setRewardTokenIcon("/images/tokens/" + "mono" + ".png");
+    });
   }, [Staking, rewardTokenAddress]);
 
   useEffect(() => {
-    if (!Staking || !rewardTokenAddress || !rewardTokenPriceFeed) {
-      return;
-    }
+    if (!Staking || !rewardTokenAddress || !rewardTokenPriceFeed) return;
 
     const RewardTokenInstance = new ethers.Contract(
       rewardTokenAddress,
       ERC20Json.abi,
       provider.getSigner()
     );
-
-    console.log("RewardTokenInstance.name");
-    RewardTokenInstance.name().then((_name) => setRewardTokenName(_name));
-    console.log("RewardTokenInstance.symbol");
-    RewardTokenInstance.symbol().then((_symbol) => {
-      setRewardTokenSymbol(_symbol);
-      setRewardTokenIcon("/images/tokens/" + _symbol.toLowerCase() + ".svg");
-    });
-    console.log("RewardTokenInstance.decimals");
-    RewardTokenInstance.decimals();
   }, [Staking, rewardTokenAddress, rewardTokenPriceFeed]);
 
   useEffect(() => {
@@ -227,7 +217,6 @@ function App() {
       provider.getSigner()
     );
 
-    console.log("RewardTokenPriceFeedInstance.latestRoundData");
     RewardTokenPriceFeedInstance.latestRoundData().then((roundData) => {
       setRewardTokenPrice(
         ethers.utils.formatEther(roundData.answer + "0000000000")

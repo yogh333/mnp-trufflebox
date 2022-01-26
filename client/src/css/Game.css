@@ -1,11 +1,8 @@
-.Game {
-  /*  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  min-height: 100vh;
-  */
+button img.symbol {
+  filter: invert(100%);
+}
 
+.Game {
   display: grid;
   grid-template-columns: 1fr 730px 1fr;
   grid-template-rows: 363px 363px;
@@ -17,23 +14,28 @@
 }
 
 .info-area-1 {
+  //background-color: rgba(2, 2, 2, 0.2);
+  //filter: invert(100%);
   border-width: 4px 0 2px 4px;
   grid-column: 1 / 2;
   grid-row: 1 / 2;
 }
 
 .info-area-2 {
+  //background-color: rgba(2, 2, 2, 0.2);
   border-width: 4px 4px 2px 0;
   grid-column: 3 / 4;
   grid-row: 1 / 2;
 }
 
 .info-area-3 {
+  //background-color: rgba(2, 2, 2, 0.2);
   border-width: 2px 0 4px 4px;
   grid-column: 1 / 2;
   grid-row: 2 / 3;
 }
 .info-area-4 {
+  //background-color: rgba(2, 2, 2, 0.2);
   border-width: 2px 4px 4px 0;
   grid-column: 3 / 4;
   grid-row: 2 / 3;

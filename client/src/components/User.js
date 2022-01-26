@@ -2,13 +2,11 @@ import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import Spinner from "react-bootstrap/Spinner";
 
-import MonoJson from "../contracts/MonoContract.json";
-import PropJson from "../contracts/PropContract.json";
-import BoardJson from "../contracts/BoardContract.json";
 import VRFCoordinatorJson from "../contracts/VRFCoordinatorContract.json";
 
 import "../css/User.css";
 import Button from "react-bootstrap/Button";
+import { randomDiceThrow } from "./DiceBoard/DiceBoard";
 
 export default function User(props) {
   const spinner = <Spinner as="span" animation="border" size="sm" />;
@@ -30,19 +28,22 @@ export default function User(props) {
   const globalVars = props.global_vars;
   const startBlockNumber = props.start_block_number;
   const toggleUpdateValues = props.toggle_update_user_values;
+  const areDiceRolling = props.are_dice_rolling;
   // functions
   const retrieveLandInfo = props.retrieve_land_info;
   const parentUpdateValues = props.parent_update_values_function;
   const setGlobalVars = props.set_global_vars;
   const setMustResetAlert = props.set_must_reset_alert;
+  const setAreDiceRolling = props.set_are_dice_rolling;
 
   const [VRFCoordinator, setVRFCoordinator] = useState(null);
   const [balance, setBalance] = useState(spinner);
   const [propertyCount, setPropertyCount] = useState(spinner);
   const [rollDice, setRollDice] = useState(null);
-  const [areDicesDisplayed, setAreDicesDisplayed] = useState(false);
+  const [areDiceDisplayed, setAreDiceDisplayed] = useState(false);
   const [isShakerDisplayed, setIsShakerDisplayed] = useState(false);
-  const [isDicesRolling, setIsDicesRolling] = useState(false);
+  const [isRollRequested, setIsRollRequested] = useState(false);
+  const [isInitialization, setIsInitialization] = useState(true);
 
   useEffect(() => {
     if (!(provider && address && networkId)) return;
@@ -85,19 +86,45 @@ export default function User(props) {
 
   useEffect(() => {
     if (pawnPosition === null || !pawnInfo || !pawnInfo.random) return;
-    console.log("pawnPosition", pawnPosition);
 
     setRollDice(calculateDicesNumbers(pawnInfo));
-
-    displayPawn(pawnPosition);
-    const rarity = getRandomRarity(pawnInfo.random);
-    retrieveLandInfo(pawnPosition, rarity);
-    forgetPreviousPawnPosition();
   }, [pawnPosition]);
 
   useEffect(() => {
-    setAreDicesDisplayed(!isRoundCompleted);
+    if (areDiceRolling) return;
+    if (isInitialization) return;
+
+    setAreDiceDisplayed(!isRoundCompleted);
   }, [isRoundCompleted]);
+
+  useEffect(() => {
+    if (!rollDice || !rollDice.dices[0] || !rollDice.dices[1]) return;
+
+    const canvas = document.querySelector(".canvas");
+    canvas.style.display = "block";
+    setAreDiceRolling(true);
+    let time = 1;
+    if (!isInitialization) {
+      randomDiceThrow(rollDice.dices[0], rollDice.dices[1]);
+      time = 2500;
+    }
+    function delay(_time) {
+      return new Promise((_resolve) => setTimeout(_resolve, _time));
+    }
+
+    delay(time).then(() => {
+      if (!isInitialization) {
+        setAreDiceDisplayed(true);
+      }
+
+      setAreDiceRolling(false);
+      canvas.style.display = "none";
+      displayPawn(pawnPosition);
+      const rarity = getRandomRarity(pawnInfo.random);
+      retrieveLandInfo(pawnPosition, rarity);
+      forgetPreviousPawnPosition();
+    });
+  }, [rollDice]);
 
   const getRandomRarity = (randomness) => {
     // Logical is the same in Bank contract
@@ -136,9 +163,10 @@ export default function User(props) {
 
       console.log("event RollingDices", event);
       setIsShakerDisplayed(true);
-      setAreDicesDisplayed(false);
+      setAreDiceDisplayed(false);
       globalVars.requestedId = _requestID;
       setGlobalVars(globalVars);
+      setIsInitialization(false);
 
       // begin - only with Ganache
       if (
@@ -155,18 +183,13 @@ export default function User(props) {
       // end - only with Ganache
     });
     Board.on("RandomReady", (_requestID, event) => {
-      console.log(
-        "event RandomReady",
-        event,
-        event.blockNumber <= startBlockNumber,
-        _requestID !== globalVars.requestedId
-      );
       if (event.blockNumber <= startBlockNumber) return;
       if (_requestID !== globalVars.requestedId) return;
 
       console.log("event RandomReady", event);
-      setIsShakerDisplayed(false); // todo lancer l'animation 3D
-      setIsDicesRolling(false);
+      setIsShakerDisplayed(false);
+      setIsRollRequested(false);
+      setAreDiceRolling(true);
       parentUpdateValues();
     });
   };
@@ -206,13 +229,13 @@ export default function User(props) {
     if (!Bank || !props.edition_id) return;
 
     setMustResetAlert(true);
-    setAreDicesDisplayed(false);
-    setIsDicesRolling(true);
+    setAreDiceDisplayed(false);
+    setIsRollRequested(true);
     try {
       Bank.rollDices(props.edition_id);
     } catch (error) {
-      setAreDicesDisplayed(true);
-      setIsDicesRolling(false);
+      setAreDiceDisplayed(true);
+      setIsRollRequested(false);
     }
   }
 
@@ -267,7 +290,7 @@ export default function User(props) {
         size="sm"
         className="btn btn-primary btn-lg btn-block m-2"
         onClick={rollDices}
-        disabled={!isRoundCompleted || isDicesRolling}
+        disabled={!isRoundCompleted || isRollRequested}
       >
         Roll the dice!
       </Button>
@@ -286,7 +309,7 @@ export default function User(props) {
         </div>
       </div>
 
-      <div id="dices" className={areDicesDisplayed ? "d-block" : "d-none"}>
+      <div id="dices" className={areDiceDisplayed ? "d-block" : "d-none"}>
         <div className="m-4 text-center">
           {/* first dice display */}
           <img

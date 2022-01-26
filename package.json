@@ -22,7 +22,8 @@
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.15",
     "@truffle/hdwallet-provider": "^2.0.0",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "three": "^0.136.0"
   },
   "devDependencies": {
     "@chainlink/contracts": "^0.3.1",

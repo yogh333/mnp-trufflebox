@@ -63,7 +63,7 @@ function Pool(props) {
     }
 
     Staking.pools(poolTokenAddress).then((_pool) => {
-      setPoolTokenYield(parseInt(_pool.yield));
+      setPoolTokenYield(parseInt(_pool.info.yield));
       setPoolTokenIsTokenNetworkPool(_pool.isTokenNetwork);
     });
 
@@ -100,24 +100,24 @@ function Pool(props) {
       });
 
       Staking.pools(networkTokenVirtualAddress).then((_pool) =>
-        setPoolTokenPriceFeed(_pool.priceFeed)
+        setPoolTokenPriceFeed(_pool.info.priceFeed)
       );
 
       return;
     }
 
-    PoolTokenInstance.symbol().then((_symbol) => {
-      setPoolTokenSymbol(_symbol);
-      setPoolTokenIcon("./images/tokens/" + _symbol.toLowerCase() + ".svg");
-    });
-    PoolTokenInstance.name().then((_name) => setPoolTokenName(_name));
     PoolTokenInstance.decimals().then((_decimals) =>
       setPoolTokenDecimals(_decimals)
     );
 
-    Staking.pools(poolTokenAddress).then((_pool) =>
-      setPoolTokenPriceFeed(_pool.priceFeed)
-    );
+    Staking.pools(poolTokenAddress).then((_pool) => {
+      setPoolTokenPriceFeed(_pool.info.priceFeed);
+      setPoolTokenName(_pool.info.name);
+      setPoolTokenSymbol(_pool.info.symbol);
+      setPoolTokenIcon(
+        "/images/tokens/" + _pool.info.symbol.toLowerCase() + ".png"
+      );
+    });
   }, [
     Staking,
     poolTokenAddress,
@@ -302,6 +302,7 @@ function Pool(props) {
             title={poolTokenName}
             src={poolTokenIcon}
           />
+          <br />
           earn <span className="symbol">{rewardTokenSymbol}</span>
           <img
             className="token"
