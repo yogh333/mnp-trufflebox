@@ -28,11 +28,13 @@ export default function User(props) {
   const globalVars = props.global_vars;
   const startBlockNumber = props.start_block_number;
   const toggleUpdateValues = props.toggle_update_user_values;
+  const areDiceRolling = props.are_dice_rolling;
   // functions
   const retrieveLandInfo = props.retrieve_land_info;
   const parentUpdateValues = props.parent_update_values_function;
   const setGlobalVars = props.set_global_vars;
   const setMustResetAlert = props.set_must_reset_alert;
+  const setAreDiceRolling = props.set_are_dice_rolling;
 
   const [VRFCoordinator, setVRFCoordinator] = useState(null);
   const [balance, setBalance] = useState(spinner);
@@ -41,10 +43,7 @@ export default function User(props) {
   const [areDiceDisplayed, setAreDiceDisplayed] = useState(false);
   const [isShakerDisplayed, setIsShakerDisplayed] = useState(false);
   const [isRollRequested, setIsRollRequested] = useState(false);
-  const [areDiceRolling, setAreDiceRolling] = useState(false);
   const [isInitialization, setIsInitialization] = useState(true);
-
-  useEffect(() => {}, []);
 
   useEffect(() => {
     if (!(provider && address && networkId)) return;
@@ -87,7 +86,6 @@ export default function User(props) {
 
   useEffect(() => {
     if (pawnPosition === null || !pawnInfo || !pawnInfo.random) return;
-    console.log("pawnPosition", pawnPosition);
 
     setRollDice(calculateDicesNumbers(pawnInfo));
   }, [pawnPosition]);
@@ -104,7 +102,6 @@ export default function User(props) {
 
     const canvas = document.querySelector(".canvas");
     canvas.style.display = "block";
-    console.log("rollDice", rollDice);
     setAreDiceRolling(true);
     let time = 1;
     if (!isInitialization) {
@@ -186,12 +183,6 @@ export default function User(props) {
       // end - only with Ganache
     });
     Board.on("RandomReady", (_requestID, event) => {
-      console.log(
-        "event RandomReady",
-        event,
-        event.blockNumber <= startBlockNumber,
-        _requestID !== globalVars.requestedId
-      );
       if (event.blockNumber <= startBlockNumber) return;
       if (_requestID !== globalVars.requestedId) return;
 

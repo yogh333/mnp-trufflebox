@@ -618,7 +618,7 @@ let OrbitControls = function (object, domElement) {
   }
 
   function handleTouchEnd(event) {
-    console.log("handleTouchEnd");
+    //console.log("handleTouchEnd");
   }
 
   //

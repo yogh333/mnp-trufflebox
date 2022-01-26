@@ -25,12 +25,15 @@ contract StakingContract is Ownable {
         ERC20 token; // Address of the staked token
         bool isTokenNetwork; // ex. MATIC for Polygon networks
         uint256 yield;          // Percentage yield for the pool.
+        string symbol;           // if not original token symbol
+        string name;   // if not original token name
         AggregatorV3Interface priceFeed;    // ChainLink oracle feed for this token
     }
 
     struct Pool {
         PoolInfo info;
         mapping(address => UserInfo) users;
+        bool isActive;
     }
 
     address constant public NETWORK_TOKEN_VIRTUAL_ADDRESS = address(0x1);
@@ -41,6 +44,7 @@ contract StakingContract is Ownable {
 
     mapping(address => Pool) public pools;
     address[] private registeredPools;
+    address[] private activePools;
     mapping(string => address) public poolAddressBySymbol;
     uint256 public networkTokenPoolBalance;
 
@@ -72,7 +76,7 @@ contract StakingContract is Ownable {
     constructor(address _rewardToken, address _rewardTokenFeed, uint256 _yield, string memory _networkTokenSymbol) {
         networkTokenSymbol = _networkTokenSymbol;
         rewardToken = IERC20(_rewardToken);
-        _addPool(_rewardToken, _rewardTokenFeed, _yield);
+        _addPool(_rewardToken, _rewardTokenFeed, _yield, "MONO", "MWMONO", false);
     }
 
     /**
@@ -108,27 +112,45 @@ contract StakingContract is Ownable {
     }
 
     /**
-     * @dev internal method to add a pool
-     * @param _token: pool token address
-     * @param _priceFeed: pool token feed
-     * @param _yield: Percentage token yield.
+     * @notice get active pools
+     * @return array of addresses
      */
-    function _addPool(address _token, address _priceFeed, uint256 _yield) internal {
-        pools[_token].info.token = ERC20(_token);
-        pools[_token].info.yield = _yield;
-        pools[_token].info.priceFeed = AggregatorV3Interface(_priceFeed);
+    function getActivePools() external view returns (address[] memory) {
+        return activePools;
+    }
+
+    /**
+     * @dev internal method to add a pool
+     * @param _token pool token address
+     * @param _priceFeed pool token feed
+     * @param _yield Percentage token yield.
+     * @param _symbol pool token symbol, put "" if you want keep original token symbol.
+     * @param _name pool token symbol, put "" if you want keep original token name.
+     * @param _isActive pool activated
+     */
+    function _addPool(address _token, address _priceFeed, uint256 _yield, string memory _symbol, string memory _name, bool _isActive) internal {
+        Pool storage p = pools[_token];
+        p.info.token = ERC20(_token);
+        p.info.yield = _yield;
+        p.info.symbol = _symbol;
+        p.info.name = _name;
+        p.info.priceFeed = AggregatorV3Interface(_priceFeed);
+        p.isActive = _isActive;
 
         registeredPools.push(_token);
 
+        if (_isActive) {
+            activePools.push(_token);
+        }
+
         if (_token == NETWORK_TOKEN_VIRTUAL_ADDRESS) {
-            pools[_token].info.isTokenNetwork = true;
+            p.info.isTokenNetwork = true;
             poolAddressBySymbol[networkTokenSymbol] = _token;
 
             return;
         }
 
-        string memory symbol = pools[_token].info.token.symbol();
-        poolAddressBySymbol[symbol] = _token;
+        poolAddressBySymbol[p.info.symbol] = _token;
     }
 
     /**
@@ -138,11 +160,14 @@ contract StakingContract is Ownable {
      * @param _token: pool token address
      * @param _priceFeed: pool token feed
      * @param _yield: Percentage token yield.
+     * @param _symbol poll token symbol, put "" if you want keep original token symbol.
+     * @param _name pool token symbol, put "" if you want keep original token name.
+     * @param _isActive pool activated
      */
-    function addPool(address _token, address _priceFeed, uint256 _yield) external onlyOwner {
+    function addPool(address _token, address _priceFeed, uint256 _yield, string memory _symbol, string memory _name, bool _isActive) external onlyOwner {
         require(pools[_token].info.token != ERC20(_token), "Pool already exists.");
 
-        _addPool(_token, _priceFeed, _yield);
+        _addPool(_token, _priceFeed, _yield, _symbol, _name, _isActive);
 
         emit PoolAdded(_token, _priceFeed);
     }

@@ -63,6 +63,8 @@ function Game(props) {
   const [pawnPosition, setPawnPosition] = useState(0);
   const [globalVars, setGlobalVars] = useState({});
   const [mustResetAlert, setMustResetAlert] = useState(false);
+  const [areDiceRolling, setAreDiceRolling] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (!(provider && address && networkId)) return;
@@ -125,12 +127,12 @@ function Game(props) {
   }, [startBlockNumber, Board]);
 
   const subscribeContractsEvents = () => {
-    console.log("subscribeContractsEvents");
     Bank.on("PropertyBought", (_player, _propID, event) => {
       if (event.blockNumber <= startBlockNumber) return;
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
       console.log("event PropertyBought", event);
+      setIsProcessing(false);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -139,6 +141,7 @@ function Game(props) {
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
       console.log("event PropertyRentPaid", event);
+      setIsProcessing(false);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -147,6 +150,7 @@ function Game(props) {
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
       console.log("event CommunityTaxPaid", event);
+      setIsProcessing(false);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -155,6 +159,7 @@ function Game(props) {
       if (address.toLowerCase() !== _player.toLowerCase()) return;
 
       console.log("event ChanceProfitReceived", event);
+      setIsProcessing(false);
       updateValues();
       setToggleUpdateValues(!toggleUpdateValues);
     });
@@ -166,14 +171,11 @@ function Game(props) {
   };
 
   const updatePawnInfo = async () => {
-    console.log("Pawn.balanceOf");
     const _pawnBalance = await Pawn.balanceOf(address);
 
     if (_pawnBalance.toNumber() === 0) return;
 
-    console.log("Bank.locatePlayer");
     Bank.locatePlayer(editionID).then((_pawnInfo) => {
-      console.log("_pawnInfo", _pawnInfo);
       setIsRoundCompleted(_pawnInfo.isRoundCompleted);
       setPawnInfo(_pawnInfo);
       setPawnPosition(_pawnInfo.position);
@@ -181,18 +183,13 @@ function Game(props) {
   };
 
   const updatePlayerInfo = async () => {
-    console.log("Mono.balanceOf");
     const _monoBalance = await Mono.balanceOf(address);
-    console.log("Pawn.balanceOf");
-
     const _pawnBalance = await Pawn.balanceOf(address);
 
     let _isRegistered = false,
       _pawnID;
     if (_pawnBalance.toNumber() > 0) {
-      console.log("Pawn.tokenOfOwnerByIndex");
       _pawnID = await Pawn.tokenOfOwnerByIndex(address, 0);
-      console.log("Board.isRegistered");
       _isRegistered = await Board.isRegistered(editionID, _pawnID);
     }
 
@@ -207,7 +204,6 @@ function Game(props) {
   const retrieveCellPrices = async (_editionId, _cellID) => {
     let propertiesPrices = [];
     for (let rarity = 0; rarity < board.maxLandRarities; rarity++) {
-      console.log(" Bank.getPriceOfProp");
       propertiesPrices[rarity] = await Bank.getPriceOfProp(
         _editionId,
         _cellID,
@@ -322,6 +318,8 @@ function Game(props) {
               global_vars={globalVars}
               start_block_number={startBlockNumber}
               set_must_reset_alert={setMustResetAlert}
+              are_dice_rolling={areDiceRolling}
+              set_are_dice_rolling={setAreDiceRolling}
             />
           )}
         </div>
@@ -329,9 +327,11 @@ function Game(props) {
       <div className="grid-area info-area-2 text-center">
         <Visual
           spinner={spinner}
+          address={address}
           land_info={landInfo}
           bank_contract={Bank}
           edition_id={editionID}
+          mono_contract={Mono}
           mono_symbol={monoSymbol}
           set_is_modal_shown={setIsModalShown}
           set_modal_html={setModalHTML}
@@ -342,6 +342,9 @@ function Game(props) {
           must_reset_alert={mustResetAlert}
           set_must_reset_alert={setMustResetAlert}
           pawn_info={pawnInfo}
+          are_dice_rolling={areDiceRolling}
+          is_processing={isProcessing}
+          set_is_processing={setIsProcessing}
         />
       </div>
       <div className="grid-area info-area-3 text-center">
@@ -353,7 +356,7 @@ function Game(props) {
         />
       </div>
       <div className="grid-area info-area-4 text-center">
-        <h2>NFT Info</h2>
+        <h2>NFT info</h2>
         {isRetrievingInfo ? (
           spinner
         ) : (

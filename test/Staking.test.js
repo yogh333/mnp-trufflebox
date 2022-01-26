@@ -133,15 +133,15 @@ contract("Staking", async (accounts) => {
       );
 
       assert.strictEqual(
-        pool.token,
+        pool.info.token,
         tokens[rewardTokenSymbol].instance.address
       );
       assert.strictEqual(
-        pool.yield,
+        pool.info.yield,
         tokens[rewardTokenSymbol].yield.toString()
       );
       assert.strictEqual(
-        pool.priceFeed,
+        pool.info.priceFeed,
         tokens[rewardTokenSymbol].priceFeedInstance.address
       );
     });
@@ -176,6 +176,9 @@ contract("Staking", async (accounts) => {
           tokens["LINK"].instance.address,
           tokens["LINK"].priceFeedInstance.address,
           tokens["LINK"].yield,
+          tokens["LINK"].symbol,
+          tokens["LINK"].name,
+          true,
           { from: user }
         )
       );
@@ -186,6 +189,9 @@ contract("Staking", async (accounts) => {
           tokens[rewardTokenSymbol].instance.address,
           tokens[rewardTokenSymbol].priceFeedInstance.address,
           tokens[rewardTokenSymbol].yield,
+          tokens[rewardTokenSymbol].symbol,
+          tokens[rewardTokenSymbol].name,
+          true,
           { from: owner }
         )
       );
@@ -195,6 +201,9 @@ contract("Staking", async (accounts) => {
         tokens["LINK"].instance.address,
         tokens["LINK"].priceFeedInstance.address,
         tokens["LINK"].yield,
+        tokens["LINK"].symbol,
+        tokens["LINK"].name,
+        true,
         { from: owner }
       );
       const poolsAddresses = await StakingInstance.getPools();

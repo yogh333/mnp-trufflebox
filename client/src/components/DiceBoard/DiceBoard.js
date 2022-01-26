@@ -118,7 +118,7 @@ function init() {
     scene.add(die.getObject());
     dice.push(die);
   }
-  console.log("dice", dice);
+
   requestAnimationFrame(animate);
 }
 

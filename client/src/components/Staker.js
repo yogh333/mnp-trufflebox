@@ -80,7 +80,7 @@ function Staker(props) {
   };
 
   const updatePoolsAddresses = () => {
-    Staking.getPools().then((poolsAddresses) => {
+    Staking.getActivePools().then((poolsAddresses) => {
       setPoolsAddresses(poolsAddresses);
     });
   };

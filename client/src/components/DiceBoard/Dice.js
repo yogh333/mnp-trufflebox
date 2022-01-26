@@ -88,7 +88,6 @@ class DiceManagerClass {
       }
 
       if (allStable) {
-        console.log("all stable");
         DiceManager.world.removeEventListener("postStep", check);
 
         for (let i = 0; i < diceValues.length; i++) {
@@ -387,7 +386,6 @@ class DiceObject {
       }
     }
 
-    console.log({ geom });
     geom.setAttribute(
       "position",
       new THREE.Float32BufferAttribute(positions, 3)

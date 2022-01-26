@@ -8,10 +8,11 @@ const Link = artifacts.require("Link");
 const LinkForChainlinkVRF = artifacts.require("LinkForChainlinkVRF");
 const CoordinatorVRF = artifacts.require("VRFCoordinatorContract");
 const Mono = artifacts.require("MonoContract");
+const MaticMono = artifacts.require("MaticMono");
 
 const EthUsdPriceFeed = artifacts.require("EthUsdPriceFeed");
 const LinkUsdPriceFeed = artifacts.require("LinkUsdPriceFeed");
-const MaticUsdPriceFeed = artifacts.require("MaticUsdPriceFeed");
+const MaticMonoPriceFeed = artifacts.require("MaticMonoPriceFeed");
 const MonoUsdPriceFeed = artifacts.require("MonoUsdPriceFeed");
 
 const Bank = artifacts.require("BankContract");
@@ -29,6 +30,7 @@ const PawnStub = artifacts.require("PawnStubContract");
 let LinkInstance,
   VRFCoordinatorInstance,
   MonoInstance,
+  MaticMonoInstance,
   PawnInstance,
   PropInstance,
   BankInstance,
@@ -36,7 +38,7 @@ let LinkInstance,
   BoardInstance,
   EthUsdPriceFeedInstance,
   LinkUsdPriceFeedInstance,
-  MaticUsdPriceFeedInstance,
+  MaticMonoPriceFeedInstance,
   MonoUsdPriceFeedInstance,
   PawnStubInstance,
   LINK,
@@ -46,6 +48,7 @@ let LinkInstance,
   ETH_USD,
   LINK_USD,
   MATIC_USD,
+  MATIC_MONO,
   NETWORK_TOKEN_VIRTUAL_ADDRESS,
   MINTER_ROLE,
   MANAGER_ROLE,
@@ -81,6 +84,11 @@ module.exports = async function (deployer, network, accounts) {
       // ***************
       // Deploy others ERC20 tokens
       // ***************
+
+      // Deploy MATIC-MONO LP
+      await deployer.deploy(MaticMono);
+      MaticMonoInstance = await MaticMono.deployed();
+
       // Deploy this one if not using Chainlink VRF
 
       // Deploy the VRF Coordinator
@@ -105,8 +113,8 @@ module.exports = async function (deployer, network, accounts) {
       await deployer.deploy(EthUsdPriceFeed, 3800 * 10 ** 8);
       EthUsdPriceFeedInstance = await EthUsdPriceFeed.deployed();
 
-      //await deployer.deploy(MaticUsdPriceFeed, 2.48 * 10 ** 8);
-      //MaticUsdPriceFeedInstance = await MaticUsdPriceFeed.deployed();
+      await deployer.deploy(MaticMonoPriceFeed, 2480 * 10 ** 8);
+      MaticMonoPriceFeedInstance = await MaticMonoPriceFeed.deployed();
 
       await deployer.deploy(LinkUsdPriceFeed, 21.86 * 10 ** 8);
       LinkUsdPriceFeedInstance = await LinkUsdPriceFeed.deployed();
@@ -216,224 +224,29 @@ module.exports = async function (deployer, network, accounts) {
       await StakingInstance.addPool(
         NETWORK_TOKEN_VIRTUAL_ADDRESS,
         EthUsdPriceFeedInstance.address,
-        110
+        110,
+        "ETH",
+        "Ether",
+        false
       );
 
       await StakingInstance.addPool(
         LinkInstance.address,
         LinkUsdPriceFeedInstance.address,
-        120
+        120,
+        "LINK",
+        "ChainLink Token",
+        false
       );
 
-      // ***************
-      // Setup roles
-      // ***************
-      MINTER_ROLE = await PropInstance.MINTER_ROLE();
-      await PropInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-        from: admin,
-      });
-      await PawnInstance.grantRole(MINTER_ROLE, BankInstance.address, {
-        from: admin,
-      });
-
-      MANAGER_ROLE = await BoardInstance.MANAGER_ROLE();
-      await BoardInstance.grantRole(MANAGER_ROLE, BankInstance.address, {
-        from: admin,
-      });
-
-      // ***************
-      // Setup Paris board prices
-      // ***************
-      commonLandPrices = [];
-      Paris.lands.forEach((land, index) => {
-        commonLandPrices[index] = 0;
-        if (land.hasOwnProperty("commonPrice")) {
-          commonLandPrices[index] = land.commonPrice;
-        }
-      });
-
-      await BankInstance.setPrices(
-        Paris.id,
-        Paris.maxLands,
-        Paris.maxLandRarities,
-        Paris.rarityMultiplier,
-        commonLandPrices,
-        { from: admin }
-      );
-
-      // ***************
-      // Give allowance for players to contract to spend all $MONO
-      // ***************
-      await MonoInstance.approve(
-        BankInstance.address,
-        ethers.utils.parseEther("100000"),
-        {
-          from: player1,
-        }
-      );
-
-      // ***************
-      // Allow Bank contract and OpenSea's ERC721 Proxy Address
-      // ***************
-      await PropInstance.setIsOperatorAllowed(BankInstance.address, true);
-      await PropInstance.setIsOperatorAllowed(
-        "0x58807baD0B376efc12F5AD86aAc70E78ed67deaE",
-        true
-      );
-
-      // ***************
-      // Create pawn to players
-      // ***************
-      await PawnInstance.mint(player1);
-
-      // ***************
-      // Register pawns
-      // ***************
-      pawnID = await PawnInstance.tokenOfOwnerByIndex(player1, 0);
-      await BoardInstance.register(Paris.id, pawnID, {
-        from: admin,
-      });
-
-      break;
-
-    case "kovan":
-      console.warn(
-        "/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\"
-      );
-      console.warn(`/!\\ Deployer account (${accounts[0]}) must have ETH.`);
-      console.warn(
-        "/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\"
-      );
-
-      // deploy ERC20 token contracts and price feeds and use these addresses in following deployment
-      // Deploy MONO
-      await deployer.deploy(Mono, ethers.utils.parseEther("3000000"));
-      MonoInstance = await Mono.deployed();
-
-      // ***************
-      // Deploy others ERC20 tokens
-      //
-      // Already deployed
-      // LINK 0xa36085F69e2889c224210F603D836748e7dC0088
-      //
-      // Kovan Faucets
-      // Testnet LINK are available from https://faucets.chain.link/kovan
-      // Testnet ETH are available from https://faucets.chain.link/kovan
-      // ***************
-
-      // ***************
-      // Deploy price feeds
-      //
-      // Already deployed
-      // ETH/USD 	0x9326BFA02ADD2366b30bacB125260Af641031331
-      // LINK/USD 0x396c5E36DD0a0F5a5D33dae44368D4193f69a1F0
-      // ***************
-      ETH_USD = "0x9326BFA02ADD2366b30bacB125260Af641031331";
-      LINK_USD = "0x396c5E36DD0a0F5a5D33dae44368D4193f69a1F0";
-
-      await deployer.deploy(MonoUsdPriceFeed, MonoUsdPrice);
-      MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.deployed();
-
-      //await deployer.deploy(MaticUsdPriceFeed, 2.48 * 10 ** 8);
-      //MaticUsdPriceFeedInstance = await MaticUsdPriceFeed.deployed();
-
-      // ***************
-      // Deploy Staking contract
-      // ***************
-      await deployer.deploy(
-        Staking,
-        MonoInstance.address,
-        MonoUsdPriceFeedInstance.address,
-        "100", // yield
-        "ETH" // network token symbol
-      );
-      StakingInstance = await Staking.deployed();
-
-      // ***************
-      // Deploy Board contract
-      // ***************
-      LINK = "0xa36085F69e2889c224210F603D836748e7dC0088";
-      VRFCoordinator = "0xdD3782915140c8f3b190B5D67eAc6dc5760C46E9";
-      KEYHASH =
-        "0x6c3699283bda56ad74f6b855546325b68d482e983852a7a82979cc4807b641f4";
-      FEE = web3.utils.toWei("0.1", "ether");
-
-      await deployer.deploy(Board, VRFCoordinator, LINK, KEYHASH, FEE);
-
-      BoardInstance = await Board.deployed();
-
-      // ***************
-      // Deploy Prop contract
-      // ***************
-      await deployer.deploy(
-        Prop,
-        BoardInstance.address,
-        "MNW Properties",
-        "MWP",
-        "http://token-cdn-uri/"
-      );
-      PropInstance = await Prop.deployed();
-
-      // ***************
-      // Deploy Pawn contract
-      // ***************
-      await deployer.deploy(Pawn, "MNW Pawns", "MWPa", "http://token-cdn-uri/");
-      PawnInstance = await Pawn.deployed();
-
-      // ***************
-      // Deploy Bank contract
-      // ***************
-      await deployer.deploy(
-        Bank,
-        PawnInstance.address,
-        BoardInstance.address,
-        PropInstance.address,
-        MonoInstance.address,
-        LINK,
-        StakingInstance.address
-      );
-
-      BankInstance = await Bank.deployed();
-
-      // ***************
-      // Transfer LINK to Board and Bank contracts
-      //
-      // Testnet LINK are available from https://faucets.chain.link/kovan
-      // ***************
-
-      // ***************
-      // Transfer Mono to Staking and Bank contracts and to accounts
-      // ***************
-      await MonoInstance.mint(
-        StakingInstance.address,
-        ethers.utils.parseEther("200000")
-      );
-      await MonoInstance.mint(
-        BankInstance.address,
-        ethers.utils.parseEther("1000000")
-      );
-
-      for (let index = 0; index < 2; index++) {
-        await MonoInstance.mint(
-          accounts[index],
-          ethers.utils.parseEther("100000")
-        );
-      }
-
-      // ***************
-      // Add ERC20 tokens to stake
-      // ***************
-      NETWORK_TOKEN_VIRTUAL_ADDRESS =
-        await StakingInstance.NETWORK_TOKEN_VIRTUAL_ADDRESS();
-
-      // Add network token
       await StakingInstance.addPool(
-        NETWORK_TOKEN_VIRTUAL_ADDRESS,
-        ETH_USD,
-        110
+        MaticMonoInstance.address,
+        MaticMonoPriceFeedInstance.address,
+        123,
+        "MATIC-MONO",
+        "LP Matic-Mono",
+        true
       );
-
-      await StakingInstance.addPool(LINK, LINK_USD, 120);
 
       // ***************
       // Setup roles
@@ -503,16 +316,6 @@ module.exports = async function (deployer, network, accounts) {
       await BoardInstance.register(Paris.id, pawnID, {
         from: admin,
       });
-
-      console.warn("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
-      console.warn(
-        `/!\\ You must fill Board contract (${BoardInstance.address})`
-      );
-      console.warn(`/!\\ and Bank contract (${BankInstance.address})`);
-      console.warn(`/!\\ with LINK (${LINK}).`);
-      console.warn("/!\\ LINK faucet https://faucets.chain.link/kovan");
-      console.warn("/!\\ Players must have some ETH");
-      console.warn("/!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\ /!\\");
 
       break;
 
@@ -552,6 +355,9 @@ module.exports = async function (deployer, network, accounts) {
 
       await deployer.deploy(LinkUsdPriceFeed, 21.86 * 10 ** 8);
       LinkUsdPriceFeedInstance = await LinkUsdPriceFeed.deployed();
+
+      await deployer.deploy(MaticMonoPriceFeed, 2480 * 10 ** 8);
+      MaticMonoPriceFeedInstance = await MaticMonoPriceFeed.deployed();
 
       await deployer.deploy(MonoUsdPriceFeed, MonoUsdPrice);
       MonoUsdPriceFeedInstance = await MonoUsdPriceFeed.deployed();
@@ -649,13 +455,28 @@ module.exports = async function (deployer, network, accounts) {
       await StakingInstance.addPool(
         NETWORK_TOKEN_VIRTUAL_ADDRESS,
         MATIC_USD,
-        110
+        110,
+        "MATIC",
+        "Matic Token",
+        false
       );
 
       await StakingInstance.addPool(
         LINK,
         LinkUsdPriceFeedInstance.address,
-        120
+        120,
+        "LINK",
+        "ChainLink Token",
+        false
+      );
+
+      await StakingInstance.addPool(
+        "0xa49a31df27460977c38356b9608ae24be1dd0b26", // Uniswap address for LP token
+        MaticMonoPriceFeedInstance.address,
+        123,
+        "MATIC-MONO",
+        "LP Matic-Mono",
+        true
       );
 
       // ***************
