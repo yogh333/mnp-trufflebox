@@ -122,7 +122,6 @@ function App() {
     }
 
     setProvider(getProvider());
-    setIsReadyToRender(true);
   }, []);
 
   useEffect(() => {

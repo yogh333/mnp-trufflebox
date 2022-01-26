@@ -180,28 +180,22 @@ function App() {
       return;
     }
 
-    Staking.pools(rewardTokenAddress).then((_pool) =>
-      setRewardTokenPriceFeed(_pool.priceFeed)
-    );
+    Staking.pools(rewardTokenAddress).then((_pool) => {
+      setRewardTokenPriceFeed(_pool.info.priceFeed);
+      setRewardTokenName(_pool.info.name);
+      setRewardTokenSymbol(_pool.info.symbol);
+      setRewardTokenIcon("/images/tokens/" + "mono" + ".png");
+    });
   }, [Staking, rewardTokenAddress]);
 
   useEffect(() => {
-    if (!Staking || !rewardTokenAddress || !rewardTokenPriceFeed) {
-      return;
-    }
+    if (!Staking || !rewardTokenAddress || !rewardTokenPriceFeed) return;
 
     const RewardTokenInstance = new ethers.Contract(
       rewardTokenAddress,
       ERC20Json.abi,
       provider.getSigner()
     );
-
-    RewardTokenInstance.name().then((_name) => setRewardTokenName(_name));
-    RewardTokenInstance.symbol().then((_symbol) => {
-      setRewardTokenSymbol(_symbol);
-      setRewardTokenIcon("/images/tokens/" + _symbol.toLowerCase() + ".svg");
-    });
-    RewardTokenInstance.decimals();
   }, [Staking, rewardTokenAddress, rewardTokenPriceFeed]);
 
   useEffect(() => {
