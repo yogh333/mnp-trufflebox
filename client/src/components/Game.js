@@ -353,7 +353,7 @@ function Game(props) {
         />
       </div>
       <div className="grid-area info-area-4 text-center">
-        <h2>NFT Info</h2>
+        <h2>NFT info</h2>
         {isRetrievingInfo ? (
           spinner
         ) : (

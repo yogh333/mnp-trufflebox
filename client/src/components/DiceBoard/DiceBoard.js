@@ -134,7 +134,7 @@ export function randomDiceThrow(value0, value1) {
       ((Math.random() * 90 - 45) * Math.PI) / 180;
     dice[i].updateBodyFromMesh();
     let rand = Math.random() * 5;
-    dice[i].getObject().body.velocity.set(25 + rand, 25 + yRand, 25 + rand);
+    dice[i].getObject().body.velocity.set(15 + rand, 15 + yRand, 15 + rand);
     dice[i]
       .getObject()
       .body.angularVelocity.set(

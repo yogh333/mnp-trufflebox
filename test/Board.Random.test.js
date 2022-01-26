@@ -35,12 +35,12 @@ contract("Board - Related to random", async (accounts) => {
     );
   };
 
-  describe("A. Test of the requestRandomNumber function", () => {
+  describe.only("A. Test of the requestRandomNumber function", () => {
     beforeEach("SETUP", async () => {
       await initialSetUp();
     });
 
-    xit("2. Reverts if the LINK balance of the contract is lower than the fee", async function () {
+    it("2. Reverts if the LINK balance of the contract is lower than the fee", async function () {
       await BoardInstance.register(new BN(0), new BN(1));
       await expectRevert(
         BoardInstance.play(new BN(0), new BN(1)),
@@ -48,7 +48,7 @@ contract("Board - Related to random", async (accounts) => {
       );
     });
 
-    xit("3. Pass if the LINK balance of the contract has enough fees", async function () {
+    it("3. Pass if the LINK balance of the contract has enough fees", async function () {
       await BoardInstance.getFaucet(
         BoardInstance.address,
         web3.utils.toBN(new BN(30).mul(new BN(10).pow(new BN(48))))

@@ -6,7 +6,7 @@ function Home() {
   return (
     <>
       <div className="home">
-        <Image src="/images/logo.png" fluid />
+        <Image src="/images/logo.png" className="centered" fluid />
       </div>
     </>
   );
